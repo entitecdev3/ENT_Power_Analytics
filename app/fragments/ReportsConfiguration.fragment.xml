@@ -1,0 +1,42 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:layout="sap.ui.layout.form"
+>
+    <VBox alignItems="Center" fitContainer="true" height="100%">
+        <!-- Table for Existing Configurations -->
+        <Table id="idRCConfigTable" items="{appView>/ReportsExposed}" mode="SingleSelectMaster" alternateRowColors="true">
+            <headerToolbar>
+                <Toolbar>
+                    <Title text="Existing Exposed Reports" level="H3"/>
+                    <ToolbarSpacer/>
+                    <Button icon="sap-icon://refresh" text="{i18n>Refresh}" visible="true" tooltip="{i18n>Refresh}" press="" />
+                    <Button id="idRCAddButton" icon="sap-icon://add" tooltip="Add Report" text="{i18n>Add}" press=".onAddConfiguration"/>
+                    <Button text="{i18n>Delete}" icon="sap-icon://delete" press="" type="Reject" />
+                </Toolbar>
+            </headerToolbar>
+            <columns>
+                <Column><Text text="Reports Exposed ID"/></Column>
+                <Column><Text text="Report ID"/></Column>
+                <Column><Text text="Report Comment"/></Column>
+                <Column><Text text="Workspace ID"/></Column>
+                <Column><Text text="Workspace Comment"/></Column>
+                <Column><Text text="Security Filter Type ID"/></Column>
+            </columns>
+            <items>
+                <ColumnListItem>
+                    <cells>
+                        <Text text="{appView>REPORTS_EXPOSED_ID}"/>
+                        <Text text="{appView>REPORT_ID}"/>
+                        <Text text="{appView>WORKSPACE_ID}"/>
+                        <Text text="{appView>REPORT_COMMENT}"/>
+                        <Text text="{appView>WORKSPACE_COMMENT}"/>
+                        <Text text="{appView>SECURITY_FILTER_TYPE_ID}"/>                        
+                        <Button icon="sap-icon://edit" type="Transparent" press=".onEditPress" tooltip="Edit Configuration"/>
+                        <Button icon="sap-icon://delete" type="Negative" press=".onDeletePress" tooltip="Delete Configuration"/>
+                    </cells>
+                </ColumnListItem>
+            </items>
+        </Table>
+    </VBox>
+</core:FragmentDefinition>

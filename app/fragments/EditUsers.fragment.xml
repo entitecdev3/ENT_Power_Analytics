@@ -1,0 +1,26 @@
+<core:FragmentDefinition xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+    <Dialog id="idEditUSersDialog" title="{= ${appView>/addUser} ? 'Add User' : 'Update User'}" class="sapUiResponsiveMargin">
+        <VBox class="sapUiSmallMargin">
+            <Label required="true" text="{i18n>Name}" />
+            <Input value="{appView>/userData/USERNAME}"/>
+            <Label required="true" text="{i18n>Role}" />
+            <Select width="20vw" selectedKey="{appView>/userData/ROLE_ID}" editable="true" forceSelection="false">
+                <core:Item key="ADMIN" text="{i18n>Admin}" />
+                <core:Item key="USER" text="{i18n>User}" />
+            </Select>
+            <Label required="true" text="{i18n>Company_ID}" />
+            <Select width="20vw" items="{appView>/B1Companies}" forceSelection="false" selectedKey="{appView>/userData/COMPANY_ID}" >
+                <core:Item key="{appView>COMPANY_ID}" text="{appView>COMPANY_NAME}" />
+            </Select>
+            <Label required="true" text="{i18n>B1AccountUser}" />
+            <Select width="20vw" items="{appView>/B1AccountUsers}" forceSelection="false" selectedKey="{appView>/userData/BIACCOUNTUSER}">
+                <core:Item key="{appView>ACCOUNT_ID}" text="{appView>BIACCOUNTUSER}" />
+            </Select>
+        </VBox>
+        <buttons>
+            <Button text="{= ${appView>/addUser} ? ${i18n>save} : ${i18n>update}}" type="Emphasized" press="onSaveEditUserDialog"/>
+            <Button text="Cancel" press="onCloseEditUserDialog"/>
+        </buttons>
+    </Dialog>
+</core:FragmentDefinition>

@@ -1,0 +1,51 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:layout="sap.ui.layout.form"
+>
+    <VBox alignItems="Center" fitContainer="true" height="100%">
+        <!-- Table for Existing Configurations -->
+        <Table id="idConfigSFTable" items="{appView>/SecurityFilters}" mode="SingleSelectMaster" alternateRowColors="true">
+            <headerToolbar>
+                <Toolbar>
+                    <Title text="Existing Security Filters" level="H3"/>
+                    <ToolbarSpacer/>
+                    <Button icon="sap-icon://refresh" text="{i18n>Refresh}" visible="true" tooltip="{i18n>Refresh}" press="" />
+                    <Button id="idAddSFButton" icon="sap-icon://add" tooltip="Add Report" text="{i18n>Add}" press=".onAddConfiguration"/>
+                    <Button text="{i18n>Delete}" icon="sap-icon://delete" press="" type="Reject" />
+                </Toolbar>
+            </headerToolbar>
+            <columns>
+                <Column><Text text="Security Filter ID"/></Column>
+                <Column><Text text="Security Filter Type ID"/></Column>
+                <Column><Text text="Schema"/></Column>
+                <Column><Text text="Display Settings ID"/></Column>
+                <Column><Text text="Operator"/></Column>
+                <Column><Text text="Require Single Selection"/></Column>
+                <Column><Text text="Table Name"/></Column>
+                <Column><Text text="Column Name"/></Column>
+                <Column><Text text="Filter Type"/></Column>
+                <Column><Text text="Value"/></Column>
+            </columns>
+            <items>
+                <ColumnListItem>
+                    <cells>
+                        <Text text="{appView>SECURITY_FILTER_ID}"/>
+                        <Text text="{appView>SECURITY_FILTER_TYPE_ID}"/>
+                        <Text text="{appView>SCHEMA}"/>
+                        <Text text="{appView>DISPLAY_SETTINGS_ID}"/>
+                        <Text text="{appView>OPERATOR}"/>
+                        <CheckBox text="{appView>REQUIRE_SINGLE_SELECTION}"/>
+                        <Text text="{appView>TABLE_NAME}"/>
+                        <Text text="{appView>COLUMN_NAME}"/>
+                        <Text text="{appView>FILTERTYPE}"/>
+                        <Text text="{appView>VALUE}"/>
+                        
+                        <Button icon="sap-icon://edit" type="Transparent" press=".onEditPress" tooltip="Edit Configuration"/>
+                        <Button icon="sap-icon://delete" type="Negative" press=".onDeletePress" tooltip="Delete Configuration"/>
+                    </cells>
+                </ColumnListItem>
+            </items>
+        </Table>
+    </VBox>
+</core:FragmentDefinition>

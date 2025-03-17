@@ -1,0 +1,8 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+	<Menu  title="" >
+		<items>
+			<MenuItem  text="{appView>/customData/userName}" icon="sap-icon://account" />
+			<MenuItem  text="Logout" icon="sap-icon://log" press="onLogOut"/>
+		</items>
+	</Menu>
+</core:FragmentDefinition>

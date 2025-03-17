@@ -1,0 +1,29 @@
+/* Enter your custom styles here */
+body, html {
+    height: 100%;
+    overflow: hidden; /* Disable overflow on the page */
+}
+
+.sapUiBody {
+    height: 100%; /* Ensure the body takes full height */
+}
+
+#idLoginPage {
+    height: 100% !important; /* Make sure the page takes full height */
+}
+
+#idLoginPage .sapMPage {
+    overflow: hidden; /* Disable any overflow inside the page */
+}
+
+
+.loginBackground {
+    background: #000000;
+  }
+
+  .coverImage {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    /* animation: glow 0.5s infinite alternate; */
+  }

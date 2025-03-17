@@ -1,0 +1,44 @@
+<mvc:View
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:layout="sap.ui.layout.form"
+    xmlns:core="sap.ui.core"
+    controllerName="entitec.pbi.embedding.controller.Configuration"
+>
+    <Page showHeader="false">
+        <content>
+        <IconTabBar tabDensityMode="Inherit" backgroundDesign="Transparent">
+            <items>            
+                <IconTabFilter
+                    text="Service Principal Configuration"
+                    icon="sap-icon://key"
+                    design="Horizontal"
+                >
+                    <VBox>
+                        <core:Fragment fragmentName="entitec.pbi.embedding.fragments.ServicePrincipalConfiguration" type="XML"/>
+                    </VBox>
+                </IconTabFilter>
+
+                <IconTabFilter
+                    design="Horizontal"
+                    text="Reports Configuration"
+                    icon="sap-icon://business-objects-experience"
+                >
+                    <VBox>
+                        <core:Fragment fragmentName="entitec.pbi.embedding.fragments.ReportsConfiguration" type="XML"/>
+                    </VBox>
+                </IconTabFilter>
+                <IconTabFilter
+                    design="Horizontal"
+                    text="Security Filter Configuration"
+                    icon="sap-icon://shield"
+                >
+                    <VBox>
+                        <core:Fragment fragmentName="entitec.pbi.embedding.fragments.SecurityFilterConfiguration" type="XML"/>
+                    </VBox>
+                </IconTabFilter>
+            </items>
+        </IconTabBar>
+        </content>
+    </Page>
+</mvc:View>

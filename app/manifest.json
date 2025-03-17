@@ -1,0 +1,182 @@
+{
+    "_version": "1.65.0",
+    "sap.app": {
+        "id": "entitec.pbi.embedding",
+        "type": "application",
+        "i18n": "i18n/i18n.properties",
+        "applicationVersion": {
+            "version": "0.0.1"
+        },
+        "title": "{{appTitle}}",
+        "description": "{{appDescription}}",
+        "resources": "resources.json",
+        "sourceTemplate": {
+            "id": "@sap/generator-fiori:basic",
+            "version": "1.16.2",
+            "toolsId": "0fba2bd6-881b-42a5-98a8-9355e188a55e"
+        }
+    },
+    "sap.ui": {
+        "technology": "UI5",
+        "icons": {
+            "icon": "",
+            "favIcon": "",
+            "phone": "",
+            "phone@2": "",
+            "tablet": "",
+            "tablet@2": ""
+        },
+        "deviceTypes": {
+            "desktop": true,
+            "tablet": true,
+            "phone": true
+        }
+    },
+    "sap.ui5": {
+        "flexEnabled": false,
+        "dependencies": {
+            "minUI5Version": "1.132.1",
+            "libs": {
+                "sap.m": {},
+                "sap.ui.core": {},
+                "sap.f": {},
+                "sap.ui.layout": {
+                    "lazy": true
+                }
+            }
+        },
+        "contentDensities": {
+            "compact": true,
+            "cozy": true
+        },
+        "models": {
+            "i18n": {
+                "type": "sap.ui.model.resource.ResourceModel",
+                "settings": {
+                    "bundleName": "entitec.pbi.embedding.i18n.i18n"
+                }
+            },
+            "": {
+                "type": "",
+                "dataSource": "default",
+                "settings": {
+                    "defaultBindingMode": "TwoWay",
+                    "useBatch": false
+                },
+                "preload": true
+            }
+        },
+        "resources": {
+            "css": [
+                {
+                    "uri": "css/style.css"
+                }
+            ]
+        },
+        "routing": {
+            "config": {
+                "routerClass": "sap.m.routing.Router",
+                "controlAggregation": "pages",
+                "controlId": "idApp",
+                "transition": "slide",
+                "type": "View",
+                "viewType": "XML",
+                "path": "entitec.pbi.embedding.view",
+                "bypassed": {
+                    "target": "notFound"
+                },
+                "async": true,
+                "viewPath": "entitec.pbi.embedding.view"
+            },
+            "routes": [
+                {
+                    "pattern": "",
+                    "name": "Login",
+                    "target": "Login"
+                },
+                {
+                    "pattern": "LoginError/{oError}",
+                    "name": "LoginError",
+                    "target": "LoginError"
+                },
+                {
+                    "pattern": "notFound",
+                    "name": "notFound",
+                    "target": "notFound"
+                },
+                {
+                    "pattern": "Apps",
+                    "name": "Apps",
+                    "target": "Apps"
+                },
+                {
+                    "pattern": "Users",
+                    "name": "Users",
+                    "target": "Users"
+                },
+                {
+                    "pattern": "ServicePrincipalConfiguration",
+                    "name": "ServicePrincipalConfiguration",
+                    "target": "ServicePrincipalConfiguration"
+                },
+                {
+                    "pattern": "Configuration",
+                    "name": "Configuration",
+                    "target": "Configuration"
+                },
+                {
+                    "pattern": "Report",
+                    "name": "Report",
+                    "target": "Report"
+                }
+            ],
+            "targets": {
+                "Login": {
+                    "viewName": "Login",
+                    "viewLevel": 1,
+                    "viewId": "Login"
+                },
+                "LoginError": {
+                    "viewName": "LoginError",
+                    "viewLevel": 1,
+                    "viewId": "LoginError"
+                },
+                "notFound": {
+                    "viewName": "NotFound",
+                    "viewId": "notFound"
+                },
+                "Apps": {
+                    "viewName": "Launchpad",
+                    "viewId": "Launchpad",
+                    "viewLevel": 1
+                },
+                "Users": {
+                    "viewName": "Users",
+                    "viewId": "Users",
+                    "viewLevel": 1
+                },
+                "ServicePrincipalConfiguration": {
+                    "viewName": "ServicePrincipalConfiguration",
+                    "viewId": "ServicePrincipalConfiguration",
+                    "viewLevel": 1
+                },
+                "Configuration": {
+                    "viewName": "Configuration",
+                    "viewId": "Configuration",
+                    "viewLevel": 1
+                },
+                "Report": {
+                    "viewName": "Report",
+                    "viewId": "Report",
+                    "viewLevel": 1
+                }
+            }
+        },
+        "rootView": {
+            "viewName": "entitec.pbi.embedding.view.App",
+            "id": "idApp",
+            "async": true,
+            "type": "XML"
+        }
+    }
+}
