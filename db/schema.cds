@@ -20,6 +20,7 @@ context PowerBIPortal {
         UserName         : String;
         CompanyID        : Association to PowerBIPortal.Company;
         BIAccountUser    : Boolean;
+        Password         : String(255) @cds.password
     }
 
     entity PowerBI {
