@@ -9,8 +9,11 @@ sap.ui.define(["./BaseController"], function (BaseController) {
           .attachPatternMatched(this._matchedHandler, this);
       },
       _matchedHandler: function () {
-        this.getCustomData();
-        this.getModel("appView").setProperty("/navVisible", false);
+        
+      var oViewModel = this.getView().getModel("appView");
+      oViewModel.setProperty("/navVisible", false);   // Show back button
+      oViewModel.setProperty("/LoginHeader", false);   // Show back button
+      oViewModel.setProperty("/HomeScreen", true);   // Show back button
       },
       press: function (oEvent) {
         
@@ -26,7 +29,7 @@ sap.ui.define(["./BaseController"], function (BaseController) {
           this._oRouter.navTo("Configuration");
         }
 
-        if (id === "idUsers") {
+        if (id === "idUser") {
           this._oRouter.navTo("Users");
         }
 

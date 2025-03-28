@@ -1,13 +1,31 @@
-<core:FragmentDefinition xmlns="sap.m"
-    xmlns:core="sap.ui.core"
-    xmlns:tnt="sap.tnt">
-      <tnt:ToolHeader id="idToolHeader" width="100%" height="auto">
-        <Button id="idNavBack" icon="sap-icon://nav-back" type="Transparent" press="onNavBack" visible="{appView>/navVisible}" />
-        <ToolbarSpacer />       
-         <Button id="idUserProfile" icon="sap-icon://person-placeholder" type="Attention" press="onProfilePress">
-            <layoutData>
-                <OverflowToolbarLayoutData id="idOverFlowToolbar" priority="NeverOverflow" />
-            </layoutData>
-        </Button>
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:tnt="sap.tnt">
+    <tnt:ToolHeader id="idToolHeader" width="100%" height="auto">
+     <Button id="idNavBack" icon="sap-icon://nav-back" type="Transparent" press="onNavBack"
+                visible="{appView>/navVisible}" />
+            <!-- Show only in login header -->
+            <Image class="coverImage sapUiTinyMarginBegin" src="./images/logo_medium.png" width="155px" height="40px"
+                visible="{appView>/LoginHeader}" />
+
+            <ToolbarSpacer />
+
+            <!-- Show for Home and other pages -->
+            <Title class="sapUiSmallMarginBegin" text="Power Analytics Portal" wrapping="true" level="H3"
+                visible="true" />
+
+            <ToolbarSpacer />
+
+            <Text class="sapUiSmallMarginBegin" text="Version 1.0.0" wrapping="true"
+                visible="{appView>/LoginHeader}" />
+
+           
+
+            <ToolbarSpacer visible="{appView>/HomeScreen}" />
+
+            <Button id="idUserProfile" icon="sap-icon://person-placeholder" type="Attention" press="onProfilePress"
+                visible="{appView>/HomeScreen}">
+                <layoutData>
+                    <OverflowToolbarLayoutData id="idOverFlowToolbar" priority="NeverOverflow" />
+                </layoutData>
+            </Button>
     </tnt:ToolHeader>
 </core:FragmentDefinition>

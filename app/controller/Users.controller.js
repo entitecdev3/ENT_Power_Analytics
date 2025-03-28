@@ -10,73 +10,23 @@ sap.ui.define([
   return BaseController.extend("entitec.pbi.embedding.controller.Users", {
     onInit: function () {
       this.getRouter().getRoute("Users").attachPatternMatched(this._matchedHandler, this);
+      this._oODataModel = this.getView().getModel(); // OData V4 Model
     },
     _matchedHandler: function () {
-      this.getCustomData();
-      this.getUsers();
-      this.getB1Companies();
-      this.getB1AccountUsers();
-      this.getModel("appView").setProperty("/navVisible", true);
+      var oViewModel = this.getView().getModel("appView");
+      oViewModel.setProperty("/navVisible", true);   // Show back button
+      oViewModel.setProperty("/LoginHeader", false);   // Show back button
+      oViewModel.setProperty("/HomeScreen", true);   // Show back button
     },
-    getB1Companies: function () {
-      var that = this;
-      this.middleWare.callMiddleWare("/B1Companies", "GET")
-        .then(function (data) {
-          that.getModel("appView").setProperty("/B1Companies", data);
-        }).catch(function (oError) {
-          that.middleWare.errorHandler(oError, that);
-        });
-    },
-    getB1AccountUsers: function () {
-      var that = this;
-      this.middleWare.callMiddleWare("/B1AccountUsers", "GET")
-        .then(function (data) {
-          that.getModel("appView").setProperty("/B1AccountUsers", data);
-        }).catch(function (oError) {
-          that.middleWare.errorHandler(oError, that);
-        });
-    },
-    getUsers: function () {
-      var that = this;
-      this.middleWare.callMiddleWare("/Users", "GET")
-        .then(function (data) {
-          that.getModel("appView").setProperty("/Users", data);
-        }).catch(function (oError) {
-          that.middleWare.errorHandler(oError, that);
-        });
-    },
-    onAddUserPress: function () {
-      var that = this;
-      var oView = this.getView();
-      this.addUserPress = true;
-      this.getView().getModel("appView").setProperty("/addUser", that.addUserPress);
-      if (!this.UserEditDialog) {
-        this.UserEditDialog = Fragment.load({
-          id: oView.getId(),
-          name: "entitec.pbi.embedding.fragments.EditUsers",
-          controller: this
-        }).then(function (oDialog) {
-          oView.addDependent(oDialog);
-          return oDialog;
-        });
-      }
-      this.UserEditDialog.then(async function (oDialog) {
-        let userDataObject = {
-          USERNAME: null,
-          ROLE_ID: null,
-          COMPANY_ID: null,
-          BIACCOUNTUSER: null,
-        }
-        that.getView().getModel("appView").setProperty("/userData", userDataObject);
-        oDialog.open();
-      });
+    onAddUser: function () {
+      this.addUserPress=true;
+      let oListBinding = this.getView().byId("idTableUsers").getBinding("items");
+      let oNewContext = oListBinding.create({}, true); // Creates an empty entry in deferred mode
+      this.openUserDialog("Add User","Add", oNewContext);
+     
     },
     onCloseEditUserDialog: function () {
-      this.addUserPress = false;
-      this.getView().getModel("appView").setProperty("/addUser", this.addUserPress);
-      this.UserEditDialog.then(async function (oDialog) {
-        oDialog.close();
-      });
+      this._oDialog.close();
     },
     onAccountNewPasswordLiveChange: function (oEvent) {
       var getConfirmPass = oEvent.getParameter('value');
@@ -103,39 +53,54 @@ sap.ui.define([
       }
     },
     onSaveEditUserDialog: function () {
-      var that = this;
-      var oView = this.getView();
-      let userData = this.getView().getModel("appView").getProperty("/userData");
-      if (!userData.USERNAME || !userData.ROLE_ID || !userData.COMPANY_ID || !userData.BIACCOUNTUSER) {
-        MessageToast.show(that.getView().getModel("i18n").getProperty("requiredFieldsNotPresent"))
+      let oContext = this._oDialog.getBindingContext();
+      let userObject = oContext.getObject();
+
+      // 🔹 Step 1: Validate Required Fields
+      let validated = this._validateUserFields(userObject);
+      if(!validated){
         return;
       }
+
+      // 🔹 Step 2: If Adding a User, Handle Password Separately
       if (this.addUserPress) {
-        if (!this.UserPasswordDialog) {
-          this.UserPasswordDialog = Fragment.load({
-            id: oView.getId(),
-            name: "entitec.pbi.embedding.fragments.Password",
-            controller: this
-          }).then(function (oDialog) {
-            oView.addDependent(oDialog);
-            return oDialog;
-          });
-        }
-        this.UserPasswordDialog.then(async function (oDialog) {
-          let userDataObject = {
-            NewPassword: null,
-            ConfirmPassword: null,
-            NewPasswordValueState: null,
-            NewPasswordVST: null,
-            ConfirmPasswordValueState: null,
-            ConfirmPasswordVST: null,
-          }
-          that.getView().getModel("appView").setProperty("/Password", userDataObject);
-          oDialog.open();
-        });
+        this._handlePasswordPopup("Create Password", "OK");
       } else {
-        this.onPasswordChangeOk();
+        // this.onPasswordChangeOk();
+        this._oDialog.close();
       }
+    },
+    _validateUserFields: function (userObject) {
+      // let errors = [];
+
+      if (!userObject.UserName){
+        MessageBox.error("Username is required.");
+        return false;
+      } 
+      if (!userObject.RoleID_RoleID){
+        MessageBox.error("Role is required.");
+        return false;
+      } 
+      if (!userObject.CompanyID_CompanyID){
+        MessageBox.error("Company is required.");
+        return false;
+      } 
+      if (!userObject.BIAccountUser_id) {
+        MessageBox.error("BI Account User ID is required.");
+        return false;
+      }
+      return true;
+      // return errors;
+    },
+    _handlePasswordPopup: function (title, button) {
+      let oView = this.getView();
+      if (!this.UserPasswordDialog) {
+        this.UserPasswordDialog = sap.ui.xmlfragment(oView.getId(), "entitec.pbi.embedding.fragments.Password", this);
+        oView.addDependent(this.UserPasswordDialog);
+      }
+      this.UserPasswordDialog.setTitle(title);
+      this.byId("idPasswordSave").setText(button);
+      this.UserPasswordDialog.open();
     },
     validatePassword: function (newPassword, confirmPassword) {
       var pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
@@ -166,104 +131,45 @@ sap.ui.define([
       }
     },
     onPasswordChangeOk: function (oEvent) {
-      var that = this;
-      let sBtnText = "";
-      let userData = this.getView().getModel("appView").getProperty("/userData");
-      if(oEvent){
-        sBtnText = oEvent.getSource().getProperty('text');
-      }
-      if(sBtnText === 'Update'){
-        let { NewPassword, ConfirmPassword } = this.getView().getModel("appView").getProperty("/Password");
-        let bValidated = this.validatePassword(NewPassword, ConfirmPassword);
-        if (bValidated) {
-          this.middleWare.callMiddleWare("/resetPassword", "PATCH", {PASSWORD :NewPassword, USER_ID : userData.USER_ID})
-          .then(function (data) {
-            that.UserPasswordDialog.then(async function (oDialog) {
-              oDialog.close();
-            });
-          }).catch(function (oError) {
-            that.middleWare.errorHandler(oError, that);
-          });
-        }
+      let oPasswordData = this.getView().getModel("appView").getProperty("/Password");
+
+      // 🔹 Step 1: Validate Password
+      if (!this.validatePassword(oPasswordData.NewPassword, oPasswordData.ConfirmPassword)) {
         return;
       }
-      if (this.addUserPress) {
-        let { NewPassword, ConfirmPassword } = this.getView().getModel("appView").getProperty("/Password");
-        let bValidated = this.validatePassword(NewPassword, ConfirmPassword);
-        if (bValidated) {
-          this.UserPasswordDialog.then(async function (oDialog) {
-            oDialog.close();
-          });
-          userData.PASSWORD = NewPassword;
-        }
-      }
-      this.middleWare.callMiddleWare("/Users", "POST", userData)
-        .then(function (data) {
-          that.getUsers();
-          that.UserEditDialog.then(async function (oDialog) {
-            oDialog.close();
-          });
-        }).catch(function (oError) {
-          that.middleWare.errorHandler(oError, that);
-        });
+
+      // 🔹 Step 2: Save Password in OData Context
+      let oContext = this._oDialog.getBindingContext();
+      oContext.setProperty("Password", oPasswordData.NewPassword);
+
+      this.UserPasswordDialog.close();
     },
     onResetPassword: function (oEvent) {
-      var that = this;
-      var oView = this.getView();
-      debugger;
-      let sPath = oEvent.getSource().getBindingContext('appView').getPath();
-      let userData = this.getView().getModel('appView').getProperty(sPath);
-      this.getView().getModel("appView").setProperty("/userData", userData);
-      if (!this.UserPasswordDialog) {
-        this.UserPasswordDialog = Fragment.load({
-          id: oView.getId(),
-          name: "entitec.pbi.embedding.fragments.Password",
-          controller: this
-        }).then(function (oDialog) {
-          oView.addDependent(oDialog);
-          return oDialog;
-        });
-      }
-      this.UserPasswordDialog.then(async function (oDialog) {
-        let userDataObject = {
-          NewPassword: null,
-          ConfirmPassword: null,
-          NewPasswordValueState: null,
-          NewPasswordVST: null,
-          ConfirmPasswordValueState: null,
-          ConfirmPasswordVST: null,
-        }
-        that.getView().getModel("appView").setProperty("/Password", userDataObject);
-        oDialog.open();
-      });
+      this._handlePasswordPopup("Reset Password", "Update");
     },
     onPasswordChangeCancel: function () {
-      var that = this;
-      this.UserPasswordDialog.then(async function (oDialog) {
-        that.getView().getModel("appView").setProperty("/Password", null);
-        oDialog.close();
-      });
+      // 🔹 Close the Password Dialog without saving changes
+      this.UserPasswordDialog.close();
+      MessageToast.show("Password change canceled.");
     },
     onUserSelect: async function (oEvent) {
-      var that = this;
-      this.addUserPress = false;
-      this.getView().getModel("appView").setProperty("/addUser", that.addUserPress);
-      var userObject = oEvent.getParameter('listItem').getBindingContext("appView").getObject();
-      var oView = this.getView();
-      if (!this.UserEditDialog) {
-        this.UserEditDialog = Fragment.load({
-          id: oView.getId(),
-          name: "entitec.pbi.embedding.fragments.EditUsers",
-          controller: this
-        }).then(function (oDialog) {
-          oView.addDependent(oDialog);
-          return oDialog;
-        });
+      this.addUserPress=false;
+      let oSelectedContext = oEvent.getSource().getBindingContext();
+      this.openUserDialog("Edit User", "Update", oSelectedContext);
+      
+    },
+    openUserDialog: function (title, button, oContext) {
+      let oView = this.getView();
+      if (!this._oDialog) {
+        this._oDialog = sap.ui.xmlfragment(oView.getId(), "entitec.pbi.embedding.fragments.EditUsers", this);
+        oView.addDependent(this._oDialog);
       }
-      this.UserEditDialog.then(async function (oDialog) {
-        that.getView().getModel("appView").setProperty("/userData", userObject);
-        oDialog.open();
-      });
+
+      this._oDialog.setBindingContext(oContext);
+      this._oDialog.setModel(oContext.getModel());
+      this._oDialog.setTitle(title);
+      this.byId("idAdd").setText(button);
+      this._oDialog.open();
     },
     onDeleteVendor: function (oEvent) {
       var that = this;
@@ -296,6 +202,7 @@ sap.ui.define([
         this.getView().getModel('appView').setProperty("/Password/NewPasswordValueState", "Error");
         this.getView().getModel('appView').setProperty("/Password/NewPasswordVST", "Password must contain atleast 8 characters,\n including Upper/lowercase, numbers,\n and special character");
       }
+      this.getView().getModel('appView').setProperty("/Password/NewPassword", oEvent.getParameter("value"));
     },
     onConfirmPasswordLiveChange: function (oEvent) {
       var getConfirmPass = oEvent.getParameter('value');
@@ -308,5 +215,20 @@ sap.ui.define([
         this.getView().getModel('appView').setProperty("/Password/onConfirmPasswordVST", "Password must contain atleast 8 characters,\n including Upper/lowercase, numbers,\n and special character");
       }
     },
+    onSaveChanges: function () {
+      let oModel = this.getView().getModel(); // OData V4 Model
+
+      // 🔹 Step 1: Check if there are any pending changes
+      if (!oModel.hasPendingChanges()) {
+        MessageToast.show("No changes detected.");
+        return;
+      }
+
+      oModel.submitBatch("updateGroup").then(() => {
+        MessageToast.show("User details updated successfully.");
+      }).catch((oError) => {
+        MessageBox.error("Error updating user: " + oError.message);
+      });
+    }
   });
 });

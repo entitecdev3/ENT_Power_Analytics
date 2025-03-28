@@ -5,7 +5,7 @@
 >
     <VBox alignItems="Center" fitContainer="true" height="100%">
         <!-- Table for Existing Configurations -->
-        <Table id="idConfigSFTable" items="{appView>/SecurityFilters}" mode="SingleSelectMaster" alternateRowColors="true">
+        <Table id="idConfigSFTable" items="{/SecurityFilters}" mode="SingleSelectMaster" alternateRowColors="true">
             <headerToolbar>
                 <Toolbar>
                     <Title text="Existing Security Filters" level="H3"/>
@@ -30,16 +30,16 @@
             <items>
                 <ColumnListItem>
                     <cells>
-                        <Text text="{appView>SECURITY_FILTER_ID}"/>
-                        <Text text="{appView>SECURITY_FILTER_TYPE_ID}"/>
-                        <Text text="{appView>SCHEMA}"/>
-                        <Text text="{appView>DISPLAY_SETTINGS_ID}"/>
-                        <Text text="{appView>OPERATOR}"/>
-                        <CheckBox text="{appView>REQUIRE_SINGLE_SELECTION}"/>
-                        <Text text="{appView>TABLE_NAME}"/>
-                        <Text text="{appView>COLUMN_NAME}"/>
-                        <Text text="{appView>FILTERTYPE}"/>
-                        <Text text="{appView>VALUE}"/>
+                        <Text text="{SECURITY_FILTER_ID}"/>
+                        <Text text="{SECURITY_FILTER_TYPE_ID}"/>
+                        <Text text="{SCHEMA}"/>
+                        <Text text="{DISPLAY_SETTINGS_ID}"/>
+                        <Text text="{OPERATOR}"/>
+                        <CheckBox text="{REQUIRE_SINGLE_SELECTION}"/>
+                        <Text text="{TABLE_NAME}"/>
+                        <Text text="{COLUMN_NAME}"/>
+                        <Text text="{FILTERTYPE}"/>
+                        <Text text="{VALUE}"/>
                         
                         <Button icon="sap-icon://edit" type="Transparent" press=".onEditPress" tooltip="Edit Configuration"/>
                         <Button icon="sap-icon://delete" type="Negative" press=".onDeletePress" tooltip="Delete Configuration"/>

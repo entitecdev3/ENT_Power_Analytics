@@ -1,36 +1,36 @@
 <core:FragmentDefinition xmlns="sap.m"
     xmlns:core="sap.ui.core">
-    <Dialog id="idEditUSersDialog" title="{= ${appView>/addServicePrincipal} ? ${i18n>addServicePrincipal} : ${i18n>updateServicePrincipal}}" class="sapUiResponsiveMargin">
+    <Dialog id="idEditServicePrincipalDialog" title="{= ${/addServicePrincipal} ? ${i18n>addServicePrincipal} : ${i18n>updateServicePrincipal}}" class="sapUiResponsiveMargin">
         <VBox class="sapUiSmallMargin">
             <Label required="true" text="{i18n>BIACCOUNTUSER}" />
-            <Input value="{appView>/servicePrincipalObject/BIACCOUNTUSER}"/>
+            <Input value="{/servicePrincipalObject/BIACCOUNTUSER}"/>
             <Label required="true" text="{i18n>PASSWORD}" />
-            <Input value="{appView>/servicePrincipalObject/PASSWORD}"/>
+            <Input value="{/servicePrincipalObject/PASSWORD}"/>
             <Label required="true" text="{i18n>AUTHORITY_URL}" />
-            <Input value="{appView>/servicePrincipalObject/AUTHORITY_URL}"/>
+            <Input value="{/servicePrincipalObject/AUTHORITY_URL}"/>
             <Label required="true" text="{i18n>SCOPE_BASE}" />
-            <Input value="{appView>/servicePrincipalObject/SCOPE_BASE}"/>
+            <Input value="{/servicePrincipalObject/SCOPE_BASE}"/>
             <Label required="true" text="{i18n>POWERBI_API_URL}" />
-            <Input value="{appView>/servicePrincipalObject/POWERBI_API_URL}"/>
+            <Input value="{/servicePrincipalObject/POWERBI_API_URL}"/>
             <Label required="true" text="{i18n>CLIENT_ID}" />
-            <Input value="{appView>/servicePrincipalObject/CLIENT_ID}"/>
+            <Input value="{/servicePrincipalObject/CLIENT_ID}"/>
             <Label required="true" text="{i18n>CLIENT_SECRET}" />
-            <Input value="{appView>/servicePrincipalObject/CLIENT_SECRET}"/>
+            <Input value="{/servicePrincipalObject/CLIENT_SECRET}"/>
             <Label required="true" text="{i18n>TENANT_ID}" />
-            <Input value="{appView>/servicePrincipalObject/TENANT_ID}"/>
+            <Input value="{/servicePrincipalObject/TENANT_ID}"/>
             <!-- <Label required="true" text="{i18n>TENANT_ID}" />
-            <Input value="{appView>/servicePrincipalObject/TENANT_ID}"/> -->
+            <Input value="{/servicePrincipalObject/TENANT_ID}"/> -->
             <Label required="true" text="{i18n>IDENTITY_ID}" />
-            <Select width="20vw" items="{appView>/B1Companies}" forceSelection="false" selectedKey="{appView>/servicePrincipalObject/IDENTITY_ID}" >
-                <core:Item key="{appView>COMPANY_ID}" text="{appView>COMPANY_NAME}" />
+            <Select width="20vw" items="{/Companies}" forceSelection="false" selectedKey="" >
+                <core:Item key="{CompanyID}" text="{CompanyName}" />
             </Select>
             <Label required="true" text="{i18n>REPORTS_EXPOSED_ID}" />
-            <Select width="20vw" items="{appView>/B1AccountUsers}" forceSelection="false" selectedKey="{appView>/servicePrincipalObject/REPORTS_EXPOSED_ID}">
-                <core:Item key="{appView>ACCOUNT_ID}" text="{appView>BIACCOUNTUSER}" />
+            <Select width="20vw" items="{/PowerBI}" forceSelection="false" selectedKey="{/servicePrincipalObject/REPORTS_EXPOSED_ID}">
+                <core:Item key="{id}" text="{BIAccountUser}" />
             </Select>
         </VBox>
         <buttons>
-            <Button text="{= ${appView>/addServicePrincipal} ? ${i18n>save} : ${i18n>update}}" type="Emphasized" press="onSaveEditUserDialog"/>
+            <Button text="{= ${/addServicePrincipal} ? ${i18n>save} : ${i18n>update}}" type="Emphasized" press="onSaveEditUserDialog"/>
             <Button text="Cancel" press="onCloseEditUserDialog"/>
         </buttons>
     </Dialog>

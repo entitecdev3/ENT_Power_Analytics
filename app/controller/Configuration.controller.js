@@ -15,7 +15,7 @@ sap.ui.define([
         .attachPatternMatched(this._matchedHandler, this);
     },
     _matchedHandler: function () {
-      this.getCustomData();
+      // // this.getCustomData();;
       this.getServicePrincipals();
       this.getModel("appView").setProperty("/navVisible", true);
     },
@@ -23,7 +23,7 @@ sap.ui.define([
       var that = this;
       this.middleWare.callMiddleWare("/ServicePrincipals", "GET")
         .then(function (data) {
-          that.getModel("appView").setProperty("/ServicePrincipals", data);
+          that.getModel().setProperty("/ServicePrincipals", data);
         }).catch(function (oError) {
           that.middleWare.errorHandler(oError, that);
         });
@@ -32,7 +32,7 @@ sap.ui.define([
       var that = this;
       this.middleWare.callMiddleWare("/ReportsExposed", "GET")
         .then(function (data) {
-          that.getModel("appView").setProperty("/ReportsExposed", data);
+          that.getModel().setProperty("/ReportsExposed", data);
         }).catch(function (oError) {
           that.middleWare.errorHandler(oError, that);
         });
@@ -41,7 +41,7 @@ sap.ui.define([
       var that = this;
       this.middleWare.callMiddleWare("/SecurityFilters", "GET")
         .then(function (data) {
-          that.getModel("appView").setProperty("/SecurityFilters", data);
+          that.getModel().setProperty("/SecurityFilters", data);
         }).catch(function (oError) {
           that.middleWare.errorHandler(oError, that);
         });
@@ -50,7 +50,7 @@ sap.ui.define([
       var that = this;
       var oView = this.getView();
       this.addServicePrincipal = true;
-      this.getView().getModel("appView").setProperty("/addServicePrincipal", this.addServicePrincipal);
+      this.getView().getModel().setProperty("/addServicePrincipal", this.addServicePrincipal);
         if (!this.ServicePrincipalConfiguration) {
           this.ServicePrincipalConfiguration = Fragment.load({
             id: oView.getId(),
@@ -74,7 +74,7 @@ sap.ui.define([
             IDENTITY_ID: null,
             REPORTS_EXPOSED_ID: null,
           }
-          that.getView().getModel("appView").setProperty("/servicePrincipalObject", ServicePrincipalObject);
+          that.getView().getModel().setProperty("/servicePrincipalObject", ServicePrincipalObject);
           oDialog.open();
         });
     },

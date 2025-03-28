@@ -41,7 +41,7 @@ sap.ui.define([
          * @returns {sap.ui.model.Model} The requested model
          */
         getModel: function (sName) {
-            return this.getView().getModel(sName);
+            return this.getOwnerComponent().getModel(sName);
         },
 
         /**
@@ -50,7 +50,7 @@ sap.ui.define([
          * @param {string} sName Name of the model
          */
         setModel: function (oModel, sName) {
-            this.getView().setModel(oModel, sName);
+            this.getOwnerComponent().setModel(oModel, sName);
         },
 
         /**
@@ -74,39 +74,27 @@ sap.ui.define([
                 this.getRouter().navTo("Apps", {}, true);
             }
         },
-
-        verifySession: async function () {
-            var that = this;
-            this.middleWare
-                .callMiddleWare(`/VerifySession`, "GET")
-                .then(function (data, status, xhr) {
-                    that.getRouter().navTo("ReportConfiguration"); // Navigate if session is valid
-                })
-                .catch(function (jqXhr, textStatus, errorMessage) {
-                    sessionStorage.session_id = null;
-
-                    that.getRouter().navTo("Login"); // Redirect to login on failure
-                    that.middleWare.errorHandler(jqXhr, that);
-                });
-        },
         onLogOut: function (oEvent) {
-            var that = this, UI_SOURCE;
-            UI_SOURCE = oEvent.getSource();
-            this.middleWare.callMiddleWare("/USER-LOGOUT?UI_SOURCE=" + UI_SOURCE, "GET").then(function (oData) {
+            var that = this;
+            this.middleWare.callMiddleWare("/logout", "POST").then(function (oData) {
                 that.getRouter().navTo("Login"); // Navigate if session is valid
             }).catch(function (oError) {
                 that.getRouter().navTo("Login"); // Redirect to login on failure
+                window.location.href = '/';
+                var oViewModel = this.getView().getModel("appView");
+                oViewModel.setProperty("/LoginHeader", true);   // Show login header
+                oViewModel.setProperty("/HomeScreen", false);   // Hide home header
+                oViewModel.setProperty("/navVisible", false);   // Hide back button
                 that.middleWare.errorHandler(oError, that);
             });
         },
-
         onUserInfo: function (oEvent) {
             var oButton = oEvent.getSource(),
                 oView = this.getView();
             if (!this._pPopoverUser) {
                 this._pPopoverUser = Fragment.load({
                     id: oView.getId(),
-                    name: "nvid.sample.fragments.UserInfo",
+                    name: "entitec.pbi.embedding.fragments.UserInfo",
                     controller: this
                 }).then(function (oPopover) {
                     oView.addDependent(oPopover);
@@ -117,12 +105,9 @@ sap.ui.define([
                 oPopover.openBy(oButton);
             });
         },
-
         onProfilePress: function (oEvent) {
-
             var oButton = oEvent.getSource(),
                 oView = this.getView();
-
             if (!this._pPopover) {
                 this._pPopover = Fragment.load({
                     name: "entitec.pbi.embedding.fragments.UserMenu",
@@ -132,42 +117,21 @@ sap.ui.define([
                     return oPopover;
                 });
             }
-
             this._pPopover.then(function (oPopover) {
                 oPopover.openBy(oButton);
             });
         },
-        // onNavBack: function () {
-        //     var oHistory = History.getInstance();
-        //     var sPreviousHash = oHistory.getPreviousHash();
-
-        //     if (sPreviousHash !== undefined) {
-        //         window.history.go(-1);
-        //     }
+        // getCustomData: function () {
+        //     var that = this;
+        //     var oModel = this.getView().getModel(); // Get OData V4 model
+        //     oModel.bindContext("/Configurations").requestObject().then(function (oData) {
+        //         // console.log(oData); // Single configuration data
+        //     })
+        //     .catch(function (oError){
+        //         // debugger;
+        //         that.middleWare.errorHandler(oError.statusText, that);
+        //     });
         // },
-        getCustomData: function () {
-            var that = this;
-            this.middleWare.callMiddleWare("/CustomAttribute", "GET")
-                .then(function (data) {
-                    that.getModel("appView").setProperty("/headerVisible", true);
-                    that.getModel("appView").setProperty("/customData", data);
-                    that.getModel("appView").setProperty("/loginUser", data.Email);
-                    that.getModel("appView").setProperty("/loginUserCode", data.Code);
-                    if (data.environment && data.environment.toLowerCase().trim() != 'prod') {
-                        that.getView().getModel('configFile').setProperty("/environment", data.environment);
-                    }
-                    if (data.language) {
-                        if (data.language.includes('en')) {
-                            sap.ui.getCore().getConfiguration().setLanguage('en');
-                        }
-                        else {
-                            sap.ui.getCore().getConfiguration().setLanguage('it');
-                        }
-                    }
-                }).catch(function (oError) {
-                    that.middleWare.errorHandler(oError, that);
-                });
-        },
         onSeePasswordClick: function (oEvent) {
             var oInput = oEvent.getSource();
             if (oInput.getType() === "Password") {

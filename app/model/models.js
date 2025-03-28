@@ -14,6 +14,11 @@ function (JSONModel, Device) {
             var oModel = new JSONModel(Device);
             oModel.setDefaultBindingMode("OneWay");
             return oModel;
+        },
+        createAppModel: function () {
+            var oModel = new JSONModel();
+            oModel.setDefaultBindingMode("TwoWay");
+            return oModel;
         }
     };
 

@@ -13,7 +13,9 @@ sap.ui.define([
       oViewModel = new JSONModel({
         busy: true,
         delay: 0,
-        headerVisible: false
+        LoginHeader: true,  // Initially show login header
+        HomeScreen: false,  // Hide home header at login
+        navVisible: false   // Back button visibility
       });
       this.setModel(oViewModel, "appView");
       fnSetAppNotBusy = function () {

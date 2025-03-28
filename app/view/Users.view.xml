@@ -1,86 +1,57 @@
-<mvc:View controllerName="entitec.pbi.embedding.controller.Users"
-    xmlns="sap.m"
-    xmlns:core="sap.ui.core"
-    xmlns:mvc="sap.ui.core.mvc"
-    xmlns:fb="sap.ui.comp.filterbar">
-    <Page id="idUsers" title="{i18n>Users}" backgroundDesign="Solid" showHeader="false">
-        <content>
-            <!-- <fb:FilterBar filterContainerWidth="14rem" id="filterbar">
-                <fb:filterGroupItems>
-                    <fb:FilterGroupItem groupName="Search" name="A" label="{i18n>Search}" mandatory="false" visibleInFilterBar="true">
-                        <fb:control>
-                            <SearchField id="idSearchField" liveChange="onSearchTable" />
-                        </fb:control>
-                    </fb:FilterGroupItem>
-                    <fb:FilterGroupItem groupName="Role" name="Y" label="{i18n>Role}" mandatory="false" visibleInFilterBar="true">
-                        <fb:control>
-                            <ComboBox id="idRoleFilterSelect" placeholder="Role" selectedKey="{admin>/selectedRoleFilter}" editable="true" change="onRoleSelectionChange">
-                                <core:Item key="Admin" text="{i18n>Admin}" />
-                                <core:Item key="Vendor" text="{i18n>Vendor}" />
-                                <core:Item key="Prospect" text="{i18n>Prospect}" />
-                            </ComboBox>
-                        </fb:control>
-                    </fb:FilterGroupItem>
-                    <fb:FilterGroupItem groupName="Category" visible="{=${admin>/selectedRoleFilter}==='Admin' ? false : true}" name="C" label="{i18n>Category}" mandatory="false" visibleInFilterBar="true">
-                        <fb:control>
-                            <ComboBox id="idCardType" selectedKey="{admin>/selectedCardType}" change="onCardTypeChange" items="{path: 'admin>/vendorCategories'}">
-                                <core:ListItem key="{admin>key}" text="{admin>key} ({admin>Name})" />
-                            </ComboBox>
-                        </fb:control>
-                    </fb:FilterGroupItem>
-                </fb:filterGroupItems>
-            </fb:FilterBar> -->
-            <Table id="idTable2" mode="SingleSelectLeft" items="{path:'appView>/Users',sorter: { path: 'U_CardType', descending: false, group: true }}" fixedLayout="false" alternateRowColors="true" itemPress="onUserSelect">
-                <headerToolbar>
-                    <Toolbar id="lineItemsToolbar">
-                        <Title id="lineItemsHeader" text="{i18n>Users}" />
-                        <ToolbarSpacer />
-                        <Button icon="sap-icon://refresh" text="{i18n>Refresh}" visible="true" tooltip="{i18n>Refresh}" press="getUsers" />
-                        <Button text="{i18n>Add}" icon="sap-icon://add" press='onAddUserPress'/>
-                        <Button text="{i18n>Delete}" icon="sap-icon://delete" press="onDeleteVendor" type="Reject" />
-                    </Toolbar>
-                </headerToolbar>
-                <columns>
-                    <Column>
-                        <Label text="{i18n>Name}" />
-                    </Column>
-                    <Column>
-                        <Label text="{i18n>Role}" />
-                    </Column>
-                    <Column>
-                        <Label text="{i18n>Company_ID}" />
-                    </Column>
-                    <Column>
-                        <Label text="{i18n>B1AccountUser}" />
-                    </Column>
-                    <Column>
-                        <Label text="{i18n>ResetPassword}" />
-                    </Column>
-                </columns>
-                <items>
-                    <ColumnListItem id="idColumnlist2" type="Navigation" >
-                        <cells>
-                            <Text text="{appView>USERNAME}" />
-                            <Select selectedKey="{appView>ROLE_ID}" editable="false">
-                                <core:Item key="ADMIN" text="{i18n>Admin}" />
-                                <core:Item key="USER" text="{i18n>User}" />
-                            </Select>
-                            <Select editable="false" items="{appView>/B1Companies}" forceSelection="false" selectedKey="{appView>COMPANY_ID}" >
-                                <core:Item key="{appView>COMPANY_ID}" text="{appView>COMPANY_NAME}" />
-                            </Select>
-                            <Select editable="false" items="{appView>/B1AccountUsers}" forceSelection="false" selectedKey="{appView>BIACCOUNTUSER}">
-                                <core:Item key="{appView>ACCOUNT_ID}" text="{appView>BIACCOUNTUSER}" />
-                            </Select>
-                            <Button id="idReset" icon="sap-icon://reset" type="Attention" text="Password" press="onResetPassword" />
-                        </cells>
-                    </ColumnListItem>
-                </items>
-            </Table>
-        </content>
-        <footer>
-            <Toolbar>
-                <ToolbarSpacer />
-            </Toolbar>
-        </footer>
-    </Page>
+<mvc:View controllerName="entitec.pbi.embedding.controller.Users" xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:mvc="sap.ui.core.mvc" xmlns:fb="sap.ui.comp.filterbar" displayBlock="true">
+  <Page id="idUsers" title="{i18n>Users}" backgroundDesign="Solid" showHeader="false" showFooter="true">
+    <content>
+      <Table id="idTableUsers" mode="SingleSelectLeft" items="{path: '/Users', parameters: { updateGroupId: 'UserChanges' }}" fixedLayout="false" alternateRowColors="true">
+        <headerToolbar>
+          <Toolbar id="lineItemsToolbar">
+            <Title id="lineItemsHeader" text="{i18n>Users}" />
+            <ToolbarSpacer />
+            <Button icon="sap-icon://refresh" text="{i18n>Refresh}" visible="true" tooltip="{i18n>Refresh}" press="getUsers" />
+            <Button text="{i18n>Add}" icon="sap-icon://add" press='onAddUser' />
+            <Button text="{i18n>Delete}" icon="sap-icon://delete" press="onDeleteVendor" type="Reject" />
+          </Toolbar>
+        </headerToolbar>
+        <columns>
+          <Column>
+            <Label text="{i18n>Name}" />
+          </Column>
+          <Column>
+            <Label text="{i18n>Role}" />
+          </Column>
+          <Column>
+            <Label text="{i18n>Company_ID}" />
+          </Column>
+          <Column>
+            <Label text="{i18n>B1AccountUser}" />
+          </Column>
+          <Column>
+            <Label text="{i18n>ResetPassword}" />
+          </Column>
+        </columns>
+        <items>
+          <ColumnListItem id="idColumnlist2" type="Navigation" press="onUserSelect">
+            <cells>
+              <Text text="{UserName}" />
+              <Select selectedKey="{RoleID_RoleID}" editable="false" items="{/Roles}">
+                <core:Item key="{RoleID}" text="{RoleName}" />
+              </Select>
+              <Select editable="false" items="{/Companies}" forceSelection="false" selectedKey="{CompanyID_CompanyID}">
+                <core:Item key="{CompanyID}" text="{CompanyName}" />
+              </Select>
+              <Select editable="false" items="{/PowerBI}" forceSelection="false" selectedKey="{BIAccountUser_id}">
+                <core:Item key="{id}" text="{BIAccountUser}" />
+              </Select>
+              <Button id="idReset" icon="sap-icon://reset" type="Attention" text="Password" press="onResetPassword" />
+            </cells>
+          </ColumnListItem>
+        </items>
+      </Table>
+    </content>
+    <footer>
+      <OverflowToolbar>
+        <ToolbarSpacer />
+        <Button id="idSaveUsers" type="Emphasized" text="Save" press="onSaveChanges" />
+      </OverflowToolbar>
+    </footer>
+  </Page>
 </mvc:View>

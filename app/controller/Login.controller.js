@@ -13,7 +13,7 @@ sap.ui.define([
         .attachPatternMatched(this._matchedHandler, this);
     },
     _matchedHandler: function () {
-      this.getModel("appView").setProperty("/headerVisible", false);
+      this.getModel("appView").setProperty("/navVisible", false);
     },
     onButtonLoginPress: function (oEvent) {
       // MessageToast.show("Login logic to be implemented.");
@@ -37,8 +37,10 @@ sap.ui.define([
         .then(function (data, status, xhr) {
           that.getView().setBusy(false);
           that.getRouter().navTo("Apps");
-          that.getModel("appView").setProperty("/headerVisible", true);
-          that.getModel("appView").setProperty("/navVisible", false);
+          var oViewModel = that.getView().getModel("appView");
+          oViewModel.setProperty("/LoginHeader", false);  // Hide login header
+          oViewModel.setProperty("/HomeScreen", true);    // Show home header
+          oViewModel.setProperty("/navVisible", false);   // No back button needed at home
         })
         .catch(function (jqXhr, textStatus, errorMessage) {
           that.getView().setBusy(false);

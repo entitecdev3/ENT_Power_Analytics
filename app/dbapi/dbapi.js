@@ -152,10 +152,11 @@ sap.ui.define(
                 } else if (JSON.parse(jqr).error) {
                   if (
                     jqr.includes("Session expired.") ||
-                    jqr.includes("authenticated")
+                    jqr.includes("authenticated") ||
+                    jqr.includes("Unauthorized")
                   ) {
                     sessionStorage.session_id = null;
-                    var oMessage = then.getModel("i18n").getProperty("SessionExpire");
+                    var oMessage = then.getModel("i18n").getProperty("SessionExpired");
                     MessageBox.error(oMessage, {
                       actions: [MessageBox.Action.OK],
                       onClose: function () {
@@ -189,7 +190,8 @@ sap.ui.define(
               } catch (error) {
                 if (
                   jqr.includes("Session expired.") ||
-                  jqr.includes("authenticated")
+                  jqr.includes("authenticated")||
+                  jqr.includes("Unauthorized")
                 ) {
                   sessionStorage.session_id = null;
                   var oMessage = then

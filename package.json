@@ -25,6 +25,10 @@
           "url": "db.poweranalytics.sqlite",
           "key": "my_passphrase"
         }
+      },
+      "auth": {
+        "kind": "custom",
+        "impl": "srv/custom-auth.js"
       }
     }
   },

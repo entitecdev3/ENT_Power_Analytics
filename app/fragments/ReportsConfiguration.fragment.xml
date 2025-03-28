@@ -5,7 +5,7 @@
 >
     <VBox alignItems="Center" fitContainer="true" height="100%">
         <!-- Table for Existing Configurations -->
-        <Table id="idRCConfigTable" items="{appView>/ReportsExposed}" mode="SingleSelectMaster" alternateRowColors="true">
+        <Table id="idRCConfigTable" items="{/ReportsExposed}" mode="SingleSelectMaster" alternateRowColors="true">
             <headerToolbar>
                 <Toolbar>
                     <Title text="Existing Exposed Reports" level="H3"/>
@@ -26,12 +26,12 @@
             <items>
                 <ColumnListItem>
                     <cells>
-                        <Text text="{appView>REPORTS_EXPOSED_ID}"/>
-                        <Text text="{appView>REPORT_ID}"/>
-                        <Text text="{appView>WORKSPACE_ID}"/>
-                        <Text text="{appView>REPORT_COMMENT}"/>
-                        <Text text="{appView>WORKSPACE_COMMENT}"/>
-                        <Text text="{appView>SECURITY_FILTER_TYPE_ID}"/>                        
+                        <Text text="{REPORTS_EXPOSED_ID}"/>
+                        <Text text="{REPORT_ID}"/>
+                        <Text text="{WORKSPACE_ID}"/>
+                        <Text text="{REPORT_COMMENT}"/>
+                        <Text text="{WORKSPACE_COMMENT}"/>
+                        <Text text="{SECURITY_FILTER_TYPE_ID}"/>                        
                         <Button icon="sap-icon://edit" type="Transparent" press=".onEditPress" tooltip="Edit Configuration"/>
                         <Button icon="sap-icon://delete" type="Negative" press=".onDeletePress" tooltip="Delete Configuration"/>
                     </cells>

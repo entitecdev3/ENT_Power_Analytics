@@ -1,90 +1,81 @@
 namespace portal.Power.Analytics;
-//using { sap.common } from '@sap/cds/common';
 
 context PowerBIPortal {
 
     entity Role {
         key RoleID    : UUID;
-        RoleName      : String;
+        RoleName      : String(100);
     }
 
     entity Company {
         key CompanyID     : UUID;
-        CompanyName       : String;
-        ContactDetails    : String;
+        CompanyName       : String(255);
+        ContactDetails    : String(500);
+    }
+
+    entity PowerBI {
+        key id            : UUID;
+        BIAccountUser     : String(100);
+        Password          : String(255) @cds.password;
+        authorityUrl      : String(255);
+        scopeBase         : String(255);
+        powerBiApiUrl     : String(255);
+        clientId          : String(100);
+        clientSecret      : String(255);
+        tenantId          : String(100);
+        reportsExposedId  : Association to PowerBIPortal.ReportsExposed;
     }
 
     entity Users {
         key UserID       : UUID;
         RoleID           : Association to PowerBIPortal.Role;
-        UserName         : String;
+        UserName         : String(150);
         CompanyID        : Association to PowerBIPortal.Company;
-        BIAccountUser    : Boolean;
-        Password         : String(255) @cds.password
-    }
-
-    entity PowerBI {
-        key id            : UUID;
-        BIAccountUser     : Association to PowerBIPortal.Users;
-        Password          : String;
-        authorityUrl      : String;
-        scopeBase         : String;
-        powerBiApiUrl     : String;
-        clientId          : String;
-        clientSecret      : String;
-        tenantId          : String;
-        reportsExposedId  : Association to PowerBIPortal.ReportsExposed;
-    }
+        BIAccountUser    : Association to PowerBIPortal.PowerBI;
+        Password         : String(255) @cds.password;
+    }    
 
     entity Identity {
         key id          : UUID;
-        username        : String;
-        roles           : String;
+        username        : String(150);
+        roles           : String(255);
     }
 
     entity ReportsExposed {
         key id                    : UUID;
-        reportId                  : String;
-        workspaceId               : String;
-        reportComment             : String;
-        workspaceComment          : String;
+        reportId                  : String(100);
+        workspaceId               : String(100);
+        reportComment             : String(500);
+        workspaceComment          : String(500);
         securityFilterTypeId      : Association to PowerBIPortal.SecurityFiltersType;
     }
 
     entity SecurityFiltersType {
         key securityFilterTypeID  : UUID;
-        securityFilterType        : String;
+        securityFilterType        : String(100);
     }
 
     entity SecurityFilters {
         key securityId            : UUID;
         securityFilterTypeID      : Association to PowerBIPortal.SecurityFiltersType;
-        schema                    : String;
+        schema                    : String(100);
         displaySettingsID         : Association to PowerBIPortal.DisplaySettings;
-        operator                  : String;
+        operator                  : String(50);
         requireSingleSelection    : Boolean;
-        table                     : String;
-        column                    : String;
-        filterType                : String;
-        values                    : String;
+        table                     : String(100);
+        column                    : String(100);
+        filterType                : String(50);
+        values                    : String(500);
     }
 
     entity DisplaySettings {
         key DisplaySettingsId     : UUID;
-        IsLockedInViewMode        : Boolean;
+        Property                  : String(100);
+        Value                     : String(255);
     }
 
-     entity Configuration {
-        key ConfigKey   : String;
-        Value           : String;
+    entity Configuration {
+        key ConfigKey   : String(100);
+        Value           : String(255);
     }
 }
-
-
-// Configuration is outside the PowerBIPortal context since it is independent as per the table diagram provided
-// context ConfigurationContext {
-//     entity Configuration {
-//         key ConfigKey   : String;
-//         Value           : String;
-//     }
-// }

@@ -1,7 +1,7 @@
 # CAP CAPM_TABLES
 _out
 *.db
-*.sqlite
+*.sqlite*
 connection.properties
 default-*.json
 .cdsrc-private.json
@@ -12,6 +12,8 @@ target/
 # Web IDE, App Studio
 .che/
 .gen/
+package-lock.json
+
 
 # MTA
 *_mta_build_tmp

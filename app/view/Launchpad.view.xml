@@ -46,7 +46,7 @@
             sizeBehavior="Small"
             class="sapUiSmallMarginBegin sapUiSmallMarginTop tileLayout"
             header="Register Users"
-            id="idUsers"
+            id="idUser"
             press="press"
             visible="true"
         >
