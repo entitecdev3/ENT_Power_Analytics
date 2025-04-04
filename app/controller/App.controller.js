@@ -1,7 +1,7 @@
 sap.ui.define([
   "./BaseController",
   "sap/ui/model/json/JSONModel",
-	"sap/ui/core/BusyIndicator"
+  "sap/ui/core/BusyIndicator"
 ], (BaseController, JSONModel, BusyIndicator) => {
   "use strict";
 
@@ -23,13 +23,20 @@ sap.ui.define([
         oViewModel.setProperty("/delay", iOriginalBusyDelay);
       };
       $(document).ajaxStart(function (x, y, z) {
-				BusyIndicator.show(0);
-			});
+        BusyIndicator.show(0);
+      });
 
-			$(document).ajaxStop(function (x, y, z) {
-				BusyIndicator.hide();
-			});
+      $(document).ajaxStop(function (x, y, z) {
+        BusyIndicator.hide();
+        // if(x.currentTarget.URL.includes('odata/v4')){
+        //   debugger;
+        // }
+      });
+
+      
     },
+
+   
 
   });
 });

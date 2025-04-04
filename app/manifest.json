@@ -74,7 +74,7 @@
                     "operationMode": "Server",
                     "autoExpandSelect": true,
                     "groupId": "$auto",
-                    "updateGroupId": "updateGroup"
+                    "updateGroupId": "UserChanges"
                 }             
             }
         },
@@ -184,7 +184,6 @@
                     "viewName": "Report",
                     "viewId": "Report",
                     "viewLevel": 3,
-                    "controlAggregation": "endColumnPages",
                     "layout": "OneColumn"
                 }
             }

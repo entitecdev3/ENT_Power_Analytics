@@ -1,6 +1,6 @@
 <core:FragmentDefinition xmlns="sap.m"
     xmlns:core="sap.ui.core">
-    <Dialog id="idEditUsersDialog" title="{= ${appView>/addUser} ? 'Add User' : 'Update User'}" class="sapUiResponsiveMargin">
+    <Dialog id="idEditUsersDialog" class="sapUiResponsiveMargin">
         <VBox class="sapUiSmallMargin">
             <Label required="true" text="{i18n>Name}" />
             <Input value="{UserName}"/>

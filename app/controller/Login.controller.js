@@ -38,6 +38,7 @@ sap.ui.define([
           that.getView().setBusy(false);
           that.getRouter().navTo("Apps");
           var oViewModel = that.getView().getModel("appView");
+          oViewModel.setProperty("/User",data.user);
           oViewModel.setProperty("/LoginHeader", false);  // Hide login header
           oViewModel.setProperty("/HomeScreen", true);    // Show home header
           oViewModel.setProperty("/navVisible", false);   // No back button needed at home

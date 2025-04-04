@@ -13,7 +13,6 @@ sap.ui.define([
           .attachPatternMatched(this._matchedHandler, this);
       },
       _matchedHandler: function () {
-        this.getCustomData();
         this.getModel("appView").setProperty("/navVisible", true);
       }
   

@@ -10,5 +10,12 @@ module.exports = cds.service.impl(async function () {
             req.data.Password = await bcrypt.hash(req.data.Password, saltRounds);
         }
     });
+
+    this.before('*', async (req) => {
+        if (!req.user) {
+            req.reject(401, "Session expired. Please log in again.");
+        }
+    });
+    
 });
 

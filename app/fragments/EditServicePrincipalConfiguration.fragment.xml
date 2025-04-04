@@ -1,37 +1,23 @@
 <core:FragmentDefinition xmlns="sap.m"
     xmlns:core="sap.ui.core">
-    <Dialog id="idEditServicePrincipalDialog" title="{= ${/addServicePrincipal} ? ${i18n>addServicePrincipal} : ${i18n>updateServicePrincipal}}" class="sapUiResponsiveMargin">
+    <Dialog id="idEditServicePrincipalDialog" class="sapUiResponsiveMargin">
         <VBox class="sapUiSmallMargin">
             <Label required="true" text="{i18n>BIACCOUNTUSER}" />
-            <Input value="{/servicePrincipalObject/BIACCOUNTUSER}"/>
-            <Label required="true" text="{i18n>PASSWORD}" />
-            <Input value="{/servicePrincipalObject/PASSWORD}"/>
-            <Label required="true" text="{i18n>AUTHORITY_URL}" />
-            <Input value="{/servicePrincipalObject/AUTHORITY_URL}"/>
-            <Label required="true" text="{i18n>SCOPE_BASE}" />
-            <Input value="{/servicePrincipalObject/SCOPE_BASE}"/>
-            <Label required="true" text="{i18n>POWERBI_API_URL}" />
-            <Input value="{/servicePrincipalObject/POWERBI_API_URL}"/>
+            <Input value="{BIAccountUser}"/>
             <Label required="true" text="{i18n>CLIENT_ID}" />
-            <Input value="{/servicePrincipalObject/CLIENT_ID}"/>
+            <Input value="{clientId}"/>
             <Label required="true" text="{i18n>CLIENT_SECRET}" />
-            <Input value="{/servicePrincipalObject/CLIENT_SECRET}"/>
+            <Input value="{clientSecret}"/>
             <Label required="true" text="{i18n>TENANT_ID}" />
-            <Input value="{/servicePrincipalObject/TENANT_ID}"/>
-            <!-- <Label required="true" text="{i18n>TENANT_ID}" />
-            <Input value="{/servicePrincipalObject/TENANT_ID}"/> -->
-            <Label required="true" text="{i18n>IDENTITY_ID}" />
-            <Select width="20vw" items="{/Companies}" forceSelection="false" selectedKey="" >
-                <core:Item key="{CompanyID}" text="{CompanyName}" />
-            </Select>
-            <Label required="true" text="{i18n>REPORTS_EXPOSED_ID}" />
-            <Select width="20vw" items="{/PowerBI}" forceSelection="false" selectedKey="{/servicePrincipalObject/REPORTS_EXPOSED_ID}">
-                <core:Item key="{id}" text="{BIAccountUser}" />
-            </Select>
+            <Input value="{tenantId}"/>
+            <Label required="false" text="{i18n>REPORTS_EXPOSED_ID}" />
+            <MultiComboBox width="20vw" items="{/ReportsExposed}" selectedItems="{reportsExposedId}">
+                <core:Item key="{id}" text="{reportComment}" />
+            </MultiComboBox>
         </VBox>
         <buttons>
-            <Button text="{= ${/addServicePrincipal} ? ${i18n>save} : ${i18n>update}}" type="Emphasized" press="onSaveEditUserDialog"/>
-            <Button text="Cancel" press="onCloseEditUserDialog"/>
+            <Button id="idAddConfig" type="Emphasized" press="onSaveEditServicePrincipalDialog"/>
+            <Button text="Cancel" press="onCloseEditServicePrincipalDialog"/>
         </buttons>
     </Dialog>
 </core:FragmentDefinition>

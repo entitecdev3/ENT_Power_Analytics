@@ -14,6 +14,8 @@ sap.ui.define([
          * Retrieves the router instance for navigation
          * @returns {sap.ui.core.routing.Router} Router instance
          */
+       
+
         getRouter: function () {
             return this.getOwnerComponent().getRouter();
         },
@@ -65,6 +67,7 @@ sap.ui.define([
          * Navigates back to the previous page if available, else navigates to the home page
          */
         onNavBack: function () {
+          
             var oHistory = History.getInstance();
             var sPreviousHash = oHistory.getPreviousHash();
 
@@ -75,6 +78,7 @@ sap.ui.define([
             }
         },
         onLogOut: function (oEvent) {
+            window.location.href = '/';
             var that = this;
             this.middleWare.callMiddleWare("/logout", "POST").then(function (oData) {
                 that.getRouter().navTo("Login"); // Navigate if session is valid
@@ -121,17 +125,7 @@ sap.ui.define([
                 oPopover.openBy(oButton);
             });
         },
-        // getCustomData: function () {
-        //     var that = this;
-        //     var oModel = this.getView().getModel(); // Get OData V4 model
-        //     oModel.bindContext("/Configurations").requestObject().then(function (oData) {
-        //         // console.log(oData); // Single configuration data
-        //     })
-        //     .catch(function (oError){
-        //         // debugger;
-        //         that.middleWare.errorHandler(oError.statusText, that);
-        //     });
-        // },
+        
         onSeePasswordClick: function (oEvent) {
             var oInput = oEvent.getSource();
             if (oInput.getType() === "Password") {
@@ -146,6 +140,59 @@ sap.ui.define([
                 oInput.setType("Password");
                 oInput.setValueHelpIconSrc("sap-icon://show");
             }
-        },
+        }
+
+        // attachODataEventHandlers: function () {
+        //     var oDataModel = this.getOwnerComponent().getModel();
+        
+        //     if (!oDataModel) {
+        //         console.error("ODataModel not found!");
+        //         return;
+        //     }
+        
+        //     // Function to attach event handlers to a binding
+        //     var attachHandlers = (oBinding) => {
+        //         if (!oBinding) return;
+        
+        //         oBinding.attachDataRequested(() => BusyIndicator.show(0));
+        
+        //         oBinding.attachDataReceived((oEvent) => {
+        //             BusyIndicator.hide();
+        
+        //             var oError = oEvent.getParameter("error");
+        //             if (oError) {
+        //                 var statusCode = oError.status || oError.statusCode;
+        //                 if (statusCode === 401 || statusCode === 403) {
+        //                     MessageBox.error("Your session has expired. Please log in again.", {
+        //                         onClose: function () {
+        //                             var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+        //                             oRouter.navTo("Login");
+        //                         }.bind(this)
+        //                     });
+        //                 } else {
+        //                     // ✅ Using this.middleWare.errorHandler 
+        //                     this.middleWare.errorHandler(oError, this);
+        //                 }
+        //             }
+        //         });
+        //     };
+        
+        //     // // Attach to existing table/list bindings
+        //     // var oTable = this.byId("yourTableId"); // Replace with actual table ID
+        //     // if (oTable) {
+        //     //     var oListBinding = oTable.getBinding("items");
+        //     //     attachHandlers(oListBinding);
+        //     // }
+        
+        //     // // Attach to form/context bindings
+        //     // var oForm = this.byId("yourFormId"); // Replace with actual form ID
+        //     // if (oForm) {
+        //     //     var oContextBinding = oForm.getBinding("bindingContext");
+        //     //     attachHandlers(oContextBinding);
+        //     // }
+        // }
+        
+        
+        
     });
 });

@@ -7,7 +7,7 @@ using auth from './auth';
 service MyService @(path: 'MyService'){
     entity Roles as projection on PowerBIPortal.Role;
     entity Companies as projection on PowerBIPortal.Company;
-    @(requires : ['2301eafc-f5d7-4b90-9842-5480ec8bf56e'])
+    @(requires : ['37d7bb34-c821-4e71-9bb5-b772df61c5dc'])
     entity Users as projection on PowerBIPortal.Users;
     entity PowerBI as projection on PowerBIPortal.PowerBI;
     entity Identities as projection on PowerBIPortal.Identity;

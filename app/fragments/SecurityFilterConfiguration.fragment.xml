@@ -5,18 +5,16 @@
 >
     <VBox alignItems="Center" fitContainer="true" height="100%">
         <!-- Table for Existing Configurations -->
-        <Table id="idConfigSFTable" items="{/SecurityFilters}" mode="SingleSelectMaster" alternateRowColors="true">
+        <Table id="idConfigSecurityFilterTable" alternateRowColors="true" items="{path: '/SecurityFilters', parameters: { $$updateGroupId: 'SecurityFilterChanges' }}" fixedLayout="true" delete="onDeleteSecurityFilterConfig">
             <headerToolbar>
                 <Toolbar>
                     <Title text="Existing Security Filters" level="H3"/>
                     <ToolbarSpacer/>
-                    <Button icon="sap-icon://refresh" text="{i18n>Refresh}" visible="true" tooltip="{i18n>Refresh}" press="" />
-                    <Button id="idAddSFButton" icon="sap-icon://add" tooltip="Add Report" text="{i18n>Add}" press=".onAddConfiguration"/>
-                    <Button text="{i18n>Delete}" icon="sap-icon://delete" press="" type="Reject" />
+                    <Button icon="sap-icon://refresh" text="{i18n>Refresh}" visible="true" tooltip="{i18n>Refresh}" press="onRefreshSecurityFilters" />
+                    <Button id="idAddSFButton" icon="sap-icon://add" tooltip="Add Security Filter" text="{i18n>Add}" press="onAddSecurityFilterConfiguration"/>
                 </Toolbar>
             </headerToolbar>
             <columns>
-                <Column><Text text="Security Filter ID"/></Column>
                 <Column><Text text="Security Filter Type ID"/></Column>
                 <Column><Text text="Schema"/></Column>
                 <Column><Text text="Display Settings ID"/></Column>
@@ -28,21 +26,17 @@
                 <Column><Text text="Value"/></Column>
             </columns>
             <items>
-                <ColumnListItem>
+                <ColumnListItem type="Active" press="onSecurityFilterSelect">
                     <cells>
-                        <Text text="{SECURITY_FILTER_ID}"/>
-                        <Text text="{SECURITY_FILTER_TYPE_ID}"/>
-                        <Text text="{SCHEMA}"/>
-                        <Text text="{DISPLAY_SETTINGS_ID}"/>
-                        <Text text="{OPERATOR}"/>
-                        <CheckBox text="{REQUIRE_SINGLE_SELECTION}"/>
-                        <Text text="{TABLE_NAME}"/>
-                        <Text text="{COLUMN_NAME}"/>
-                        <Text text="{FILTERTYPE}"/>
-                        <Text text="{VALUE}"/>
-                        
-                        <Button icon="sap-icon://edit" type="Transparent" press=".onEditPress" tooltip="Edit Configuration"/>
-                        <Button icon="sap-icon://delete" type="Negative" press=".onDeletePress" tooltip="Delete Configuration"/>
+                        <Text text="{securityFilterTypeID}"/>
+                        <Text text="{schema}"/>
+                        <Text text="{displaySettingsID}"/>
+                        <Text text="{operator}"/>
+                        <CheckBox selected="{requireSingleSelection}"/>
+                        <Text text="{table}"/>
+                        <Text text="{column}"/>
+                        <Text text="{filterType}"/>
+                        <Text text="{values}"/>
                     </cells>
                 </ColumnListItem>
             </items>

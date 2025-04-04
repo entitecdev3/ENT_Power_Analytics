@@ -1,43 +1,35 @@
-<core:FragmentDefinition
-    xmlns="sap.m"
-    xmlns:core="sap.ui.core"
-    xmlns:layout="sap.ui.layout.form"
->
-    <VBox alignItems="Center" fitContainer="true" height="100%">
-        <!-- Table for Existing Configurations -->
-        <Table id="idConfigTable" items="{/ServicePrincipals}" mode="SingleSelectMaster" alternateRowColors="true">
-            <headerToolbar>
-                <Toolbar>
-                    <Title text="Existing Service Principal" level="H3"/>
-                    <ToolbarSpacer/>
-                    <Button icon="sap-icon://refresh" text="{i18n>Refresh}" visible="true" tooltip="{i18n>Refresh}" press="getServicePrincipals" />
-                    <Button id="idAddButton" icon="sap-icon://add" tooltip="Add Report" text="{i18n>Add}" press="onAddServicePrincipalConfiguration"/>
-                    <Button text="{i18n>Delete}" icon="sap-icon://delete" press="" type="Reject" />
-                </Toolbar>
-            </headerToolbar>
-            <columns>
-                <Column><Text text="BI Account Username"/></Column>
-                <Column><Text text="Client ID"/></Column>
-                <Column><Text text="Client Secret"/></Column>
-                <Column><Text text="Tenant ID"/></Column>
-                <Column><Text text="Identity"/></Column>
-                <Column><Text text="Reports Exposed ID"/></Column>
-            </columns>
-            <items>
-                <ColumnListItem>
-                    <cells>
-                        <Text text="{BIACCOUNTUSER}"/>
-                        <Text text="{CLIENT_ID}"/>
-                        <Text text="{CLIENT_SECRET}"/>
-                        <Text text="{TENANT_ID}"/>
-                        <Text text="{IDENTITY_ID}"/>
-                        <Text text="{REPORTS_EXPOSED_ID}"/>
-                        
-                        <Button icon="sap-icon://edit" type="Transparent" press=".onEditPress" tooltip="Edit Configuration"/>
-                        <Button icon="sap-icon://delete" type="Negative" press=".onDeletePress" tooltip="Delete Configuration"/>
-                    </cells>
-                </ColumnListItem>
-            </items>
-        </Table>
-    </VBox>
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:layout="sap.ui.layout.form">
+  <VBox alignItems="Center" fitContainer="true" height="100%">
+    <!-- Table for Existing Configurations -->
+    <Table id="idConfigTable" mode="Delete" alternateRowColors="true" items="{path: '/PowerBI', parameters: { $$updateGroupId: 'ServicePrincipalChanges' }}" fixedLayout="true" delete="onDeleteConfig">
+      <headerToolbar>
+        <Toolbar>
+          <Title text="Existing Service Principal" level="H3" />
+          <ToolbarSpacer />
+          <Button icon="sap-icon://refresh" text="{i18n>Refresh}" visible="true" tooltip="{i18n>Refresh}" press="onRefreshServicePrincipal" />
+          <Button id="idAddButton" icon="sap-icon://add" tooltip="Add Service Principal" text="{i18n>Add}" press="onAddServicePrincipalConfiguration" />
+        </Toolbar>
+      </headerToolbar>
+      <columns>
+        <Column><Text text="BI Account Username" /></Column>
+        <Column><Text text="Client ID" /></Column>
+        <Column><Text text="Client Secret" /></Column>
+        <Column><Text text="Tenant ID" /></Column>
+        <Column><Text text="Reports Exposed ID" /></Column>
+        <!-- <Column><Text text="" /></Column> -->
+      </columns>
+      <items>
+        <ColumnListItem type="Active" press="onConfigSelect">
+          <cells>
+            <Text text="{BIAccountUser}" />
+            <Text text="{clientId}" />
+            <Text text="{clientSecret}" />
+            <Text text="{tenantId}" />
+            <Text text="{reportsExposedId}" />
+            <!-- <Button text="Make Default" tooltip="Make this Service Principal as Default Service Principal"></Button> -->
+          </cells>
+        </ColumnListItem>
+      </items>
+    </Table>
+  </VBox>
 </core:FragmentDefinition>
