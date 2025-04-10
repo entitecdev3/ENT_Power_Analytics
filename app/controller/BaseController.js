@@ -3,8 +3,9 @@ sap.ui.define([
     "sap/m/MessageToast",
     "sap/ui/core/routing/History",
     "entitec/pbi/embedding/dbapi/dbapi",
-    "sap/ui/core/Fragment"
-], function (Controller, MessageToast, History, dbapi, Fragment) {
+    "sap/ui/core/Fragment",
+    "sap/m/MessageBox"
+], function (Controller, MessageToast, History, dbapi, Fragment, MessageBox) {
     "use strict";
 
     return Controller.extend("entitec.pbi.embedding.controller.BaseController", {
@@ -14,7 +15,7 @@ sap.ui.define([
          * Retrieves the router instance for navigation
          * @returns {sap.ui.core.routing.Router} Router instance
          */
-       
+
 
         getRouter: function () {
             return this.getOwnerComponent().getRouter();
@@ -67,7 +68,7 @@ sap.ui.define([
          * Navigates back to the previous page if available, else navigates to the home page
          */
         onNavBack: function () {
-          
+
             var oHistory = History.getInstance();
             var sPreviousHash = oHistory.getPreviousHash();
 
@@ -125,7 +126,7 @@ sap.ui.define([
                 oPopover.openBy(oButton);
             });
         },
-        
+
         onSeePasswordClick: function (oEvent) {
             var oInput = oEvent.getSource();
             if (oInput.getType() === "Password") {
@@ -140,59 +141,61 @@ sap.ui.define([
                 oInput.setType("Password");
                 oInput.setValueHelpIconSrc("sap-icon://show");
             }
+        },
+
+        getRequiredFieldsFromMetadata: async function (entityName) {
+            const oModel = this.getView().getModel(); 
+            const sServiceUrl = oModel.getMetaModel().getAbsoluteServiceUrl('$metadata'); // gives the service root URL
+            const sMetadataUrl = sServiceUrl + "/$metadata";
+            const oMetadataXML = await fetch(sMetadataUrl).then(res => res.text());
+
+            const oParser = new DOMParser();
+            const oXmlDoc = oParser.parseFromString(oMetadataXML, "application/xml");
+
+            // Find entity type
+            const oEntityType = [...oXmlDoc.getElementsByTagName("EntityType")].find(type =>
+                type.getAttribute("Name") === entityName
+            );
+
+            const aRequiredFields = [];
+            const aPrimaryKeys = [];
+
+            if (oEntityType) {
+                // Get primary keys
+                const oKey = oEntityType.getElementsByTagName("Key")[0];
+                if (oKey) {
+                    const keyProps = oKey.getElementsByTagName("PropertyRef");
+                    for (let keyProp of keyProps) {
+                        aPrimaryKeys.push(keyProp.getAttribute("Name"));
+                    }
+                }
+
+                // Get properties with Nullable="false", excluding primary keys
+                const properties = oEntityType.getElementsByTagName("Property");
+                for (let prop of properties) {
+                    const propName = prop.getAttribute("Name");
+                    const isNullable = prop.getAttribute("Nullable");
+                    if (isNullable === "false" && !aPrimaryKeys.includes(propName)) {
+                        aRequiredFields.push(propName);
+                    }
+                }
+            }
+
+            return aRequiredFields; // e.g. ['reportComment', 'workspaceId', ...] (no primary keys)
+        },
+
+        validateEntityFields: async function (entityName, oData) {
+            const aRequiredFields = await this.getRequiredFieldsFromMetadata(entityName);
+            for (let field of aRequiredFields) {
+                if (!oData[field]) {
+                    MessageBox.error(`"${field}" is required.`);
+                    return false;
+                }
+            }
+            return true;
         }
 
-        // attachODataEventHandlers: function () {
-        //     var oDataModel = this.getOwnerComponent().getModel();
-        
-        //     if (!oDataModel) {
-        //         console.error("ODataModel not found!");
-        //         return;
-        //     }
-        
-        //     // Function to attach event handlers to a binding
-        //     var attachHandlers = (oBinding) => {
-        //         if (!oBinding) return;
-        
-        //         oBinding.attachDataRequested(() => BusyIndicator.show(0));
-        
-        //         oBinding.attachDataReceived((oEvent) => {
-        //             BusyIndicator.hide();
-        
-        //             var oError = oEvent.getParameter("error");
-        //             if (oError) {
-        //                 var statusCode = oError.status || oError.statusCode;
-        //                 if (statusCode === 401 || statusCode === 403) {
-        //                     MessageBox.error("Your session has expired. Please log in again.", {
-        //                         onClose: function () {
-        //                             var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
-        //                             oRouter.navTo("Login");
-        //                         }.bind(this)
-        //                     });
-        //                 } else {
-        //                     // ✅ Using this.middleWare.errorHandler 
-        //                     this.middleWare.errorHandler(oError, this);
-        //                 }
-        //             }
-        //         });
-        //     };
-        
-        //     // // Attach to existing table/list bindings
-        //     // var oTable = this.byId("yourTableId"); // Replace with actual table ID
-        //     // if (oTable) {
-        //     //     var oListBinding = oTable.getBinding("items");
-        //     //     attachHandlers(oListBinding);
-        //     // }
-        
-        //     // // Attach to form/context bindings
-        //     // var oForm = this.byId("yourFormId"); // Replace with actual form ID
-        //     // if (oForm) {
-        //     //     var oContextBinding = oForm.getBinding("bindingContext");
-        //     //     attachHandlers(oContextBinding);
-        //     // }
-        // }
-        
-        
-        
+
+
     });
 });

@@ -38,7 +38,7 @@ context PowerBIPortal {
             RoleID        : Association to PowerBIPortal.Role not null @mandatory;
             UserName      : String(150) not null @mandatory;
             CompanyID     : Association to PowerBIPortal.Company not null @mandatory;
-            BIAccountUser : Association to PowerBIPortal.PowerBI not null @mandatory;
+            BIAccountUser : Association to PowerBIPortal.PowerBI;
             Password      : String(255) not null @mandatory @cds.password;
             CreatedAt     : Timestamp @cds.on.insert: $now;
             UpdatedAt     : Timestamp @cds.on.insert: $now;
