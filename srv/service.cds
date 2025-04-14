@@ -6,9 +6,10 @@ using auth from './auth';
 @requires : 'authenticated-user'
 service MyService @(path: 'MyService'){
     entity Roles as projection on PowerBiPortal.Roles;
+    entity UserRoles as projection on PowerBiPortal.UserRoles;
     entity Companies as projection on PowerBiPortal.Companies;
     @(requires : ['Admin'])
-    entity Users as projection on PowerBiPortal.Users @e;
+    entity Users as projection on PowerBiPortal.Users;
     entity PowerBi as projection on PowerBiPortal.PowerBi;
     entity Identity as projection on PowerBiPortal.Identity;
     entity ReportsExposed as projection on PowerBiPortal.ReportsExposed;
