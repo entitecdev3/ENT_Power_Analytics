@@ -26,11 +26,14 @@ cds.on('bootstrap', async (app) => {
     passport.use(new LocalStrategy(async (username, password, done) => {
         try {
             const db = cds.db;
-            let user = await db.run(SELECT.one.from('portal_Power_Analytics_PowerBIPortal_Users').where({ username }));
+            let user = await db.run(SELECT.one.from('portal_Power_Analytics_PowerBIPortal_Users').where({ username }).columns(['ID', 'username', 'password']));
             if (!user) return done(null, false, { message: 'Invalid username or password' });
-            const validPassword = await bcrypt.compare(password, user.Password);
+            const validPassword = await bcrypt.compare(password, user.password);
             if (!validPassword) return done(null, false, { message: 'Invalid username or password' });
-            return done(null, {ID: user.UserID, username: user.UserName, roles:  [user.RoleID_RoleID]});
+            let userRolesIDs = (await db.run(SELECT.from('portal_Power_Analytics_PowerBIPortal_UserRoles').where({ user_ID:user.ID }).columns(['role_ID']))).map(item=>item.role_ID);
+            let roles = (await db.run(SELECT.from('portal_Power_Analytics_PowerBIPortal_Roles').where({ ID: userRolesIDs }).columns(['name']))).map(item=>item.name);
+            console.log(roles);
+            return done(null, {ID: user.ID, username: user.username, roles});
         } catch (err) {
             return done(err);
         }
@@ -45,16 +48,28 @@ cds.on('bootstrap', async (app) => {
     passport.deserializeUser(async (id, done) => {
         try {
             const db = cds.db;
-            const user = await db.run(SELECT.one.from('portal_Power_Analytics_PowerBIPortal_Users').where({ UserID: id }));
-            return done(null, {ID: user.UserID, username: user.UserName, roles:  [user.RoleID_RoleID]});
+            let user = await db.run(SELECT.one.from('portal_Power_Analytics_PowerBIPortal_Users').where({ ID:id }).columns(['ID', 'username']));
+            let userRolesIDs = (await db.run(SELECT.from('portal_Power_Analytics_PowerBIPortal_UserRoles').where({ user_ID:user.ID }).columns(['role_ID']))).map(item=>item.role_ID);
+            let roles = (await db.run(SELECT.from('portal_Power_Analytics_PowerBIPortal_Roles').where({ ID: userRolesIDs }).columns(['name']))).map(item=>item.name);
+            console.log(roles)
+            return done(null, {ID: user.ID, username: user.username, roles});
         } catch (err) {
             done(err);
         }
     });
 
     // Login route
-    app.post('/api/Login', passport.authenticate('local'), (req, res) => {
-        res.send({ message: 'Login successful', user: req.user });
+    app.post('/api/Login', (req, res, next) => {
+        passport.authenticate('local', (err, user, info) => {
+          if (err) return next(err);
+          if (!user) {
+            return res.status(401).json({ success: false, message: info.message });
+          }
+          req.logIn(user, (err) => {
+            if (err) return next(err);
+            return res.json({ success: true, message: 'Logged in successfully', user });
+          });
+        })(req, res, next);
     });
 
     // Logout route

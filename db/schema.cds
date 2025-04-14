@@ -1,102 +1,80 @@
 namespace portal.Power.Analytics;
 
+using { cuid, managed } from '@sap/cds/common';
 
-context PowerBIPortal {
 
-    entity Role {
-        key RoleID    : UUID;
-            RoleName  : String(100);
-            CreatedAt : Timestamp @cds.on.insert: $now;
-            UpdatedAt : Timestamp @cds.on.insert: $now;
+context PowerBiPortal {
+    entity Users: cuid, managed {
+            username      : String(150) not null @mandatory;
+            company       : Association to PowerBiPortal.Companies not null @mandatory;
+            biAccountUser : Association to PowerBiPortal.PowerBi;
+            password      : String(255) not null @mandatory @cds.password;
+            roles    : Association to many UserRoles on roles.user = $self;
     }
 
-    entity Company {
-        key CompanyID      : UUID;
-            CompanyName    : String(255);
-            ContactDetails : String(500);
-            CreatedAt      : Timestamp @cds.on.insert: $now;
-            UpdatedAt      : Timestamp @cds.on.insert: $now;
+    entity Roles: cuid, managed {
+            name  : String(100);
+            users    : Association to many UserRoles on users.role = $self;
     }
 
+    entity UserRoles: managed {
+        user : Association to Users @key;
+        role : Association to Roles @key;
+    }
 
-    entity PowerBI {
-        key id               : UUID;
-        BIAccountUser    : String(100) not null @mandatory;
+    entity Companies: cuid, managed  {
+            name           : String(255);
+            contactDetails : String(500);
+            users: Association to many PowerBiPortal.Users on users.company = $self;
+    }
+
+    entity PowerBi: cuid, managed {
+            biAccountUser    : String(100) not null @mandatory;
             authorityUrl     : String(255) default 'https://login.microsoftonline.com/';
             scopeBase        : String(255) default 'https://analysis.windows.net/powerbi/api/.default';
             powerBiApiUrl    : String(255) default 'https://api.powerbi.com/';
             clientId         : UUID not null @mandatory;
             clientSecret     : String(255) not null @mandatory;
             tenantId         : UUID not null @mandatory;
-            reportsExposedId : Association to PowerBIPortal.ReportsExposed;
-            CreatedAt        : Timestamp @cds.on.insert: $now;
-            UpdatedAt        : Timestamp @cds.on.insert: $now;
+            reportsExposedId : Association to PowerBiPortal.ReportsExposed;
     }
 
-    entity Users {
-        key UserID        : UUID;
-            RoleID        : Association to PowerBIPortal.Role not null @mandatory;
-            UserName      : String(150) not null @mandatory;
-            CompanyID     : Association to PowerBIPortal.Company not null @mandatory;
-            BIAccountUser : Association to PowerBIPortal.PowerBI;
-            Password      : String(255) not null @mandatory @cds.password;
-            CreatedAt     : Timestamp @cds.on.insert: $now;
-            UpdatedAt     : Timestamp @cds.on.insert: $now;
-    }
-
-    entity Identity {
-        key id        : UUID;
+    entity Identity: cuid, managed  {
             username  : String(150);
             roles     : String(255);
-            CreatedAt : Timestamp @cds.on.insert: $now;
-            UpdatedAt : Timestamp @cds.on.insert: $now;
     }
 
-    entity ReportsExposed {
-        key id                   : UUID;
+    entity ReportsExposed: cuid, managed  {
             reportId             : UUID not null @mandatory;
             workspaceId          : UUID not null @mandatory;
             reportComment        : String(500) not null @mandatory;
             workspaceComment     : String(500) not null @mandatory;
-            securityFilterTypeId : Association to PowerBIPortal.SecurityFiltersType;
-            CreatedAt            : Timestamp @cds.on.insert: $now;
-            UpdatedAt            : Timestamp @cds.on.insert: $now;
+            securityFilterTypeId : Association to PowerBiPortal.SecurityFiltersType;
     }
 
-    entity SecurityFiltersType {
-        key securityFilterTypeID : UUID;
+    entity SecurityFiltersType: cuid, managed {
             securityFilterType   : String(100) not null @mandatory;
-            CreatedAt            : Timestamp @cds.on.insert: $now;
-            UpdatedAt            : Timestamp @cds.on.insert: $now;
     }
 
-    entity SecurityFilters {
-        key securityId             : UUID;
-            securityFilterTypeID   : Association to PowerBIPortal.SecurityFiltersType not null @mandatory;
+    entity SecurityFilters: cuid, managed {
+            securityFilterTypeID   : Association to PowerBiPortal.SecurityFiltersType not null @mandatory;
             schema                 : String(100) not null @mandatory;
-            displaySettingsID      : Association to PowerBIPortal.DisplaySettings not null @mandatory;
+            displaySettingsID      : Association to PowerBiPortal.DisplaySettings not null @mandatory;
             operator               : String(50) not null @mandatory;
             requireSingleSelection : Boolean not null @mandatory;
             table                  : String(100) not null @mandatory;
             column                 : String(100) not null @mandatory;
             filterType             : String(50) not null @mandatory;
             values                 : String(500) not null @mandatory;
-            CreatedAt              : Timestamp @cds.on.insert: $now;
-            UpdatedAt              : Timestamp @cds.on.insert: $now;
     }
 
-    entity DisplaySettings {
-        key DisplaySettingsId : UUID;
-            Property          : String(100);
-            Value             : String(255);
-            CreatedAt         : Timestamp @cds.on.insert: $now;
-            UpdatedAt         : Timestamp @cds.on.insert: $now;
+    entity DisplaySettings: cuid, managed  {
+            property          : String(100);
+            value             : String(255);
     }
 
-    entity Configuration {
-        key ConfigKey : String(100);
-            Value     : String(255) not null @mandatory;
-            CreatedAt : Timestamp @cds.on.insert: $now;
-            UpdatedAt : Timestamp @cds.on.insert: $now;
+    entity Configuration: cuid, managed  {
+        key configKey : String(100);
+            value     : String(255) not null @mandatory;
     }
 }
