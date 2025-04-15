@@ -32,8 +32,7 @@ cds.on('bootstrap', async (app) => {
             if (!validPassword) return done(null, false, { message: 'Invalid username or password' });
             let userRolesIDs = (await db.run(SELECT.from('portal_Power_Analytics_PowerBIPortal_UserRoles').where({ user_ID:user.ID }).columns(['role_ID']))).map(item=>item.role_ID);
             let roles = (await db.run(SELECT.from('portal_Power_Analytics_PowerBIPortal_Roles').where({ ID: userRolesIDs }).columns(['name']))).map(item=>item.name);
-            console.log(roles);
-            return done(null, {ID: user.ID, username: user.username, roles});
+            return done(null, new cds.User({id: user.ID, username: user.username, roles}));
         } catch (err) {
             return done(err);
         }
@@ -41,7 +40,7 @@ cds.on('bootstrap', async (app) => {
 
     // Serialize user (store in session)
     passport.serializeUser((user, done) => {
-        done(null, user.ID);
+        done(null, user.id);
     });
 
     // Deserialize user (retrieve from session)
@@ -51,8 +50,7 @@ cds.on('bootstrap', async (app) => {
             let user = await db.run(SELECT.one.from('portal_Power_Analytics_PowerBIPortal_Users').where({ ID:id }).columns(['ID', 'username']));
             let userRolesIDs = (await db.run(SELECT.from('portal_Power_Analytics_PowerBIPortal_UserRoles').where({ user_ID:user.ID }).columns(['role_ID']))).map(item=>item.role_ID);
             let roles = (await db.run(SELECT.from('portal_Power_Analytics_PowerBIPortal_Roles').where({ ID: userRolesIDs }).columns(['name']))).map(item=>item.name);
-            console.log(roles)
-            return done(null, {ID: user.ID, username: user.username, roles});
+            return done(null, new cds.User({id: user.ID, username: user.username, roles}));
         } catch (err) {
             done(err);
         }
@@ -73,7 +71,7 @@ cds.on('bootstrap', async (app) => {
     });
 
     // Logout route
-    app.post('/api/logout', (req, res) => {
+    app.post('/api/Logout', (req, res) => {
         req.logout((err) => {
             if (err) return res.status(500).send({ error: 'Logout failed' });
             res.send({ message: 'Logged out successfully' });
