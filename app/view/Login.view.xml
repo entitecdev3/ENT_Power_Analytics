@@ -24,7 +24,7 @@
                     <Label text="{i18n>PASSWORD_LABEL}" design="Bold" />
                     <Input id="idPasswordInput" type="Password" placeholder="{i18n>PASSWORD_PLACEHOLDER}" submit="onButtonLoginPress" showValueHelp="true" valueHelpIconSrc="sap-icon://show" valueHelpRequest="onSeePasswordClick" maxLength="15" />
 
-                    <Button text="{i18n>LOGIN_BUTTON}" submit="onButtonLoginPress" type="Emphasized" press="onButtonLoginPress" />
+                    <Button text="{i18n>LOGIN_BUTTON}" type="Emphasized" press="onButtonLoginPress" />
                   </form:content>
                 </form:SimpleForm>
               </VBox>

@@ -22,6 +22,13 @@
                 "settings": {
                     "odataVersion": "4.0"
                 }
+            },
+            "powerBiService": {
+                "type": "OData",
+                "uri": "/powerbi/PowerBiService/",
+                "settings": {
+                    "odataVersion": "4.0"
+                }
             }
         }
     },
@@ -68,14 +75,26 @@
             "": {
                 "dataSource": "mainService",
                 "type": "sap.ui.model.odata.v4.ODataModel",
-                "preload": true   ,
+                "preload": true,
+                "settings": {
+                    "synchronizationMode": "None",
+                    "operationMode": "Server",
+                    "autoExpandSelect": true,
+                    "groupId": "$auto"
+                }
+            },
+            "powerBi": {
+                "dataSource": "powerBiService",
+                "type": "sap.ui.model.odata.v4.ODataModel",
+                "async": "true",
+                "preload": true,
                 "settings": {
                     "synchronizationMode": "None",
                     "operationMode": "Server",
                     "autoExpandSelect": true,
                     "groupId": "$auto",
-                    "updateGroupId": "UserChanges"
-                }             
+                    "updateGroupId": "powerBiChanges"
+                }
             }
         },
         "resources": {
@@ -193,6 +212,7 @@
             "id": "idApp",
             "async": true,
             "type": "XML"
-        }
+        },
+        "handleValidation": true
     }
 }

@@ -89,12 +89,12 @@ sap.ui.define([
       }
     },
 
-    onSaveEditServicePrincipalDialog: function () {
+    onSaveEditServicePrincipalDialog: async function () {
       let oContext = this._oDialog.getBindingContext();
       let userObject = oContext.getObject();
 
       // 🔹 Step 1: Validate Required Fields
-      let validated = this._validateSPFields(userObject);
+      let validated = await this._validateSPFields(userObject);
       if (!validated) {
         return;
       }
@@ -102,28 +102,12 @@ sap.ui.define([
 
     },
 
-    _validateSPFields: function (userObject) {
-      // let errors = [];
+    _validateSPFields: async function (userObject) {
 
-      if (!userObject.BIAccountUser) {
-        MessageBox.error("Account Username is required.");
-        return false;
-      }
-      if (!userObject.clientId) {
-        MessageBox.error("Client ID is required.");
-        return false;
-      }
-      if (!userObject.clientSecret) {
-        MessageBox.error("Client Secret is required.");
-        return false;
-      }
-      if (!userObject.tenantId) {
-        MessageBox.error("Tenant ID is required.");
-        return false;
-      }
+      const isValid = await this.validateEntityFields("PowerBi", userObject);
 
+      if (!isValid) return false;
       return true;
-      // return errors;
     },
 
     onCloseEditServicePrincipalDialog: function () {
@@ -162,12 +146,12 @@ sap.ui.define([
       this._oReportDialog.open();
     },
 
-    onSaveEditReportsDialog: function () {
+    onSaveEditReportsDialog: async function () {
       let oContext = this._oReportDialog.getBindingContext();
       let reportObject = oContext.getObject();
 
       // 🔹 Step 1: Validate Required Fields
-      let validated = this._validateReportFields(reportObject);
+      let validated = await this._validateReportFields(reportObject);
       if (!validated) {
         return;
       }
@@ -175,25 +159,10 @@ sap.ui.define([
 
     },
 
-    _validateReportFields: function (reportObject) {
+    _validateReportFields: async function (reportObject) {
+      const isValid = await this.validateEntityFields("ReportsExposed", reportObject); 
 
-      if (!reportObject.reportId) {
-        MessageBox.error("Account Username is required.");
-        return false;
-      }
-      if (!reportObject.reportComment) {
-        MessageBox.error("Client ID is required.");
-        return false;
-      }
-      if (!reportObject.workspaceId) {
-        MessageBox.error("Client Secret is required.");
-        return false;
-      }
-      if (!reportObject.workspaceComment) {
-        MessageBox.error("Tenant ID is required.");
-        return false;
-      }
-
+      if (!isValid) return false;
       return true;
     },
 
@@ -270,12 +239,12 @@ sap.ui.define([
       this._oSecurityFilterDialog.open();
     },
 
-    onSaveEditSecurityFilterDialog: function () {
+    onSaveEditSecurityFilterDialog: async function () {
       let oContext = this._oSecurityFilterDialog.getBindingContext();
       let securityFilterObject = oContext.getObject();
 
       // 🔹 Step 1: Validate Required Fields
-      let validated = this._validateSecurityFilterFields(securityFilterObject);
+      let validated = await this._validateSecurityFilterFields(securityFilterObject);
       if (!validated) {
         return;
       }
@@ -283,25 +252,9 @@ sap.ui.define([
 
     },
 
-    _validateSecurityFilterFields: function (securityFilterObject) {
-
-      if (!securityFilterObject.reportId) {
-        MessageBox.error("Account Username is required.");
-        return false;
-      }
-      if (!securityFilterObject.reportComment) {
-        MessageBox.error("Client ID is required.");
-        return false;
-      }
-      if (!securityFilterObject.workspaceId) {
-        MessageBox.error("Client Secret is required.");
-        return false;
-      }
-      if (!securityFilterObject.workspaceComment) {
-        MessageBox.error("Tenant ID is required.");
-        return false;
-      }
-
+    _validateSecurityFilterFields: async function (securityFilterObject) {
+      const isValid = await this.validateEntityFields("SecurityFilters", securityFilterObject); // Use your actual Entity name
+      if (!isValid) return false;
       return true;
     },
 
@@ -353,11 +306,7 @@ sap.ui.define([
     onSaveChanges: function () {
       let oModel = this.getView().getModel(); // OData V4 Model
 
-      // 🔹 Step 1: Check if there are any pending changes
-      if (!oModel.hasPendingChanges()) {
-        MessageToast.show("No changes detected.");
-        return;
-      }
+      
 
       // Get the IconTabBar control
       let oIconTabBar = this.byId("idConfigurationMenu");
@@ -365,8 +314,12 @@ sap.ui.define([
       // Get the selected tab key
       let sSelectedKey = oIconTabBar.getSelectedKey();
 
-      if (sSelectedKey === "idServicePrincipalConfig") {
+      if (sSelectedKey.includes("idServicePrincipalConfig")) {
         // Service Principal batch 
+        if (!oModel.hasPendingChanges("ServicePrincipalChanges")) {
+          MessageToast.show("No changes detected.");
+          return;
+        }
         this.getModel().submitBatch("ServicePrincipalChanges").then(() => {
           // Retrieve all messages from the model
           const oContext = this.byId("idConfigTable").getBinding("items");
@@ -400,8 +353,12 @@ sap.ui.define([
         }).catch(oError => {
           MessageBox.error("Batch request failed: " + oError.message);
         });
-      } else if (sSelectedKey === "idReportConfig") {
+      } else if (sSelectedKey.includes("idReportConfig")) {
         // Report batch
+        if (!oModel.hasPendingChanges("ReportsChanges")) {
+          MessageToast.show("No changes detected.");
+          return;
+        }
         this.getModel().submitBatch("ReportsChanges").then(() => {
           // Retrieve all messages from the model
           const oContext = this.byId("idRCConfigTable").getBinding("items");
@@ -435,7 +392,11 @@ sap.ui.define([
         }).catch(oError => {
           MessageBox.error("Batch request failed: " + oError.message);
         });
-      } else if (sSelectedKey === "idSecurityFilterConfig") {
+      } else if (sSelectedKey.includes("idSecurityFilterConfig")) {
+        if (!oModel.hasPendingChanges("SecurityFilterChanges")) {
+          MessageToast.show("No changes detected.");
+          return;
+        }
         this.getModel().submitBatch("SecurityFilterChanges").then(() => {
           // Retrieve all messages from the model
           const oContext = this.byId("idConfigSecurityFilterTable").getBinding("items");

@@ -3,11 +3,14 @@ sap.ui.define([
   "sap/m/MessageToast",
   "sap/m/MessageBox",
   "entitec/pbi/embedding/controller/BaseController",
-  "sap/ui/core/Fragment"
-], function (Controller, MessageToast, MessageBox, BaseController, Fragment) {
+  "sap/ui/core/Fragment",
+  "entitec/pbi/embedding/model/formatter"
+], function (Controller, MessageToast, MessageBox, BaseController, Fragment, formatter) {
   "use strict";
 
   return BaseController.extend("entitec.pbi.embedding.controller.Users", {
+    formatter: formatter,
+    
     onInit: function () {
       this.getRouter().getRoute("Users").attachPatternMatched(this._matchedHandler, this);
       this._oODataModel = this.getView().getModel(); // OData V4 Model
@@ -21,28 +24,12 @@ sap.ui.define([
 
     },
 
-    _onRequestFailed: function (oEvent) {
-      let oError = oEvent.getParameter("errorObject");
-
-      // Check if the error is a 401 Unauthorized (session expired)
-      if (oError && oError.statusCode === 401) {
-        // Show a message box to inform the user
-        MessageBox.error("Your session has expired. Please log in again.", {
-          onClose: function () {
-            // Navigate back to the login page
-            let oRouter = sap.ui.core.UIComponent.getRouterFor(this);
-            oRouter.navTo("Login");  // Ensure that "Login" route is set up in your router
-            window.location.href = '/';
-          }.bind(this)
-        });
-      }
-    },
-
     _matchedHandler: function () {
       var oViewModel = this.getView().getModel("appView");
       oViewModel.setProperty("/navVisible", true);   // Show back button
       oViewModel.setProperty("/LoginHeader", false);   // Show back button
       oViewModel.setProperty("/HomeScreen", true);   // Show back button
+      // this.onUsersLoaded();
     },
 
     onAddUser: function () {
@@ -101,45 +88,33 @@ sap.ui.define([
         this.getView().getModel('appView').setProperty("/Password/ConfirmPasswordVST", "Password must contain atleast 8 characters,\n including Upper/lowercase, numbers,\n and special character");
       }
     },
-    onSaveEditUserDialog: function () {
+    onSaveEditUserDialog: async function () {
       let oContext = this._oDialog.getBindingContext();
       let userObject = oContext.getObject();
 
-      // 🔹 Step 1: Validate Required Fields
-      let validated = this._validateUserFields(userObject);
+      // 🔹 Step 1: Prepare fields to skip
+      let skipFields = ["Password"];
+
+      // 🔹 Step 2: Validate fields
+      let validated = await this.validateEntityFields("Users", userObject, skipFields);
       if (!validated) {
         return;
       }
 
-      // 🔹 Step 2: If Adding a User, Handle Password Separately
+      // 🔹 Step 3: If it's Add, now show password popup
       if (this.addUserPress) {
         this._handlePasswordPopup("Create Password", "OK");
       } else {
-        // this.onPasswordChangeOk();
         this._oDialog.close();
       }
     },
-    _validateUserFields: function (userObject) {
-      // let errors = [];
+    _validateUserFields: async function (userObject) {
 
-      if (!userObject.UserName) {
-        MessageBox.error("Username is required.");
-        return false;
-      }
-      if (!userObject.RoleID_RoleID) {
-        MessageBox.error("Role is required.");
-        return false;
-      }
-      if (!userObject.CompanyID_CompanyID) {
-        MessageBox.error("Company is required.");
-        return false;
-      }
-      if (!userObject.BIAccountUser_id) {
-        MessageBox.error("BI Account User ID is required.");
-        return false;
-      }
+      const isValid = await this.validateEntityFields("Users", userObject);
+
+      if (!isValid) return false;
       return true;
-      // return errors;
+
     },
     _handlePasswordPopup: function (title, button) {
       let oView = this.getView();
@@ -191,25 +166,39 @@ sap.ui.define([
         return false;
       }
     },
-    onPasswordChangeOk: function (oEvent) {
+    onPasswordChangeOk: function () {
       let oPasswordData = this.getView().getModel("appView").getProperty("/Password");
-
-      // 🔹 Step 1: Validate Password
-      if (!this.validatePassword(oPasswordData.NewPassword, oPasswordData.ConfirmPassword)) {
+    
+      // 🔹 Generic Validation
+      if (!this.validatePasswordFields(oPasswordData)) {
         return;
       }
-
-      // 🔹 Step 2: Save Password in OData Context
+    
+      // 🔹 Save to context
       let oContext = this._oDialog.getBindingContext();
       oContext.setProperty("Password", oPasswordData.NewPassword);
+    
+      // 🔹 Reset flag & close
       this.addUserPress = false;
       this.UserPasswordDialog.close();
     },
+    clearPasswordFields: function () {
+      let oAppViewModel = this.getView().getModel("appView");
+      oAppViewModel.setProperty("/Password", {
+        NewPassword: "",
+        ConfirmPassword: "",
+        NewPasswordValueState: "None",
+        NewPasswordVST: "",
+        onConfirmPasswordValueState: "None",
+        onConfirmPasswordVST: ""
+      });
+    },    
     onResetPassword: function (oEvent) {
       this._handlePasswordPopup("Reset Password", "Update");
     },
     onPasswordChangeCancel: function () {
       // 🔹 Close the Password Dialog without saving changes
+      this.clearPasswordFields();
       this.UserPasswordDialog.close();
       MessageToast.show("Password change canceled.");
     },
@@ -283,14 +272,6 @@ sap.ui.define([
         MessageToast.show("No changes detected.");
         return;
       }
-      // oModel.submitBatch("UserChanges").then(function(response) {
-      //   debugger;
-      //   MessageToast.show("User details updated successfully.");
-      // }.bind(this))
-      // .catch((oError) => {
-
-      //   MessageBox.error("Error updating user: " + oError.message);
-      // });
 
       this.getModel().submitBatch("UserChanges").then(() => {
         // Retrieve all messages from the model
@@ -304,11 +285,11 @@ sap.ui.define([
           if (aErrorMessages.length > 0) {
             // Construct error message from multiple messages
 
-            
-            let sErrorMessage = aErrorMessages.map(msg =>{
+
+            let sErrorMessage = aErrorMessages.map(msg => {
               let aTargets = msg.getTargets().map(target => target.split("/").pop()); // Extract property
               return `${aTargets.join(", ")} ${msg.getMessage()}`;
-            }   
+            }
             ).join("\n\n");
 
             MessageBox.error(sErrorMessage);
@@ -327,6 +308,40 @@ sap.ui.define([
       });
 
 
+    },
+    onRoleSelectionChange: async function (oEvent) {
+      const oMCB = oEvent.getSource();
+      const oContext = oMCB.getBindingContext(); // User context
+      const aSelectedKeys = oEvent.getParameter("selectedItems").map(item => item.getKey());
+      const oModel = oContext.getModel();
+    
+      const userId = oContext.getProperty("ID");
+    
+      // 1. Delete old UserRoles for this user
+      const oldRoles = oContext.getProperty("roles");
+      for (const ur of oldRoles) {
+        await oModel.remove(`/UserRoles(${ur.ID})`);
+      }
+    
+      // 2. Create new UserRoles
+      for (const roleId of aSelectedKeys) {
+        await oModel.create("/UserRoles", {
+          user_ID: userId,
+          role_ID: roleId
+        });
+      }
+    
+      // Optional: Refresh the table
+      await oModel.refresh();
+    },
+    formatRolesForSelectedKeys: function (aRoles) {
+      debugger
+      if (!aRoles || !Array.isArray(aRoles)) {
+        return [];
+      }
+    
+      return aRoles.map(r => r.role.name); // or r.role.ID if your key is ID
     }
+    
   });
 });

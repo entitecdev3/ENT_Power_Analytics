@@ -28,9 +28,9 @@
             <items>
                 <ColumnListItem type="Active" press="onSecurityFilterSelect">
                     <cells>
-                        <Text text="{securityFilterTypeID}"/>
+                        <Text text="{securityFilterType}"/>
                         <Text text="{schema}"/>
-                        <Text text="{displaySettingsID}"/>
+                        <Text text="{displaySetting}"/>
                         <Text text="{operator}"/>
                         <CheckBox selected="{requireSingleSelection}"/>
                         <Text text="{table}"/>

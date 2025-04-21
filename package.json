@@ -9,12 +9,14 @@
     "@cap-js-community/odata-v2-adapter": "^1.14.2",
     "@sap/cds": "^8",
     "@sap/cds-dk": "^8.8.1",
+    "axios": "^1.8.4",
     "bcryptjs": "^3.0.2",
     "ent-power-analytics": "file:",
     "express": "^4",
     "express-session": "^1.18.1",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
+    "powerbi-client": "^2.23.1",
     "sqlite3": "^5.1.7"
   },
   "cds": {

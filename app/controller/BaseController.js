@@ -4,8 +4,9 @@ sap.ui.define([
     "sap/ui/core/routing/History",
     "entitec/pbi/embedding/dbapi/dbapi",
     "sap/ui/core/Fragment",
-    "sap/m/MessageBox"
-], function (Controller, MessageToast, History, dbapi, Fragment, MessageBox) {
+    "sap/m/MessageBox",
+    "sap/ui/Device"
+], function (Controller, MessageToast, History, dbapi, Fragment, MessageBox, Device) {
     "use strict";
 
     return Controller.extend("entitec.pbi.embedding.controller.BaseController", {
@@ -79,7 +80,6 @@ sap.ui.define([
             }
         },
         onLogOut: function (oEvent) {
-            window.location.href = '/';
             var that = this;
             this.middleWare.callMiddleWare("/logout", "POST").then(function (oData) {
                 that.getRouter().navTo("Login"); // Navigate if session is valid
@@ -144,7 +144,7 @@ sap.ui.define([
         },
 
         getRequiredFieldsFromMetadata: async function (entityName) {
-            const oModel = this.getView().getModel(); 
+            const oModel = this.getView().getModel();
             const sServiceUrl = oModel.getMetaModel().getAbsoluteServiceUrl('$metadata'); // gives the service root URL
             const sMetadataUrl = sServiceUrl + "/$metadata";
             const oMetadataXML = await fetch(sMetadataUrl).then(res => res.text());
@@ -184,18 +184,20 @@ sap.ui.define([
             return aRequiredFields; // e.g. ['reportComment', 'workspaceId', ...] (no primary keys)
         },
 
-        validateEntityFields: async function (entityName, oData) {
-            const aRequiredFields = await this.getRequiredFieldsFromMetadata(entityName);
-            for (let field of aRequiredFields) {
-                if (!oData[field]) {
-                    MessageBox.error(`"${field}" is required.`);
+        validateEntityFields: async function (entityName, dataObject, skipFields = []) {
+            const requiredFields = await this.getRequiredFieldsFromMetadata(entityName);
+
+            for (let field of requiredFields) {
+                if (skipFields.includes(field)) {
+                    continue; // skip fields like "Password" if told to
+                }
+
+                if (!dataObject[field]) {
+                    MessageBox.error(`${field} is required.`);
                     return false;
                 }
             }
             return true;
         }
-
-
-
     });
 });

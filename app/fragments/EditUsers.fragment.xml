@@ -2,19 +2,15 @@
     xmlns:core="sap.ui.core">
     <Dialog id="idEditUsersDialog" class="sapUiResponsiveMargin">
         <VBox class="sapUiSmallMargin">
-            <Label required="true" text="{i18n>Name}" />
-            <Input value="{UserName}"/>
-            <Label required="true" text="{i18n>Role}" />
-            <Select width="20vw" selectedKey="{RoleID_RoleID}" forceSelection="false" items="{/Roles}">
-                <core:Item key="{RoleID}" text="{RoleName}" />
-            </Select>
-            <Label required="true" text="{i18n>Company_ID}" />
-            <Select width="20vw" items="{/Companies}" forceSelection="false" selectedKey="{CompanyID_CompanyID}" >
-                <core:Item key="{CompanyID}" text="{CompanyName}" />
-            </Select>
-            <Label required="true" text="{i18n>REPORTS_EXPOSED_ID}" />
-            <Select width="20vw" items="{/PowerBI}" forceSelection="false" selectedKey="{BIAccountUser_id}">
-                <core:Item key="{id}" text="{BIAccountUser}" />
+            <Label required="true" text="{i18n>Name}" labelFor="idUserName" />
+            <Input id="idUserName" value="{username}"/>
+            <!-- <Label required="true"  text="{i18n>Role}" />
+            <Select width="20vw" selectedKey="{role}" forceSelection="false" items="{/Roles}">
+                <core:Item key="{ID}" text="{name}" />
+            </Select> -->
+            <Label required="true"  text="{i18n>Company_ID}" />
+            <Select width="20vw" items="{/Companies}" forceSelection="false" selectedKey="{company_ID}" >
+                <core:Item key="{ID}" text="{name}" />
             </Select>
         </VBox>
         <buttons>

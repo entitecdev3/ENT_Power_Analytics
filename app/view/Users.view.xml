@@ -1,48 +1,42 @@
 <mvc:View controllerName="entitec.pbi.embedding.controller.Users" xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:mvc="sap.ui.core.mvc" xmlns:fb="sap.ui.comp.filterbar" displayBlock="true">
   <Page id="idUsers" title="{i18n>Users}" backgroundDesign="Solid" showHeader="false" showFooter="true">
     <content>
-      <Table id="idTableUsers" 
-       mode="Delete" 
-       items="{path: '/Users', parameters: { updateGroupId: 'UserChanges' }}" 
-       fixedLayout="false" 
-       alternateRowColors="true" 
-       delete="onDeleteUser">
-       
-    <headerToolbar>
-        <Toolbar id="lineItemsToolbar">
+      <Table id="idTableUsers" updateFinished=".onUpdateFinished" mode="Delete" items="{path: '/Users', parameters: { $expand: 'roles($expand=role($select=name))', updateGroupId: 'UserChanges' }}" fixedLayout="false" alternateRowColors="true" delete="onDeleteUser">
+
+        <headerToolbar>
+          <Toolbar id="lineItemsToolbar">
             <Title id="lineItemsHeader" text="{i18n>Users}" />
             <ToolbarSpacer />
             <Button icon="sap-icon://refresh" text="{i18n>Refresh}" tooltip="{i18n>Refresh}" press="onRefreshUsers" />
             <Button text="{i18n>Add}" icon="sap-icon://add" press="onAddUser" />
-        </Toolbar>
-    </headerToolbar>
+          </Toolbar>
+        </headerToolbar>
 
-    <columns>
-        <Column><Label text="{i18n>Name}" /></Column>
-        <Column><Label text="{i18n>Role}" /></Column>
-        <Column><Label text="{i18n>Company_ID}" /></Column>
-        <Column><Label text="{i18n>B1AccountUser}" /></Column>
-        <Column><Label text="{i18n>ResetPassword}" /></Column>
-    </columns>
+        <columns>
+          <Column><Label text="{i18n>Name}" /></Column>
+          <Column><Label text="{i18n>Company_ID}" /></Column>
+          <Column><Label text="{i18n>Role}" /></Column>
+          <Column><Label text="{i18n>ResetPassword}" /></Column>
+        </columns>
 
-    <items>
-        <ColumnListItem id="idColumnlist2" type="Active" press="onUserSelect">
+        <items>
+          <ColumnListItem id="idColumnlist2" type="Active" press="onUserSelect">
             <cells>
-                <Text text="{UserName}" />
-                <Select selectedKey="{RoleID_RoleID}" editable="false" items="{/Roles}">
-                    <core:Item key="{RoleID}" text="{RoleName}" />
-                </Select>
-                <Select editable="false" items="{/Companies}" forceSelection="false" selectedKey="{CompanyID_CompanyID}">
-                    <core:Item key="{CompanyID}" text="{CompanyName}" />
-                </Select>
-                <Select editable="false" items="{/PowerBI}" forceSelection="false" selectedKey="{BIAccountUser_id}">
-                    <core:Item key="{id}" text="{BIAccountUser}" />
-                </Select>
-                <Button id="idReset" icon="sap-icon://reset" type="Attention" text="Password" press="onResetPassword" />
+              <Text text="{username}" />
+              <Text text="{company_ID}"></Text>
+              <Text text="{path: 'roles', formatter: '.formatter.formatRoles'}" />
+
+              <!-- <MultiComboBox items="{ path: '/Roles', templateShareable: true}" selectedItems="{
+                    path: 'roles',
+                    templateShareable: false
+                }">
+                <core:Item key="{ID}" text="{name}"></core:Item>
+              </MultiComboBox> -->
+              <Button id="idReset" icon="sap-icon://reset" type="Attention" text="Password" press="onResetPassword" />
             </cells>
-        </ColumnListItem>
-    </items>
-</Table>
+          </ColumnListItem>
+        </items>
+      </Table>
 
     </content>
     <footer>

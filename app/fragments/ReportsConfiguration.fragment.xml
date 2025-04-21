@@ -20,6 +20,8 @@
                 <Column><Text text="Workspace ID"/></Column>
                 <Column><Text text="Workspace Comment"/></Column>
                 <Column><Text text="Security Filter Type ID"/></Column>
+                <Column><Text text="Service Principal"/></Column>
+                <Column><Text text=""/></Column>
             </columns>
             <items>
                 <ColumnListItem type="Active" press="onReportSelect">
@@ -28,7 +30,9 @@
                         <Text text="{reportComment}"/>
                         <Text text="{workspaceId}"/>
                         <Text text="{workspaceComment}"/>
-                        <Text text="{securityFilterTypeId}"/>                        
+                        <Text text="{securityFilterType}"/>                        
+                        <Text text="{servicePrincipal_ID}"/>  
+                        <Button text="Watch Report" type="Default"></Button>                      
                     </cells>
                 </ColumnListItem>
             </items>

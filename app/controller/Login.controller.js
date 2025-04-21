@@ -1,8 +1,9 @@
 sap.ui.define([
   "sap/ui/core/mvc/Controller",
   "sap/m/MessageToast",
-  "entitec/pbi/embedding/controller/BaseController"
-], function (Controller, MessageToast, BaseController) {
+  "entitec/pbi/embedding/controller/BaseController",
+  "sap/ui/Device"
+], function (Controller, MessageToast, BaseController, Device) {
   "use strict";
 
   return BaseController.extend("entitec.pbi.embedding.controller.Login", {
@@ -14,6 +15,7 @@ sap.ui.define([
     },
     _matchedHandler: function () {
       this.getModel("appView").setProperty("/navVisible", false);
+      this.getModel("appView").setProperty("/LoginHeader", false); 
     },
     onButtonLoginPress: function (oEvent) {
       // MessageToast.show("Login logic to be implemented.");

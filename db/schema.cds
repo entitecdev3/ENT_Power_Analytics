@@ -12,6 +12,7 @@ context PowerBiPortal {
             company       : Association to PowerBiPortal.Companies not null @mandatory;
             password      : String(255) not null @mandatory;
             roles         : Composition of many UserRoles on roles.user = $self;
+            report         : Composition of many UserReports on report.user = $self;
     }
 
     entity Roles: cuid, managed {
@@ -38,7 +39,6 @@ context PowerBiPortal {
             clientId         : UUID not null @mandatory;
             clientSecret     : String(255) not null @mandatory;
             tenantId         : UUID not null @mandatory;
-        //  reportExposed    : Association to PowerBiPortal.ReportsExposed;
     }
 
     entity Identity: cuid, managed  {
@@ -53,6 +53,12 @@ context PowerBiPortal {
             workspaceComment     : String(500) not null @mandatory;
             securityFilterType   : Association to PowerBiPortal.SecurityFiltersType;
             servicePrincipal     : Association to PowerBiPortal.PowerBi;
+            users                : Association to many UserReports on users.report = $self;
+    }
+
+    entity UserReports: cuid, managed {
+        user : Association to Users @key;
+        report : Association to ReportsExposed @key;
     }
 
     entity SecurityFiltersType: cuid, managed {

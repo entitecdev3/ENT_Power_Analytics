@@ -1,7 +1,7 @@
 sap.ui.define([
     "sap/ui/core/UIComponent",
     "entitec/pbi/embedding/model/models",
-    "entitec/pbi/embedding/errorHandler/ErrorHandler",
+    // "powerbi-client"
 ], (UIComponent, models, ErrorHandler) => {
     "use strict";
 
@@ -13,8 +13,6 @@ sap.ui.define([
             ]
         },
         init() {
-
-            // this._oErrorHandler = new ErrorHandler(this);
 
             // call the base component's init function
             UIComponent.prototype.init.apply(this, arguments);
