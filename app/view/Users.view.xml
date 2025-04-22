@@ -1,7 +1,7 @@
 <mvc:View controllerName="entitec.pbi.embedding.controller.Users" xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:mvc="sap.ui.core.mvc" xmlns:fb="sap.ui.comp.filterbar" displayBlock="true">
   <Page id="idUsers" title="{i18n>Users}" backgroundDesign="Solid" showHeader="false" showFooter="true">
     <content>
-      <Table id="idTableUsers" updateFinished=".onUpdateFinished" mode="Delete" items="{path: '/Users', parameters: { $expand: 'roles($expand=role($select=name))', updateGroupId: 'UserChanges' }}" fixedLayout="false" alternateRowColors="true" delete="onDeleteUser">
+      <Table id="idTableUsers" updateFinished=".onUpdateFinished" mode="Delete" items="{path: '/Users', parameters: { $expand: 'roles($expand=role($select=name)),company($select=name)', updateGroupId: 'UserChanges' }}" fixedLayout="false" alternateRowColors="true" delete="onDeleteUser">
 
         <headerToolbar>
           <Toolbar id="lineItemsToolbar">
@@ -14,7 +14,7 @@
 
         <columns>
           <Column><Label text="{i18n>Name}" /></Column>
-          <Column><Label text="{i18n>Company_ID}" /></Column>
+          <Column><Label text="{i18n>Company}" /></Column>
           <Column><Label text="{i18n>Role}" /></Column>
           <Column><Label text="{i18n>ResetPassword}" /></Column>
         </columns>
@@ -23,15 +23,10 @@
           <ColumnListItem id="idColumnlist2" type="Active" press="onUserSelect">
             <cells>
               <Text text="{username}" />
-              <Text text="{company_ID}"></Text>
-              <Text text="{path: 'roles', formatter: '.formatter.formatRoles'}" />
-
-              <!-- <MultiComboBox items="{ path: '/Roles', templateShareable: true}" selectedItems="{
-                    path: 'roles',
-                    templateShareable: false
-                }">
-                <core:Item key="{ID}" text="{name}"></core:Item>
-              </MultiComboBox> -->
+              <Text text="{company/name}"></Text>
+              <VBox items="{roles}">
+                <Text text="{role/name}"/>
+              </VBox>
               <Button id="idReset" icon="sap-icon://reset" type="Attention" text="Password" press="onResetPassword" />
             </cells>
           </ColumnListItem>
