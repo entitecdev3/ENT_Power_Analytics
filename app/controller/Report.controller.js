@@ -38,13 +38,12 @@ sap.ui.define([
     loadPowerBIReport: async function (reportExposedId) {
       try {
         const oModel = this.getView().getModel("powerBi");
-
-        const sPath = `/ReportsExposed(${reportExposedId})/getEmbedDetails(...)`;
+        const sPath = `/ReportsExposed(${reportExposedId})/PowerBiService.getEmbedDetails(...)`;
 
 
         const oBinding = oModel.bindContext(sPath);
-        // oBinding.setParameter("reportExposedId", reportExposedId);
         await oBinding.execute(); // wait for the action to finish
+     
 
         const oContext = oBinding.getBoundContext();
         const oResult = oContext.getObject();

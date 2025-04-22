@@ -18,8 +18,6 @@ sap.ui.define([
       this.getModel("appView").setProperty("/LoginHeader", false); 
     },
     onButtonLoginPress: function (oEvent) {
-      // MessageToast.show("Login logic to be implemented.");
-      // Here you can add navigation logic after successful authentication
       var sUsername = this.getView().byId("idUnameInput").getValue();
       var sPassword = this.getView().byId("idPasswordInput").getValue();
 

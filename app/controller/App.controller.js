@@ -28,9 +28,6 @@ sap.ui.define([
 
       $(document).ajaxStop(function (x, y, z) {
         BusyIndicator.hide();
-        // if(x.currentTarget.URL.includes('odata/v4')){
-        //   debugger;
-        // }
       });
 
       
