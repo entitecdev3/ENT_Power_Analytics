@@ -13,7 +13,6 @@ sap.ui.define([
       this._oRouter
         .getRoute("Configuration")
         .attachPatternMatched(this._matchedHandler, this);
-      this._oODataModelConfiguration = this.getView().getModel(); 
     },
     _matchedHandler: function () {
       let oViewModel = this.getView().getModel("appView");
@@ -71,20 +70,20 @@ sap.ui.define([
     },
 
     onRefreshServicePrincipal: function () {
-      
-      if (this._oODataModelConfiguration.hasPendingChanges()) {
+      let oModel = this.getView().getModel();
+      if (oModel.hasPendingChanges()) {
         MessageBox.warning("Are you sure you want to reload. Your changes will be lost?", {
           actions: [MessageBox.Action.OK, MessageBox.Action.CANCEL],
           onClose: function (sAction) {
             if (sAction === MessageBox.Action.OK) {
-              this._oODataModelConfiguration.resetChanges("ServicePrincipalChanges");
-              this._oODataModelConfiguration.refresh();
+              oModel.resetChanges("ServicePrincipalChanges");
+              oModel.refresh();
             }
           }
         });
       } else {
-        this._oODataModelConfiguration.resetChanges("ServicePrincipalChanges");
-        this._oODataModelConfiguration.refresh();
+        oModel.resetChanges("ServicePrincipalChanges");
+        oModel.refresh();
       }
     },
 
@@ -109,8 +108,8 @@ sap.ui.define([
     },
 
     onCloseEditServicePrincipalDialog: function () {
-      
-      this._oODataModelConfiguration.resetChanges("ServicePrincipalChanges");
+      let oModel = this.getView().getModel();
+      oModel.resetChanges("ServicePrincipalChanges");
       this._oDialog.close();
     },
 
@@ -189,8 +188,8 @@ sap.ui.define([
     },
 
     onCloseEditReportsDialog: function () {
-      
-      this._oODataModelConfiguration.resetChanges("ReportsChanges");
+      let oModel = this.getView().getModel();
+      oModel.resetChanges("ReportsChanges");
       this._oReportDialog.close();
     },
 
@@ -214,20 +213,20 @@ sap.ui.define([
     },
 
     onRefreshReports: function () {
-      
-      if (this._oODataModelConfiguration.hasPendingChanges()) {
+      let oModel = this.getView().getModel();
+      if (oModel.hasPendingChanges()) {
         MessageBox.warning("Are you sure you want to reload. Your changes will be lost?", {
           actions: [MessageBox.Action.OK, MessageBox.Action.CANCEL],
           onClose: function (sAction) {
             if (sAction === MessageBox.Action.OK) {
-              this._oODataModelConfiguration.resetChanges("ReportsChanges");
-              this._oODataModelConfiguration.refresh();
+              oModel.resetChanges("ReportsChanges");
+              oModel.refresh();
             }
           }
         });
       } else {
-        this._oODataModelConfiguration.resetChanges("ReportsChanges");
-        this._oODataModelConfiguration.refresh();
+        oModel.resetChanges("ReportsChanges");
+        oModel.refresh();
       }
     },
 
@@ -235,14 +234,14 @@ sap.ui.define([
       const oReport = oEvent.getSource().getBindingContext().getObject();
       const reportExposedId = oReport.ID;
       const reportName = oReport.reportComment;
-
+      let oModel = this.getView().getModel();
       if (!reportExposedId) {
         MessageBox.error("Report not found in the database!");
         return;
       }
 
       const sPath = `/ReportsExposed(${reportExposedId})/PowerBiService.getEmbedDetails(...)`;
-      const oBinding = this._oODataModelConfiguration.bindContext(sPath);
+      const oBinding = oModel.bindContext(sPath);
 
       await oBinding.execute();
 
@@ -425,8 +424,8 @@ sap.ui.define([
     },
 
     onCloseEditSecurityFilterDialog: function () {
-      
-      this._oODataModelConfiguration.resetChanges("SecurityFilterChanges");
+      let oModel = this.getView().getModel();
+      oModel.resetChanges("SecurityFilterChanges");
       this._oSecurityFilterDialog.close();
     },
 
@@ -450,20 +449,20 @@ sap.ui.define([
     },
 
     onRefreshSecurityFilters: function () {
-      
-      if (this._oODataModelConfiguration.hasPendingChanges()) {
+      let oModel = this.getView().getModel();
+      if (oModel.hasPendingChanges()) {
         MessageBox.warning("Are you sure you want to reload. Your changes will be lost?", {
           actions: [MessageBox.Action.OK, MessageBox.Action.CANCEL],
           onClose: function (sAction) {
             if (sAction === MessageBox.Action.OK) {
-              this._oODataModelConfiguration.resetChanges("SecurityFilterChanges");
-              this._oODataModelConfiguration.refresh();
+              oModel.resetChanges("SecurityFilterChanges");
+              oModel.refresh();
             }
           }
         });
       } else {
-        this._oODataModelConfiguration.resetChanges("SecurityFilterChanges");
-        this._oODataModelConfiguration.refresh();
+        oModel.resetChanges("SecurityFilterChanges");
+        oModel.refresh();
       }
     },
 
@@ -471,12 +470,12 @@ sap.ui.define([
 
     onSaveChanges: function () {
       let oIconTabBar = this.byId("idConfigurationMenu");
-
+      let oModel = this.getView().getModel();
       let sSelectedKey = oIconTabBar.getSelectedKey();
 
       if (sSelectedKey.includes("idServicePrincipalConfig")) {
         // Service Principal batch 
-        if (!this._oODataModelConfiguration.hasPendingChanges("ServicePrincipalChanges")) {
+        if (!oModel.hasPendingChanges("ServicePrincipalChanges")) {
           MessageToast.show("No changes detected.");
           return;
         }
@@ -513,7 +512,7 @@ sap.ui.define([
         });
       } else if (sSelectedKey.includes("idReportConfig")) {
         // Report batch
-        if (!this._oODataModelConfiguration.hasPendingChanges("ReportsChanges")) {
+        if (!oModel.hasPendingChanges("ReportsChanges")) {
           MessageToast.show("No changes detected.");
           return;
         }
@@ -550,7 +549,7 @@ sap.ui.define([
         });
       } else if (sSelectedKey.includes("idSecurityFilterConfig")) {
         // Security Filter batch
-        if (!this._oODataModelConfiguration.hasPendingChanges("SecurityFilterChanges")) {
+        if (!oModel.hasPendingChanges("SecurityFilterChanges")) {
           MessageToast.show("No changes detected.");
           return;
         }

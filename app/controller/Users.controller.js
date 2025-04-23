@@ -13,8 +13,6 @@ sap.ui.define([
 
     onInit: function () {
       this.getRouter().getRoute("Users").attachPatternMatched(this._matchedHandler, this);
-      this._oODataModel = this.getView().getModel(); 
-
     },
 
     _matchedHandler: function () {
@@ -31,25 +29,25 @@ sap.ui.define([
       this.openUserDialog("Add User", "Add", oNewContext);
     },
     onRefreshUsers: function () {
-      
-      if (this._oODataModel.hasPendingChanges()) {
+      let oModel = this.getView().getModel();
+      if (oModel.hasPendingChanges()) {
         MessageBox.warning("Are you sure you want to reload. Your changes will be lost?", {
           actions: [MessageBox.Action.OK, MessageBox.Action.CANCEL],
           onClose: function (sAction) {
             if (sAction === MessageBox.Action.OK) {
-              this._oODataModel.resetChanges("UserChanges");
-              this._oODataModel.refresh();
+              oModel.resetChanges("UserChanges");
+              oModel.refresh();
             }
           }
         });
       } else {
-        this._oODataModel.resetChanges("UserChanges");
-        this._oODataModel.refresh();
+        oModel.resetChanges("UserChanges");
+        oModel.refresh();
       }
     },
-    onCloseEditUserDialog: function () {
-      
-      this._oODataModel.resetChanges("UserChanges");
+    onCloseEditUserDialog: function () {  
+      let oModel = this.getView().getModel();    
+      oModel.resetChanges("UserChanges");
       this._oDialog.close();
     },
     onAccountNewPasswordLiveChange: function (oEvent) {
@@ -251,7 +249,8 @@ sap.ui.define([
     },
     onSaveChanges: function () {
       var that = this;
-      if (!this._oODataModel.hasPendingChanges()) {
+      let oModel = this.getView().getModel();
+      if (!oModel.hasPendingChanges("UserChanges")) {
         MessageToast.show("No changes detected.");
         return;
       }
