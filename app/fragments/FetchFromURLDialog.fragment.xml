@@ -1,0 +1,20 @@
+    <core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:layout="sap.ui.layout" xmlns:form="sap.ui.layout.form">
+
+    <Dialog title="Fetch From URL" contentWidth="35rem" resizable="true" draggable="true" class="sapUiResponsivePadding--header sapUiResponsivePadding--content sapUiResponsivePadding--footer">
+        <VBox class="sapUiSmallMargin">
+        
+
+        <HBox justifyContent="End" class="sapUiTinyMarginTop">
+            <!-- <Button text="Test URL" icon="sap-icon://inspection" type="Default" press=".onTestURL" /> -->
+            <!-- <Button text="Fetch Report" icon="sap-icon://broken-link" type="Emphasized" press=".onConfirmFetchURL" class="sapUiTinyMarginBegin" /> -->
+        </HBox>
+        </VBox>
+
+        <beginButton>
+        <Button text="Fetch Report" icon="sap-icon://broken-link" type="Emphasized" press=".onConfirmFetchURL" class="sapUiTinyMarginBegin" />
+        </beginButton>
+        <endButton>
+        <Button text="Cancel" press=".onFetchFromUrlDialogClose" />
+        </endButton>
+    </Dialog>
+    </core:FragmentDefinition>

@@ -82,7 +82,7 @@ sap.ui.define([
         onLogOut: function (oEvent) {
             var that = this;
             this.middleWare.callMiddleWare("/logout", "POST").then(function (oData) {
-                that.getRouter().navTo("Login"); // Navigate if session is valid
+                that.getRouter().navTo("Login"); 
             }).catch(function (oError) {
                 that.getRouter().navTo("Login"); // Redirect to login on failure
                 window.location.href = '/';
@@ -145,14 +145,14 @@ sap.ui.define([
 
         getRequiredFieldsFromMetadata: async function (entityName) {
             const oModel = this.getView().getModel();
-            const sServiceUrl = oModel.getMetaModel().getAbsoluteServiceUrl('$metadata'); // gives the service root URL
+            const sServiceUrl = oModel.getMetaModel().getAbsoluteServiceUrl('$metadata'); 
             const sMetadataUrl = sServiceUrl + "/$metadata";
             const oMetadataXML = await fetch(sMetadataUrl).then(res => res.text());
 
             const oParser = new DOMParser();
             const oXmlDoc = oParser.parseFromString(oMetadataXML, "application/xml");
 
-            // Find entity type
+            
             const oEntityType = [...oXmlDoc.getElementsByTagName("EntityType")].find(type =>
                 type.getAttribute("Name") === entityName
             );
@@ -161,7 +161,7 @@ sap.ui.define([
             const aPrimaryKeys = [];
 
             if (oEntityType) {
-                // Get primary keys
+               
                 const oKey = oEntityType.getElementsByTagName("Key")[0];
                 if (oKey) {
                     const keyProps = oKey.getElementsByTagName("PropertyRef");
@@ -170,7 +170,7 @@ sap.ui.define([
                     }
                 }
 
-                // Get properties with Nullable="false", excluding primary keys
+                
                 const properties = oEntityType.getElementsByTagName("Property");
                 for (let prop of properties) {
                     const propName = prop.getAttribute("Name");
@@ -181,7 +181,7 @@ sap.ui.define([
                 }
             }
 
-            return aRequiredFields; // e.g. ['reportComment', 'workspaceId', ...] (no primary keys)
+            return aRequiredFields; 
         },
 
         validateEntityFields: async function (entityName, dataObject, skipFields = []) {
@@ -189,7 +189,7 @@ sap.ui.define([
 
             for (let field of requiredFields) {
                 if (skipFields.includes(field)) {
-                    continue; // skip fields like "Password" if told to
+                    continue; 
                 }
 
                 if (!dataObject[field]) {

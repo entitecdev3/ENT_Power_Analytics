@@ -1,20 +1,21 @@
 <mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" xmlns:layout="sap.ui.layout.form" xmlns:core="sap.ui.core" controllerName="entitec.pbi.embedding.controller.Configuration">
   <Page showHeader="false">
     <content>
+    <Title text="Configuration" class="sapUiSmallMargin"></Title>
       <IconTabBar id="idConfigurationMenu" tabDensityMode="Inherit" backgroundDesign="Transparent">
         <items>
-          <IconTabFilter id="idServicePrincipalConfig" text="Service Principal Configuration" icon="sap-icon://key" design="Horizontal">
+          <IconTabFilter id="idServicePrincipalConfig" text="Service Principal " icon="sap-icon://key" design="Horizontal">
             <VBox>
               <core:Fragment fragmentName="entitec.pbi.embedding.fragments.ServicePrincipalConfiguration" type="XML" />
             </VBox>
           </IconTabFilter>
 
-          <IconTabFilter id="idReportConfig" design="Horizontal" text="Reports Configuration" icon="sap-icon://business-objects-experience">
+          <IconTabFilter id="idReportConfig" design="Horizontal" text="Reports" icon="sap-icon://business-objects-experience">
             <VBox>
               <core:Fragment fragmentName="entitec.pbi.embedding.fragments.ReportsConfiguration" type="XML" />
             </VBox>
           </IconTabFilter>
-          <IconTabFilter id="idSecurityFilterConfig" design="Horizontal" text="Security Filter Configuration" icon="sap-icon://shield">
+          <IconTabFilter id="idSecurityFilterConfig" design="Horizontal" text="Security Filters" icon="sap-icon://shield">
             <VBox>
               <core:Fragment fragmentName="entitec.pbi.embedding.fragments.SecurityFilterConfiguration" type="XML" />
             </VBox>

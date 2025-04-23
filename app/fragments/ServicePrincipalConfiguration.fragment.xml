@@ -1,10 +1,10 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:layout="sap.ui.layout.form">
-  <VBox alignItems="Center" fitContainer="true" height="100%">
-    <!-- Table for Existing Configurations -->
+  <VBox alignItems="Center" fitContainer="true" height="100%" class="sapUiContentPadding">
+
     <Table id="idConfigTable" mode="Delete" alternateRowColors="true" items="{path: '/PowerBi', parameters: { $$updateGroupId: 'ServicePrincipalChanges' }}" fixedLayout="true" delete="onDeleteConfig">
       <headerToolbar>
         <Toolbar>
-          <Title text="Existing Service Principal" level="H3" />
+          <Title text="Manage Service Principal" level="H3" />
           <ToolbarSpacer />
           <Button icon="sap-icon://refresh" text="{i18n>Refresh}" visible="true" tooltip="{i18n>Refresh}" press="onRefreshServicePrincipal" />
           <Button id="idAddButton" icon="sap-icon://add" tooltip="Add Service Principal" text="{i18n>Add}" press="onAddServicePrincipalConfiguration" />

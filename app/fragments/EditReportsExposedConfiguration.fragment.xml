@@ -1,27 +1,38 @@
-<core:FragmentDefinition xmlns="sap.m"
-    xmlns:core="sap.ui.core">
-    <Dialog id="idEditReportsExposedDialog" class="sapUiResponsiveMargin">
-        <VBox class="sapUiSmallMargin">
-            <Label required="true" text="{i18n>REPORT_ID}" />
-            <Input value="{reportId}"/>
-            <Label required="true" text="{i18n>REPORT_COMMENT}" />
-            <Input value="{reportComment}"/>
-            <Label required="true" text="{i18n>WORKSPACE_ID}" />
-            <Input value="{workspaceId}"/>
-            <Label required="true" text="{i18n>WORKSPACE_COMMENT}" />
-            <Input value="{workspaceComment}"/>
-            <Label required="false" text="{i18n>SECURITY_FILTER_TYPE_ID}" />
-            <MultiComboBox width="20vw" items="{/SecurityFiltersType}" selectedItems="{securityFilterType_ID}">
-                <core:Item key="{ID}" text="{name}" />
-            </MultiComboBox>
-            <Label required="false" text="{i18n>SERVICE_PRINCIPAL}" />
-            <ComboBox width="20vw" items="{/PowerBi}" selectedKey="{servicePrincipal_ID}">
-                <core:Item key="{ID}" text="{biUser}" />
-            </ComboBox>
-        </VBox>
-        <buttons>
-            <Button id="idAddReports" type="Emphasized" press="onSaveEditReportsDialog"/>
-            <Button text="Cancel" press="onCloseEditReportsDialog"/>
-        </buttons>
-    </Dialog>
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+  <Dialog id="idEditReportsExposedDialog" class="sapUiResponsiveMargin">
+    <VBox class="sapUiSmallMargin">
+      <Label required="true" text="{i18n>REPORT_ID}" />
+      <Input id="idInputReportId" value="{reportId}" />
+      <Label required="true" text="{i18n>REPORT_COMMENT}" />
+      <Input id="idInputWorkspaceId" value="{reportComment}" />
+      <Label required="true" text="{i18n>WORKSPACE_ID}" />
+      <Input id="idInputReportComment" value="{workspaceId}" />
+      <Label required="true" text="{i18n>WORKSPACE_COMMENT}" />
+      <Input id="idInputWorkspaceComment" value="{workspaceComment}" />
+      <Label required="false" text="{i18n>SECURITY_FILTER_TYPE_ID}" />
+      <MultiComboBox id="idSecurityFiltersTypeInput" width="20vw" items="{/SecurityFiltersType}" selectedItems="{securityFilterType_ID}">
+        <core:Item key="{ID}" text="{name}" />
+      </MultiComboBox>
+      <Label required="false" text="{i18n>SERVICE_PRINCIPAL}" />
+      <ComboBox id="idServicePrincipalTypeInput" width="20vw" items="{/PowerBi}" selectedKey="{servicePrincipal_ID}">
+        <core:Item key="{ID}" text="{biUser}" />
+      </ComboBox>
+    </VBox>
+
+    <VBox class="sapUiSmallMargin">
+      <Label text="Power BI Report URL" labelFor="fetchURLInput" />
+      <Input id="fetchURLInput" placeholder="https://app.powerbi.com/groups/00000000-0000-0000-0000-000000000000/reports/11111111-1111-1111-1111-111111111111/ReportSection0000000000000000000000" width="100%" valueHelpIconSrc="sap-icon://paste" showValueHelp="true" valueHelpRequest=".onPasteExampleURL" />
+      <HBox justifyContent="End" class="sapUiTinyMarginTop">
+        <Button icon="sap-icon://broken-link" text="Fetch from URL" type="Emphasized" press=".onConfirmFetchURL" tooltip="Fetch report configuration from a Power BI URL" />
+      </HBox>
+    </VBox>
+
+
+    <beginButton>
+      <Button id="idAddReports" type="Emphasized" press="onSaveEditReportsDialog" />
+    </beginButton>
+    <endButton>
+      <Button text="Cancel" press="onCloseEditReportsDialog" />
+    </endButton>
+  </Dialog>
 </core:FragmentDefinition>

@@ -11,9 +11,9 @@ sap.ui.define(["./BaseController"], function (BaseController) {
       _matchedHandler: function () {
         
       var oViewModel = this.getView().getModel("appView");
-      oViewModel.setProperty("/navVisible", false);   // Show back button
-      oViewModel.setProperty("/LoginHeader", false);   // Show back button
-      oViewModel.setProperty("/HomeScreen", true);   // Show back button
+      oViewModel.setProperty("/navVisible", false);   
+      oViewModel.setProperty("/LoginHeader", false);  
+      oViewModel.setProperty("/HomeScreen", true);  
       },
       press: function (oEvent) {
         

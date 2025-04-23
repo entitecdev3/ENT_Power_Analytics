@@ -1,21 +1,20 @@
-<core:FragmentDefinition xmlns="sap.m"
-    xmlns:core="sap.ui.core">
-    <Dialog id="idEditUsersDialog" class="sapUiResponsiveMargin">
-        <VBox class="sapUiSmallMargin">
-            <Label required="true" text="{i18n>Name}" labelFor="idUserName" />
-            <Input id="idUserName" value="{username}"/>
-            <!-- <Label required="true"  text="{i18n>Role}" />
-            <Select width="20vw" selectedKey="{role}" forceSelection="false" items="{/Roles}">
-                <core:Item key="{ID}" text="{name}" />
-            </Select> -->
-            <Label required="true"  text="{i18n>Company_ID}" />
-            <Select width="20vw" items="{/Companies}" forceSelection="false" selectedKey="{company_ID}" >
-                <core:Item key="{ID}" text="{name}" />
-            </Select>
-        </VBox>
-        <buttons>
-            <Button id="idAdd" text="Add" type="Emphasized" press="onSaveEditUserDialog"/>
-            <Button text="Cancel" press="onCloseEditUserDialog"/>
-        </buttons>
-    </Dialog>
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+  <Dialog id="idEditUsersDialog" class="sapUiResponsiveMargin">
+    <VBox class="sapUiSmallMargin">
+      <Label required="true" text="{i18n>Name}" labelFor="idUserName" />
+      <Input id="idUserName" value="{username}" />
+      <Label required="true" text="{i18n>Role}" />
+      <MultiComboBox id="idRolesMultiCombo" width="20vw" items="{/Roles}"  selectionChange="onRoleSelectionChange">
+        <core:Item key="{ID}" text="{name}" />
+      </MultiComboBox>
+      <Label required="true" text="{i18n>Company_ID}" />
+      <Select width="20vw" items="{/Companies}" forceSelection="false" selectedKey="{company/ID}">
+        <core:Item key="{ID}" text="{name}" />
+      </Select>
+    </VBox>
+    <buttons>
+      <Button id="idAdd" text="Add" type="Emphasized" press="onSaveEditUserDialog" />
+      <Button text="Cancel" press="onCloseEditUserDialog" />
+    </buttons>
+  </Dialog>
 </core:FragmentDefinition>

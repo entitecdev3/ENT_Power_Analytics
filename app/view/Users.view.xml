@@ -1,7 +1,7 @@
 <mvc:View controllerName="entitec.pbi.embedding.controller.Users" xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:mvc="sap.ui.core.mvc" xmlns:fb="sap.ui.comp.filterbar" displayBlock="true">
   <Page id="idUsers" title="{i18n>Users}" backgroundDesign="Solid" showHeader="false" showFooter="true">
     <content>
-      <Table id="idTableUsers" updateFinished=".onUpdateFinished" mode="Delete" items="{path: '/Users', parameters: { $expand: 'roles($expand=role($select=name)),company($select=name)', updateGroupId: 'UserChanges' }}" fixedLayout="false" alternateRowColors="true" delete="onDeleteUser">
+      <Table id="idTableUsers" updateFinished=".onUpdateFinished" mode="Delete" items="{path: '/Users', parameters: { $$updateGroupId: 'UserChanges' }}" fixedLayout="false" alternateRowColors="true" delete="onDeleteUser">
 
         <headerToolbar>
           <Toolbar id="lineItemsToolbar">
@@ -26,7 +26,7 @@
               <Text text="{company/name}"></Text>
               <VBox items="{roles}">
                 <Text text="{role/name}"/>
-              </VBox>
+              </VBox>              
               <Button id="idReset" icon="sap-icon://reset" type="Attention" text="Password" press="onResetPassword" />
             </cells>
           </ColumnListItem>

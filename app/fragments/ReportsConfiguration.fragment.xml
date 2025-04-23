@@ -1,41 +1,42 @@
-<core:FragmentDefinition
-    xmlns="sap.m"
-    xmlns:core="sap.ui.core"
-    xmlns:layout="sap.ui.layout.form"
->
-    <VBox alignItems="Center" fitContainer="true" height="100%">
-        <!-- Table for Existing Configurations -->
-        <Table id="idRCConfigTable" mode="Delete" alternateRowColors="true" items="{path: '/ReportsExposed', parameters: { $$updateGroupId: 'ReportsChanges' }}" fixedLayout="true" delete="onDeleteReport">
-            <headerToolbar>
-                <Toolbar>
-                    <Title text="Existing Exposed Reports" level="H3"/>
-                    <ToolbarSpacer/>
-                    <Button icon="sap-icon://refresh" text="{i18n>Refresh}" visible="true" tooltip="{i18n>Refresh}" press="onRefreshReports" />
-                    <Button id="idRCAddButton" icon="sap-icon://add" tooltip="Add Report" text="{i18n>Add}" press="onAddReportsConfiguration"/>                   
-                </Toolbar>
-            </headerToolbar>
-            <columns>
-                <Column><Text text="Report ID"/></Column>
-                <Column><Text text="Report Comment"/></Column>
-                <Column><Text text="Workspace ID"/></Column>
-                <Column><Text text="Workspace Comment"/></Column>
-                <Column><Text text="Security Filter Type ID"/></Column>
-                <Column><Text text="Service Principal"/></Column>
-                <Column><Text text=""/></Column>
-            </columns>
-            <items>
-                <ColumnListItem type="Active" press="onReportSelect">
-                    <cells>
-                        <Text text="{reportId}"/>
-                        <Text text="{reportComment}"/>
-                        <Text text="{workspaceId}"/>
-                        <Text text="{workspaceComment}"/>
-                        <Text text="{securityFilterType}"/>                        
-                        <Text text="{servicePrincipal_ID}"/>  
-                        <Button text="Watch Report" type="Default"></Button>                      
-                    </cells>
-                </ColumnListItem>
-            </items>
-        </Table>
-    </VBox>
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:layout="sap.ui.layout.form">
+  <VBox alignItems="Stretch" fitContainer="true" height="100%" class="sapUiContentPadding">
+
+    <Table id="idRCConfigTable" mode="Delete" alternateRowColors="true" items="{path: '/ReportsExposed', parameters: { $$updateGroupId: 'ReportsChanges' }}" fixedLayout="true" delete="onDeleteReport">
+
+      <headerToolbar>
+        <Toolbar>
+          <Title text="Manage Reports" level="H3" />
+          <ToolbarSpacer />
+          
+          <Button icon="sap-icon://inspection" text="Test Report URL" type="Emphasized" press=".onTestReportURL" tooltip="Open and test a report URL in a popup" class="sapUiTinyMarginBegin" />
+          <Button icon="sap-icon://refresh" text="{i18n>Refresh}" tooltip="{i18n>Refresh}" press="onRefreshReports" />
+          <Button id="idRCAddButton" icon="sap-icon://add" tooltip="Add Report" text="{i18n>Add}" press="onAddReportsConfiguration" />
+        </Toolbar>
+      </headerToolbar>
+
+      <columns>
+        <Column><Text text="Report ID" /></Column>
+        <Column><Text text="Report Comment" /></Column>
+        <Column><Text text="Workspace ID" /></Column>
+        <Column><Text text="Workspace Comment" /></Column>
+        <Column><Text text="Security Filter Type ID" /></Column>
+        <Column><Text text="Service Principal" /></Column>
+        <Column><Text text="" /></Column>
+      </columns>
+
+      <items>
+        <ColumnListItem type="Active" press="onReportSelect">
+          <cells>
+            <Text text="{reportId}" />
+            <Text text="{reportComment}" />
+            <Text text="{workspaceId}" />
+            <Text text="{workspaceComment}" />
+            <Text text="" />
+            <Text text="" />
+            <Button text="Watch Report" type="Emphasized" press=".onLoadReport" />
+          </cells>
+        </ColumnListItem>
+      </items>
+    </Table>
+  </VBox>
 </core:FragmentDefinition>

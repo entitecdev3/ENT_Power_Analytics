@@ -15,21 +15,18 @@ sap.ui.define([
     },
     _matchedHandler: function () {
       var oViewModel = this.getView().getModel("appView");
-      oViewModel.setProperty("/navVisible", true);   // Show back button
-      oViewModel.setProperty("/LoginHeader", false);   // Show back button
-      oViewModel.setProperty("/HomeScreen", true);   // Show back button
-      // this.loadPowerBIReport();
+      oViewModel.setProperty("/navVisible", true);  
+      oViewModel.setProperty("/LoginHeader", false);  
+      oViewModel.setProperty("/HomeScreen", true);  
     },
 
     onReportSelectionChange: function (oEvent) {
       const oSelectedItem = oEvent.getParameter("selectedItem");
-      // debugger;
       if (oSelectedItem) {
-        // const reportObject = oEvent.getParameter("selectedItem").getBindingContext().getObject();
         const sReportId = oSelectedItem.getKey();
         const sReportText = oSelectedItem.getText();
 
-        // Update the title (optional)
+        // Update the title
         this.byId("idReportTitle").setText("Report: " + sReportText);
         this.loadPowerBIReport(sReportId)
       }
@@ -42,7 +39,7 @@ sap.ui.define([
 
 
         const oBinding = oModel.bindContext(sPath);
-        await oBinding.execute(); // wait for the action to finish
+        await oBinding.execute(); 
      
 
         const oContext = oBinding.getBoundContext();

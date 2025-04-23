@@ -10,64 +10,51 @@ sap.ui.define([
 
   return BaseController.extend("entitec.pbi.embedding.controller.Users", {
     formatter: formatter,
-    
+
     onInit: function () {
       this.getRouter().getRoute("Users").attachPatternMatched(this._matchedHandler, this);
-      this._oODataModel = this.getView().getModel(); // OData V4 Model
-
-      try {
-        let oModel = this.getView().getModel(); // Ensure the OData model is set
-        // Attach the 'requestFailed' event to the model to catch errors
-        oModel.attachRequestFailed(this._onRequestFailed, this);
-      } catch (oErr) {
-      }
+      this._oODataModel = this.getView().getModel(); 
 
     },
 
     _matchedHandler: function () {
       var oViewModel = this.getView().getModel("appView");
-      oViewModel.setProperty("/navVisible", true);   // Show back button
-      oViewModel.setProperty("/LoginHeader", false);   // Show back button
-      oViewModel.setProperty("/HomeScreen", true);   // Show back button
-      // this.onUsersLoaded();
+      oViewModel.setProperty("/navVisible", true);   
+      oViewModel.setProperty("/LoginHeader", false); 
+      oViewModel.setProperty("/HomeScreen", true); 
     },
 
     onAddUser: function () {
       this.addUserPress = true;
-
-      let oListBinding = this.getView().byId("idTableUsers").getBinding("items"); // Get the list binding
-
-      // 🔹 Create a new entry in "UserChanges" group (Deferred Mode)
-      let oNewContext = oListBinding.create({}, true, { groupId: "UserChanges" });// 'true' ensures it's not auto-committed
-
+      let oListBinding = this.getView().byId("idTableUsers").getBinding("items"); 
+      let oNewContext = oListBinding.create({}, true, { groupId: "UserChanges" });
       this.openUserDialog("Add User", "Add", oNewContext);
     },
     onRefreshUsers: function () {
-      let oModel = this.getView().getModel();
-      if (oModel.hasPendingChanges()) {
+      
+      if (this._oODataModel.hasPendingChanges()) {
         MessageBox.warning("Are you sure you want to reload. Your changes will be lost?", {
           actions: [MessageBox.Action.OK, MessageBox.Action.CANCEL],
           onClose: function (sAction) {
             if (sAction === MessageBox.Action.OK) {
-              oModel.resetChanges("UserChanges");
-              oModel.refresh();
+              this._oODataModel.resetChanges("UserChanges");
+              this._oODataModel.refresh();
             }
           }
         });
       } else {
-        oModel.resetChanges("UserChanges");
-        oModel.refresh();
+        this._oODataModel.resetChanges("UserChanges");
+        this._oODataModel.refresh();
       }
     },
     onCloseEditUserDialog: function () {
-      let oModel = this.getView().getModel();
-      oModel.resetChanges("UserChanges");
+      
+      this._oODataModel.resetChanges("UserChanges");
       this._oDialog.close();
     },
     onAccountNewPasswordLiveChange: function (oEvent) {
       var getConfirmPass = oEvent.getParameter('value');
       var pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-      // this.getView().getModel('appView').setProperty("/accountNewPassword", getConfirmPass);
       if (pattern.test(getConfirmPass)) {
         this.getView().getModel('appView').setProperty("/Password/NewPasswordValueState", "None");
         this.getView().getModel('appView').setProperty("/Password/NewPasswordVST", "");
@@ -79,7 +66,6 @@ sap.ui.define([
     onAccountConfirmPasswordLiveChange: function (oEvent) {
       var getConfirmPass = oEvent.getParameter('value');
       var pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-      // this.getView().getModel('appView').setProperty("/accountConfirmPassword", getConfirmPass);
       if (pattern.test(getConfirmPass)) {
         this.getView().getModel('appView').setProperty("/Password/ConfirmPasswordValueState", "None");
         this.getView().getModel('appView').setProperty("/Password/ConfirmPasswordVST", "");
@@ -92,16 +78,13 @@ sap.ui.define([
       let oContext = this._oDialog.getBindingContext();
       let userObject = oContext.getObject();
 
-      // 🔹 Step 1: Prepare fields to skip
       let skipFields = ["Password"];
 
-      // 🔹 Step 2: Validate fields
       let validated = await this.validateEntityFields("Users", userObject, skipFields);
       if (!validated) {
         return;
       }
 
-      // 🔹 Step 3: If it's Add, now show password popup
       if (this.addUserPress) {
         this._handlePasswordPopup("Create Password", "OK");
       } else {
@@ -119,10 +102,9 @@ sap.ui.define([
     _handlePasswordPopup: function (title, button) {
       let oView = this.getView();
 
-      // ✅ Ensure appView model has the "Password" object initialized before opening the fragment
-      let oModel = this.getView().getModel("appView");
-      if (!oModel.getProperty("/Password")) {
-        oModel.setProperty("/Password", {
+      let appModel = oView.getModel("appView");
+      if (!appModel.getProperty("/Password")) {
+        appModel.setProperty("/Password", {
           NewPassword: "",
           ConfirmPassword: "",
           NewPasswordValueState: "None",
@@ -168,17 +150,14 @@ sap.ui.define([
     },
     onPasswordChangeOk: function () {
       let oPasswordData = this.getView().getModel("appView").getProperty("/Password");
-    
-      // 🔹 Generic Validation
-      if (!this.validatePasswordFields(oPasswordData)) {
+
+      if (!this.validatePassword(oPasswordData)) {
         return;
       }
-    
-      // 🔹 Save to context
+
       let oContext = this._oDialog.getBindingContext();
       oContext.setProperty("Password", oPasswordData.NewPassword);
-    
-      // 🔹 Reset flag & close
+
       this.addUserPress = false;
       this.UserPasswordDialog.close();
     },
@@ -192,12 +171,11 @@ sap.ui.define([
         onConfirmPasswordValueState: "None",
         onConfirmPasswordVST: ""
       });
-    },    
+    },
     onResetPassword: function (oEvent) {
       this._handlePasswordPopup("Reset Password", "Update");
     },
     onPasswordChangeCancel: function () {
-      // 🔹 Close the Password Dialog without saving changes
       this.clearPasswordFields();
       this.UserPasswordDialog.close();
       MessageToast.show("Password change canceled.");
@@ -205,6 +183,7 @@ sap.ui.define([
     onUserSelect: async function (oEvent) {
       this.addUserPress = false;
       let oSelectedContext = oEvent.getSource().getBindingContext();
+
       this.openUserDialog("Edit User", "Update", oSelectedContext);
 
     },
@@ -219,6 +198,13 @@ sap.ui.define([
       this._oDialog.setModel(oContext.getModel());
       this._oDialog.setTitle(title);
       this.byId("idAdd").setText(button);
+      let oRoles = oContext.getObject().roles;
+      if (oRoles) {
+        let aRoles = oRoles.map(role => role.role.ID);
+        this.byId("idRolesMultiCombo").setSelectedKeys(aRoles);
+      }else{
+        this.byId("idRolesMultiCombo").setSelectedKeys([]);
+      }
       this._oDialog.open();
     },
     onDeleteUser: function (oEvent) {
@@ -265,10 +251,7 @@ sap.ui.define([
     },
     onSaveChanges: function () {
       var that = this;
-      let oModel = this.getView().getModel(); // OData V4 Model
-
-      // 🔹 Step 1: Check if there are any pending changes
-      if (!oModel.hasPendingChanges()) {
+      if (!this._oODataModel.hasPendingChanges()) {
         MessageToast.show("No changes detected.");
         return;
       }
@@ -283,11 +266,8 @@ sap.ui.define([
           let aWarningMessages = aMessages.filter(msg => msg.getType() === "Warning");
 
           if (aErrorMessages.length > 0) {
-            // Construct error message from multiple messages
-
-
             let sErrorMessage = aErrorMessages.map(msg => {
-              let aTargets = msg.getTargets().map(target => target.split("/").pop()); // Extract property
+              let aTargets = msg.getTargets().map(target => target.split("/").pop()); 
               return `${aTargets.join(", ")} ${msg.getMessage()}`;
             }
             ).join("\n\n");
@@ -309,39 +289,12 @@ sap.ui.define([
 
 
     },
-    onRoleSelectionChange: async function (oEvent) {
-      const oMCB = oEvent.getSource();
-      const oContext = oMCB.getBindingContext(); // User context
-      const aSelectedKeys = oEvent.getParameter("selectedItems").map(item => item.getKey());
-      const oModel = oContext.getModel();
     
-      const userId = oContext.getProperty("ID");
-    
-      // 1. Delete old UserRoles for this user
-      const oldRoles = oContext.getProperty("roles");
-      for (const ur of oldRoles) {
-        await oModel.remove(`/UserRoles(${ur.ID})`);
-      }
-    
-      // 2. Create new UserRoles
-      for (const roleId of aSelectedKeys) {
-        await oModel.create("/UserRoles", {
-          user_ID: userId,
-          role_ID: roleId
-        });
-      }
-    
-      // Optional: Refresh the table
-      await oModel.refresh();
-    },
-    formatRolesForSelectedKeys: function (aRoles) {
-      debugger
-      if (!aRoles || !Array.isArray(aRoles)) {
-        return [];
-      }
-    
-      return aRoles.map(r => r.role.name); // or r.role.ID if your key is ID
+    formatSelectedRoles: function (aRoles) {
+      if (!aRoles) return [];
+      return aRoles.map(role => role.role.ID); 
     }
-    
+
+
   });
 });

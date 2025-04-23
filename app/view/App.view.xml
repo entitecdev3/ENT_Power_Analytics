@@ -7,11 +7,8 @@
 
     <App id="idApp">
         <tnt:ToolPage id="toolpage" >
-			<!-- Conditional Header -->
             <tnt:header>
-                <!-- <tnt:ToolHeader visible="{appView>/LoginHeader}"> -->
                     <core:Fragment fragmentName="entitec.pbi.embedding.fragments.MainToolbar" type="XML" />
-                <!-- </tnt:ToolHeader> -->
             </tnt:header>
 			<tnt:mainContents>
 				<f:FlexibleColumnLayout id="idFlexLayout" layout="{appView>/layout}" backgroundDesign="Translucent" />

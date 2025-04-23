@@ -8,7 +8,6 @@ sap.ui.define([
 
   return BaseController.extend("entitec.pbi.embedding.controller.Login", {
     onInit: function () {
-      // BaseController.prototype.onInit.apply(this);
       this.getRouter()
         .getRoute("Login")
         .attachPatternMatched(this._matchedHandler, this);
@@ -39,9 +38,9 @@ sap.ui.define([
           that.getRouter().navTo("Apps");
           var oViewModel = that.getView().getModel("appView");
           oViewModel.setProperty("/User",data.user);
-          oViewModel.setProperty("/LoginHeader", false);  // Hide login header
-          oViewModel.setProperty("/HomeScreen", true);    // Show home header
-          oViewModel.setProperty("/navVisible", false);   // No back button needed at home
+          oViewModel.setProperty("/LoginHeader", false);  
+          oViewModel.setProperty("/HomeScreen", true);    
+          oViewModel.setProperty("/navVisible", false);   
         })
         .catch(function (jqXhr, textStatus, errorMessage) {
           that.getView().setBusy(false);
@@ -50,11 +49,5 @@ sap.ui.define([
           that.middleWare.errorHandler(jqXhr, that);
         });
     },
-    onInputUsernameSubmit: function (oEvent) {
-
-    },
-    onInputPasswordSubmit: function () {
-
-    }
   });
 });
