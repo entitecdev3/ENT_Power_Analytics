@@ -1,0 +1,56 @@
+<mvc:View
+    controllerName="entitec.pbi.embedding.controller.Launchpad"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
+    xmlns="sap.m"
+>
+    <Page
+        id="idLaunchpad"
+        showHeader="false"
+    >
+        
+        <MessageStrip
+            text="Apps"
+            type="Information"
+            class="sapUiTinyMarginBegin sapUiTinyMarginEnd sapUiMediumMarginTop"
+        />
+        
+            <GenericTile
+                sizeBehavior="Small"
+                class="sapUiSmallMarginBegin sapUiSmallMarginTop tileLayout"
+                header="Report"
+                id="idReport"
+                press="press"
+                visible="true"
+            >
+                <TileContent />
+            </GenericTile>
+       
+        <MessageStrip
+            text="Configuration"
+            type="Information"
+            class="sapUiTinyMarginBegin sapUiTinyMarginEnd sapUiMediumMarginTop"
+        />
+        <GenericTile
+            sizeBehavior="Small"
+            class="sapUiSmallMarginBegin sapUiSmallMarginTop tileLayout"
+            header="Configuration"
+            id="idConfiguration"
+            press="press"
+            visible="true"
+        >
+            <TileContent />
+        </GenericTile>
+        <GenericTile
+            sizeBehavior="Small"
+            class="sapUiSmallMarginBegin sapUiSmallMarginTop tileLayout"
+            header="Register Users"
+            id="idUser"
+            press="press"
+            visible="true"
+        >
+            <TileContent />
+        </GenericTile>
+    </Page>
+</mvc:View>

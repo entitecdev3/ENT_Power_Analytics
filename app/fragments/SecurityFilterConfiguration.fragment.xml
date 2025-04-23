@@ -1,0 +1,45 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:layout="sap.ui.layout.form"
+>
+    <VBox alignItems="Center" fitContainer="true" height="100%">
+        <!-- Table for Existing Configurations -->
+        <Table id="idConfigSecurityFilterTable" alternateRowColors="true" items="{path: '/SecurityFilters', parameters: { $$updateGroupId: 'SecurityFilterChanges' }}" fixedLayout="true" delete="onDeleteSecurityFilterConfig">
+            <headerToolbar>
+                <Toolbar>
+                    <Title text="Existing Security Filters" level="H3"/>
+                    <ToolbarSpacer/>
+                    <Button icon="sap-icon://refresh" text="{i18n>Refresh}" visible="true" tooltip="{i18n>Refresh}" press="onRefreshSecurityFilters" />
+                    <Button id="idAddSFButton" icon="sap-icon://add" tooltip="Add Security Filter" text="{i18n>Add}" press="onAddSecurityFilterConfiguration"/>
+                </Toolbar>
+            </headerToolbar>
+            <columns>
+                <Column><Text text="Security Filter Type ID"/></Column>
+                <Column><Text text="Schema"/></Column>
+                <Column><Text text="Display Settings ID"/></Column>
+                <Column><Text text="Operator"/></Column>
+                <Column><Text text="Require Single Selection"/></Column>
+                <Column><Text text="Table Name"/></Column>
+                <Column><Text text="Column Name"/></Column>
+                <Column><Text text="Filter Type"/></Column>
+                <Column><Text text="Value"/></Column>
+            </columns>
+            <items>
+                <ColumnListItem type="Active" press="onSecurityFilterSelect">
+                    <cells>
+                        <Text text="{securityFilterType}"/>
+                        <Text text="{schema}"/>
+                        <Text text="{displaySetting}"/>
+                        <Text text="{operator}"/>
+                        <CheckBox selected="{requireSingleSelection}"/>
+                        <Text text="{table}"/>
+                        <Text text="{column}"/>
+                        <Text text="{filterType}"/>
+                        <Text text="{values}"/>
+                    </cells>
+                </ColumnListItem>
+            </items>
+        </Table>
+    </VBox>
+</core:FragmentDefinition>

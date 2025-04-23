@@ -1,0 +1,19 @@
+{
+  "Test": true,
+  "LiveReload": {
+    "LivereloadGate": 35096
+  },
+  "GruntGate": 8096,
+  "api": {
+    "api_url": "<UI_protocol>://<UI_host>:<UI_port>/api",
+    "api_internal_context": "/api",
+    "api_internal_host": "localhost",
+    "api_internal_port": "1896",
+    "api_internal_https": false
+  },
+  "environment": "Dev",
+  "UILanguages": [
+    "en",
+    "it"
+  ]
+}

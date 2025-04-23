@@ -1,0 +1,23 @@
+<mvc:View controllerName="entitec.pbi.embedding.controller.App" displayBlock="true"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
+    xmlns:f="sap.f"
+    xmlns:tnt="sap.tnt"
+    xmlns="sap.m">
+
+    <App id="idApp">
+        <tnt:ToolPage id="toolpage" >
+			<!-- Conditional Header -->
+            <tnt:header>
+                <!-- <tnt:ToolHeader visible="{appView>/LoginHeader}"> -->
+                    <core:Fragment fragmentName="entitec.pbi.embedding.fragments.MainToolbar" type="XML" />
+                <!-- </tnt:ToolHeader> -->
+            </tnt:header>
+			<tnt:mainContents>
+				<f:FlexibleColumnLayout id="idFlexLayout" layout="{appView>/layout}" backgroundDesign="Translucent" />
+			</tnt:mainContents>  
+		
+		</tnt:ToolPage>
+    </App>
+
+</mvc:View>

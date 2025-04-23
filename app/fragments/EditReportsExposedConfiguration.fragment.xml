@@ -1,0 +1,27 @@
+<core:FragmentDefinition xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+    <Dialog id="idEditReportsExposedDialog" class="sapUiResponsiveMargin">
+        <VBox class="sapUiSmallMargin">
+            <Label required="true" text="{i18n>REPORT_ID}" />
+            <Input value="{reportId}"/>
+            <Label required="true" text="{i18n>REPORT_COMMENT}" />
+            <Input value="{reportComment}"/>
+            <Label required="true" text="{i18n>WORKSPACE_ID}" />
+            <Input value="{workspaceId}"/>
+            <Label required="true" text="{i18n>WORKSPACE_COMMENT}" />
+            <Input value="{workspaceComment}"/>
+            <Label required="false" text="{i18n>SECURITY_FILTER_TYPE_ID}" />
+            <MultiComboBox width="20vw" items="{/SecurityFiltersType}" selectedItems="{securityFilterType_ID}">
+                <core:Item key="{ID}" text="{name}" />
+            </MultiComboBox>
+            <Label required="false" text="{i18n>SERVICE_PRINCIPAL}" />
+            <ComboBox width="20vw" items="{/PowerBi}" selectedKey="{servicePrincipal_ID}">
+                <core:Item key="{ID}" text="{biUser}" />
+            </ComboBox>
+        </VBox>
+        <buttons>
+            <Button id="idAddReports" type="Emphasized" press="onSaveEditReportsDialog"/>
+            <Button text="Cancel" press="onCloseEditReportsDialog"/>
+        </buttons>
+    </Dialog>
+</core:FragmentDefinition>

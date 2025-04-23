@@ -1,0 +1,14 @@
+<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns="sap.ui.core" xmlns:m="sap.m" xmlns:html="http://www.w3.org/1999/xhtml" controllerName="entitec.pbi.embedding.controller.Report">
+
+  <m:VBox class="sapUiSmallMargin">
+    <!-- Dropdown for selecting reports -->
+    <m:Label text="Select Report to view"></m:Label>
+    <m:ComboBox id="idReportList" width="20vw" items="{/ReportsExposed}" class="sapUiLargeMarginBottom" selectionChange="onReportSelectionChange">
+      <Item key="{ID}" text="{reportComment} - {workspaceComment}" />
+    </m:ComboBox>
+
+    <m:Title id="idReportTitle" text="Report" ></m:Title>
+    <!-- Report Embed Iframe -->
+    <html:iframe id="embedHTML" width="100%" height="600px" border="none" />
+  </m:VBox>
+</mvc:View>
