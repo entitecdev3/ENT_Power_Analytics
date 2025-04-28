@@ -77,7 +77,7 @@ module.exports = function () {
     return async function (req, res, next) {
         // do your custom authentication
         if (!(req.isAuthenticated() || req.path === '/api/Login' || req.path === '/api/Logout')) {
-          res.status(401).send({ error: 'Unauthorized: Please login' });
+          res.status(401).send({ error: 'Unauthorized: Please Login' });
           return;
         }
         next();

@@ -10,10 +10,6 @@
             <Input value="{clientSecret}"/>
             <Label required="true" text="{i18n>TENANT_ID}" />
             <Input value="{tenantId}"/>
-            <!-- <Label required="false" text="{i18n>REPORTS_EXPOSED_ID}" />
-            <MultiComboBox width="20vw" items="{/ReportsExposed}" selectedItems="{reportsExposedId}">
-                <core:Item key="{ID}" text="{reportComment}" />
-            </MultiComboBox> -->
         </VBox>
         <buttons>
             <Button id="idAddConfig" type="Emphasized" press="onSaveEditServicePrincipalDialog"/>

@@ -10,7 +10,7 @@ service PowerBiService @(path: '/powerbi/PowerBiService') {
 
   entity ReportsExposed as projection on pa.ReportsExposed
     actions {
-      action getEmbedDetails() returns EmbedDetails;
+      function getEmbedDetails() returns EmbedDetails;
     };
 
 

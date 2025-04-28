@@ -19,7 +19,7 @@
         <Column><Text text="Report Comment" /></Column>
         <Column><Text text="Workspace ID" /></Column>
         <Column><Text text="Workspace Comment" /></Column>
-        <Column><Text text="Security Filter Type ID" /></Column>
+        <Column><Text text="Security Filter Type" /></Column>
         <Column><Text text="Service Principal" /></Column>
         <Column><Text text="" /></Column>
       </columns>
@@ -31,8 +31,8 @@
             <Text text="{reportComment}" />
             <Text text="{workspaceId}" />
             <Text text="{workspaceComment}" />
-            <Text text="" />
-            <Text text="" />
+            <Text text="{securityFilterType/name}" />
+            <Text text="{servicePrincipal/biUser}" />
             <Button text="Watch Report" type="Emphasized" press=".onLoadReport" />
           </cells>
         </ColumnListItem>

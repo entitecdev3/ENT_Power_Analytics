@@ -7,18 +7,18 @@ module.exports = cds.service.impl(async function () {
 
   this.on("getEmbedDetails", async (req) => {
     const db = cds.db;
-    const reportExposedId = req.params[0]; // 🆕 Accept report ID from frontend
+    const reportExposedId = req.params[0];
 
     try {
 
       const reportDetails = await db.run(SELECT.one.from(ReportsExposed).where({ ID: reportExposedId }));
-      if (!reportDetails) return req.error(500, "Power BI report details not found for ID: " + reportId);
+      if (!reportDetails) return req.error(500, "Power BI report details not found!");
 
-      // 🔹 Fetch config and specific report info by servicePrincipal_ID
+
       const config = await db.run(SELECT.one.from(PowerBi).where({ ID: reportDetails.servicePrincipal_ID }));
       if (!config) return req.error(500, "Power BI configuration not found.");
 
-      // 🔹 Step 1: Acquire Azure AD Token (client credentials)
+
       const tokenResponse = await axios.post(
         `${config.authorityUrl}${config.tenantId}/oauth2/v2.0/token`,
         qs.stringify({
@@ -34,7 +34,7 @@ module.exports = cds.service.impl(async function () {
 
       const azureToken = tokenResponse.data.access_token;
 
-      // 🔹 Step 2: Get Report Embed URL
+
       const embedUrlResponse = await axios.get(
         `${config.biApiUrl}v1.0/myorg/groups/${reportDetails.workspaceId}/reports/${reportDetails.reportId}`,
         {
@@ -46,7 +46,7 @@ module.exports = cds.service.impl(async function () {
 
       const embedInfo = embedUrlResponse.data;
 
-      // 🔹 Step 3: Generate Embed Token (for Report + Dataset access)
+
       const embedTokenResponse = await axios.post(
         `${config.biApiUrl}v1.0/myorg/groups/${reportDetails.workspaceId}/reports/${reportDetails.reportId}/GenerateToken`,
         {
@@ -63,7 +63,7 @@ module.exports = cds.service.impl(async function () {
 
       const embedToken = embedTokenResponse.data.token;
 
-      // 🔹 Step 4: Build HTML string
+
       const embedHTML = `
         <div id="reportContainer" style="height:100%;width:100%"></div>
         <script src="https://cdn.jsdelivr.net/npm/powerbi-client@2.19.1/dist/powerbi.js"></script>
