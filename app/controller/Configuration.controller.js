@@ -163,7 +163,6 @@ sap.ui.define([
 
     openReportsConfigDialog: function (title, button, oContext) {
       let oView = this.getView();
-
       if (!this._oReportDialog) {
         this._oReportDialog = sap.ui.xmlfragment(oView.getId(), "entitec.pbi.embedding.fragments.EditReportsExposedConfiguration", this);
         oView.addDependent(this._oReportDialog);
@@ -560,7 +559,6 @@ sap.ui.define([
           return;
         }
         this.getModel().submitBatch("ServicePrincipalChanges").then(() => {
-
           const oContext = this.byId("idConfigTable").getBinding("items");
           const aMessages = this.getModel().getMessages(oContext);
 
@@ -597,7 +595,6 @@ sap.ui.define([
           return;
         }
         this.getModel().submitBatch("ReportsChanges").then(() => {
-
           const oContext = this.byId("idRCConfigTable").getBinding("items");
           const aMessages = this.getModel().getMessages(oContext);
 

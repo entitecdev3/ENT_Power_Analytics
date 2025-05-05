@@ -34,7 +34,6 @@ module.exports = cds.service.impl(async function () {
 
       const azureToken = tokenResponse.data.access_token;
 
-
       const embedUrlResponse = await axios.get(
         `${config.biApiUrl}v1.0/myorg/groups/${reportDetails.workspaceId}/reports/${reportDetails.reportId}`,
         {
@@ -45,7 +44,6 @@ module.exports = cds.service.impl(async function () {
       );
 
       const embedInfo = embedUrlResponse.data;
-
 
       const embedTokenResponse = await axios.post(
         `${config.biApiUrl}v1.0/myorg/groups/${reportDetails.workspaceId}/reports/${reportDetails.reportId}/GenerateToken`,
@@ -62,7 +60,6 @@ module.exports = cds.service.impl(async function () {
       );
 
       const embedToken = embedTokenResponse.data.token;
-
 
       const embedHTML = `
         <div id="reportContainer" style="height:100%;width:100%"></div>
