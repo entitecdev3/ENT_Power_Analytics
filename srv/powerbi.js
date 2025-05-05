@@ -92,4 +92,58 @@ module.exports = cds.service.impl(async function () {
       req.error(500, "Failed to get Power BI embed details.");
     }
   });
+
+  this.on("checkReportAccess", async (req) => {
+    const { url } = req.data;
+  
+    if (!url) return req.error(400, "URL is required.");
+  
+    try {
+      // Extract workspaceId and reportId from the provided URL
+      const matches = url.match(/groups\/([a-zA-Z0-9-]+)\/reports\/([a-zA-Z0-9-]+)/);
+      if (!matches || matches.length < 3) {
+        return req.reply({ statusCode: 400, message: "Invalid URL format." });
+      }
+  
+      const [_, workspaceId, reportId] = matches;
+  
+      // Find a valid Service Principal config (assumes one per tenant, customize if needed)
+      const config = await cds.db.run(SELECT.one.from(PowerBi));
+      if (!config) return req.reply({ statusCode: 500, message: "Power BI configuration not found." });
+  
+      // Get access token
+      const tokenResponse = await axios.post(
+        `${config.authorityUrl}${config.tenantId}/oauth2/v2.0/token`,
+        qs.stringify({
+          grant_type: "client_credentials",
+          client_id: config.clientId,
+          client_secret: config.clientSecret,
+          scope: config.scopeBase,
+        }),
+        {
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        }
+      );
+  
+      const azureToken = tokenResponse.data.access_token;
+  
+      // Check report access
+      await axios.get(
+        `${config.biApiUrl}v1.0/myorg/groups/${workspaceId}/reports/${reportId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${azureToken}`,
+          },
+        }
+      );
+  
+      return req.reply({ statusCode: 200, message: "Service Principal has access to the report." });
+  
+    } catch (error) {
+      const errMsg = error?.response?.data?.error?.message || error.message;
+      console.error("Power BI access check error:", errMsg);
+      return req.reply({ statusCode: error?.response?.status || 500, message: `Access failed: ${errMsg}` });
+    }
+  });
+  
 });

@@ -82,8 +82,10 @@ sap.ui.define([
         onLogOut: function (oEvent) {
             var that = this;
             this.middleWare.callMiddleWare("/logout", "POST").then(function (oData) {
+                sessionStorage.removeItem("LoggedInUser");
                 that.getRouter().navTo("Login"); 
             }).catch(function (oError) {
+                sessionStorage.removeItem("LoggedInUser");
                 that.getRouter().navTo("Login"); // Redirect to login on failure
                 window.location.href = '/';
                 var oViewModel = this.getView().getModel("appView");

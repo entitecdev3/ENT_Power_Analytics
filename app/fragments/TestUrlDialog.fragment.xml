@@ -1,14 +1,16 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
-    <Dialog id="idTestUrlDialog" title="Enter Test URL" contentWidth="400px" type="Message">
-        <VBox>
-            <Text text="Please enter the URL to test:" />
-            <Input id="idTestUrlInput" placeholder="Enter URL here..." />
-        </VBox>
-        <beginButton>
-            <Button text="Test" type="Emphasized" press=".onTestUrlConfirm"/>
-        </beginButton>
-        <endButton>
-            <Button text="Cancel" press=".onTestUrlCancel"/>
-        </endButton>
-    </Dialog>
+  <Dialog title="Test Report URL" contentWidth="35rem" resizable="true" draggable="true" class="sapUiResponsivePadding--header sapUiResponsivePadding--content sapUiResponsivePadding--footer">
+    <VBox class="sapUiSmallMargin">
+      <Label text="Please enter the URL to test:" />
+      <Input id="idTestUrlInput" placeholder="https://app.powerbi.com/groups/00000000-0000-0000-0000-000000000000/reports/11111111-1111-1111-1111-111111111111/ReportSection0000000000000000000000" width="100%" valueHelpIconSrc="sap-icon://paste" showValueHelp="true" valueHelpRequest=".onPasteTestURL" />
+      <HBox class="sapUiTinyMarginTop"></HBox>
+    </VBox>
+    <beginButton>
+      <Button text="Test Report" icon="sap-icon://inspection" type="Emphasized" press=".onTestURLLoad" class="sapUiTinyMarginBegin" />
+    </beginButton>
+
+    <endButton>
+      <Button text="Close" press=".onTestUrlDialogClose" />
+    </endButton>
+  </Dialog>
 </core:FragmentDefinition>

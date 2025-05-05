@@ -18,6 +18,7 @@ sap.ui.define([
       oViewModel.setProperty("/navVisible", true);  
       oViewModel.setProperty("/LoginHeader", false);  
       oViewModel.setProperty("/HomeScreen", true);  
+      this.getModel().refresh();
     },
 
     onReportSelectionChange: function (oEvent) {

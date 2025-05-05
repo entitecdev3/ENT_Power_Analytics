@@ -36,8 +36,10 @@ sap.ui.define([
         .then(function (data, status, xhr) {
           that.getView().setBusy(false);
           that.getRouter().navTo("Apps");
+          that.getModel().refresh();
           var oViewModel = that.getView().getModel("appView");
           oViewModel.setProperty("/User",data.user);
+          sessionStorage.setItem("LoggedInUser", JSON.stringify(data.user));
           oViewModel.setProperty("/LoginHeader", false);  
           oViewModel.setProperty("/HomeScreen", true);    
           oViewModel.setProperty("/navVisible", false);   

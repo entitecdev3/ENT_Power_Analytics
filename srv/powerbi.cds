@@ -6,12 +6,21 @@ service PowerBiService @(path: '/powerbi/PowerBiService') {
     html : String;
   }
 
+  type AccessStatus {
+    statusCode: Integer;
+    message: String;
+  }
+
   entity PowerBi        as projection on pa.PowerBi;
+
+  action checkReportAccess(url: String) returns AccessStatus;
 
   entity ReportsExposed as projection on pa.ReportsExposed
     actions {
       function getEmbedDetails() returns EmbedDetails;
     };
+
+  
 
 
 }

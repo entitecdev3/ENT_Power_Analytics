@@ -5,9 +5,9 @@ module.exports = cds.service.impl(async function () {
 
     this.before('CREATE', Users, async (req) => {
         // console.log(req.user);
-        if (req.data.Password) {
+        if (req.data.password) {
             const saltRounds = 10;
-            req.data.Password = await bcrypt.hash(req.data.Password, saltRounds);
+            req.data.password = await bcrypt.hash(req.data.password, saltRounds);
         }
     });
 

@@ -1,14 +1,14 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
   <Dialog id="idEditUsersDialog" class="sapUiResponsiveMargin">
-    <VBox class="sapUiSmallMargin">
+    <VBox class="sapUiSmallMargin" >
       <Label required="true" text="{i18n>Name}" labelFor="idUserName" />
-      <Input id="idUserName" value="{username}" />
+      <Input id="idUserName" value="{tempUser>/User/username}" />
       <Label required="true" text="{i18n>Role}" />
-      <MultiComboBox id="idRolesMultiCombo" width="20vw" items="{/Roles}"  selectionChange="onRoleSelectionChange">
+      <MultiComboBox id="idRolesMultiCombo" width="20vw" items="{/Roles}" selectionFinish="handleMultiComboSelectionFinish">
         <core:Item key="{ID}" text="{name}" />
       </MultiComboBox>
       <Label required="true" text="{i18n>Company_ID}" />
-      <Select width="20vw" items="{/Companies}" forceSelection="false" selectedKey="{company/ID}">
+      <Select width="20vw" items="{/Companies}" forceSelection="false" selectedKey="{tempUser>/User/company/ID}">
         <core:Item key="{ID}" text="{name}" />
       </Select>
     </VBox>

@@ -11,6 +11,7 @@ sap.ui.define([
         fnSetAppNotBusy,
         iOriginalBusyDelay = this.getView().getBusyIndicatorDelay();
       oViewModel = new JSONModel({
+        User: {},
         busy: true,
         delay: 0,
         LoginHeader: true,  // Initially show login header
@@ -30,10 +31,16 @@ sap.ui.define([
         BusyIndicator.hide();
       });
 
-      
+      var oViewModel = this.getModel("appView");
+
+      var sUser = sessionStorage.getItem("LoggedInUser");
+      if (sUser) {
+        oViewModel.setProperty("/User", JSON.parse(sUser));
+      }
+
     },
 
-   
+
 
   });
 });

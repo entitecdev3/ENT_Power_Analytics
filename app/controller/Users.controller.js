@@ -4,8 +4,9 @@ sap.ui.define([
   "sap/m/MessageBox",
   "entitec/pbi/embedding/controller/BaseController",
   "sap/ui/core/Fragment",
-  "entitec/pbi/embedding/model/formatter"
-], function (Controller, MessageToast, MessageBox, BaseController, Fragment, formatter) {
+  "entitec/pbi/embedding/model/formatter",
+  "sap/ui/model/Context"
+], function (Controller, MessageToast, MessageBox, BaseController, Fragment, formatter, Context) {
   "use strict";
 
   return BaseController.extend("entitec.pbi.embedding.controller.Users", {
@@ -17,15 +18,37 @@ sap.ui.define([
 
     _matchedHandler: function () {
       var oViewModel = this.getView().getModel("appView");
-      oViewModel.setProperty("/navVisible", true);   
-      oViewModel.setProperty("/LoginHeader", false); 
-      oViewModel.setProperty("/HomeScreen", true); 
+      oViewModel.setProperty("/navVisible", true);
+      oViewModel.setProperty("/LoginHeader", false);
+      oViewModel.setProperty("/HomeScreen", true);
+      this.getModel().refresh();
     },
 
     onAddUser: function () {
       this.addUserPress = true;
-      let oListBinding = this.getView().byId("idTableUsers").getBinding("items"); 
-      let oNewContext = oListBinding.create({}, true, { groupId: "UserChanges" });
+      let oView = this.getView();
+      // let oAppModel = this.getModel("appView");
+      // oAppModel.setProperty("/NewsUser", {
+      //   "username": "test",
+      //   "roles": [],
+      //   "company": { "ID": null }
+      // });
+      // Create a new empty entry with default values
+      const oNewUser = {
+        "User": {
+          username: "",
+          company: {
+            ID: ""
+          },
+          roles: []
+        }
+      };
+
+      // Create a new context for the dialog (optional - using a JSON model)
+      const oTempModel = new sap.ui.model.json.JSONModel(oNewUser);
+      oView.setModel(oTempModel, "tempUser")
+      let oNewContext = new Context(oTempModel, "/User");
+      // let oNewContext = new Context(oAppModel, "/NewUser");
       this.openUserDialog("Add User", "Add", oNewContext);
     },
     onRefreshUsers: function () {
@@ -45,8 +68,8 @@ sap.ui.define([
         oModel.refresh();
       }
     },
-    onCloseEditUserDialog: function () {  
-      let oModel = this.getView().getModel();    
+    onCloseEditUserDialog: function () {
+      let oModel = this.getView().getModel();
       oModel.resetChanges("UserChanges");
       this._oDialog.close();
     },
@@ -74,32 +97,54 @@ sap.ui.define([
     },
     onSaveEditUserDialog: async function () {
       let oContext = this._oDialog.getBindingContext();
-      let userObject = oContext.getObject();
+      let userObject = this._oDialog.getModel("tempUser").getProperty("/User");
+      userObject.company_ID = userObject.company.ID;
+      
+      // let userObject = oContext.getObject();      
+      // let skipFields = ["password"];
 
-      let skipFields = ["Password"];
 
-      let validated = await this.validateEntityFields("Users", userObject, skipFields);
-      if (!validated) {
-        return;
-      }
-
+      debugger;
       if (this.addUserPress) {
-        this._handlePasswordPopup("Create Password", "OK");
+        await this._handlePasswordPopup("Create Password", "OK", userObject);
       } else {
         this._oDialog.close();
+      }
+
+      const oTable = this.byId("idTableUsers").getBinding("items");
+      
+      if(this.userObject.password){
+        this.aUserTableCreateContext=oTable.create(this.userObject);
+        this.aUserTableCreateContext.created().then(function(x,y,z){debugger})
       }
     },
     _validateUserFields: async function (userObject) {
 
       const isValid = await this.validateEntityFields("Users", userObject);
-
       if (!isValid) return false;
       return true;
 
     },
-    _handlePasswordPopup: function (title, button) {
+    handleMultiComboSelectionFinish: function (oEvent) {
+      debugger;
+      var aSelectedItem = oEvent.getParameter("selectedItems");
+      var aRoles = [];
+      for (let index = 0; index < aSelectedItem.length; index++) {
+        const element = aSelectedItem[index];
+        aRoles.push({
+          // role:{
+          //   ID:element.getBindingContext().getProperty("role/ID"),
+          //   name:element.getBindingContext().getProperty("role/name")
+          // }, 
+          // ID:element.getBindingContext().getProperty("ID"),
+          role_ID: element.getBindingContext().getProperty("ID"),
+        })
+      }
+      this.getView().getModel("tempUser").setProperty("/User/roles", aRoles)
+    },
+    _handlePasswordPopup: function (title, button, userObject) {
       let oView = this.getView();
-
+      this.userObject = userObject;
       let appModel = oView.getModel("appView");
       if (!appModel.getProperty("/Password")) {
         appModel.setProperty("/Password", {
@@ -146,15 +191,23 @@ sap.ui.define([
         return false;
       }
     },
-    onPasswordChangeOk: function () {
+    onPasswordChangeOk: async function () {
       let oPasswordData = this.getView().getModel("appView").getProperty("/Password");
 
-      if (!this.validatePassword(oPasswordData)) {
+      if (!this.validatePassword(oPasswordData.NewPassword, oPasswordData.ConfirmPassword)) {
         return;
       }
-
-      let oContext = this._oDialog.getBindingContext();
-      oContext.setProperty("Password", oPasswordData.NewPassword);
+      this.userObject.password=oPasswordData.NewPassword;
+      let skipFields = [];
+      let validated = await this.validateEntityFields("Users", this.userObject, skipFields);
+      if (!validated) {
+        return;
+      }
+         
+      
+      // let oContext = this._oDialog.getBindingContext();
+      // let oContext = this.aUserTableCreateContext;
+      // oContext.setProperty("password", oPasswordData.NewPassword);
 
       this.addUserPress = false;
       this.UserPasswordDialog.close();
@@ -180,9 +233,15 @@ sap.ui.define([
     },
     onUserSelect: async function (oEvent) {
       this.addUserPress = false;
+      let oView = this.getView();
       let oSelectedContext = oEvent.getSource().getBindingContext();
+      const oNewUser = { "User": oSelectedContext.getObject() };
 
-      this.openUserDialog("Edit User", "Update", oSelectedContext);
+      // Create a new context for the dialog (optional - using a JSON model)
+      const oTempModel = new sap.ui.model.json.JSONModel(oNewUser);
+      oView.setModel(oTempModel, "tempUser")
+      let oNewContext = new Context(oTempModel, "/User");
+      this.openUserDialog("Edit User", "Update", oNewContext);
 
     },
     openUserDialog: function (title, button, oContext) {
@@ -192,15 +251,38 @@ sap.ui.define([
         oView.addDependent(this._oDialog);
       }
 
-      this._oDialog.setBindingContext(oContext);
-      this._oDialog.setModel(oContext.getModel());
+      // this._oDialog.setBindingContext(null);
+      // this._oDialog.setBindingContext(oContext);
+      // this._oDialog.setElementBindingContext(oContext)
+      // this._oDialog.unbindElement();
+      // this._oDialog.setModel(oContext.getModel());
+      // this.byId("idRolesMultiCombo").bindItems({
+      //   path: "/Roles",
+      //   model: undefined, // use root
+      //   template: new sap.ui.core.Item({
+      //     key: "{ID}",
+      //     text: "{name}"
+      //   })
+      // });
+
+      // if (this.addUserPress) {
+      //   this._oDialog.bindElement({
+      //     path: oContext.getPath(),
+      //     model:oContext.getModel(),
+      //     parameters: {
+      //       $$updateGroupId: "UserChanges"
+      //     }
+      //   });
+      // }
+
       this._oDialog.setTitle(title);
       this.byId("idAdd").setText(button);
       let oRoles = oContext.getObject().roles;
       if (oRoles) {
-        let aRoles = oRoles.map(role => role.role.ID);
+        let aRoles = oRoles.map(role => role.ID);
+        // let aRoles = oRoles.map(role => role.role.ID);
         this.byId("idRolesMultiCombo").setSelectedKeys(aRoles);
-      }else{
+      } else {
         this.byId("idRolesMultiCombo").setSelectedKeys([]);
       }
       this._oDialog.open();
@@ -266,7 +348,7 @@ sap.ui.define([
 
           if (aErrorMessages.length > 0) {
             let sErrorMessage = aErrorMessages.map(msg => {
-              let aTargets = msg.getTargets().map(target => target.split("/").pop()); 
+              let aTargets = msg.getTargets().map(target => target.split("/").pop());
               return `${aTargets.join(", ")} ${msg.getMessage()}`;
             }
             ).join("\n\n");
@@ -288,10 +370,10 @@ sap.ui.define([
 
 
     },
-    
+
     formatSelectedRoles: function (aRoles) {
       if (!aRoles) return [];
-      return aRoles.map(role => role.role.ID); 
+      return aRoles.map(role => role.role.ID);
     }
 
 
