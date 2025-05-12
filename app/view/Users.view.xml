@@ -37,7 +37,7 @@
     <footer>
       <OverflowToolbar>
         <ToolbarSpacer />
-        <Button id="idSaveUsers" type="Emphasized" text="Save" press="onSaveChanges" />
+        <Button id="idSaveUsers" enabled="false" type="Emphasized" text="Save" press="onSaveChanges" />
       </OverflowToolbar>
     </footer>
   </Page>

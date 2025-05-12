@@ -26,6 +26,7 @@ sap.ui.define([
 
     onAddUser: function () {
       this.addUserPress = true;
+      this.editUserPress = false;
       let oView = this.getView();
       // let oAppModel = this.getModel("appView");
       // oAppModel.setProperty("/NewsUser", {
@@ -44,6 +45,8 @@ sap.ui.define([
         }
       };
 
+      // let oContext = this.byId('idTableUsers').getBinding("items").create({});
+
       // Create a new context for the dialog (optional - using a JSON model)
       const oTempModel = new sap.ui.model.json.JSONModel(oNewUser);
       oView.setModel(oTempModel, "tempUser")
@@ -52,18 +55,21 @@ sap.ui.define([
       this.openUserDialog("Add User", "Add", oNewContext);
     },
     onRefreshUsers: function () {
+      var that = this;
       let oModel = this.getView().getModel();
       if (oModel.hasPendingChanges()) {
         MessageBox.warning("Are you sure you want to reload. Your changes will be lost?", {
           actions: [MessageBox.Action.OK, MessageBox.Action.CANCEL],
           onClose: function (sAction) {
             if (sAction === MessageBox.Action.OK) {
+              that.byId('idSaveUsers').setEnabled(false);
               oModel.resetChanges("UserChanges");
               oModel.refresh();
             }
           }
         });
       } else {
+        that.byId('idSaveUsers').setEnabled(false);
         oModel.resetChanges("UserChanges");
         oModel.refresh();
       }
@@ -106,16 +112,47 @@ sap.ui.define([
 
       debugger;
       if (this.addUserPress) {
+        this.clearPasswordFields();
         await this._handlePasswordPopup("Create Password", "OK", userObject);
-      } else {
+      } 
+      else {
+        if (this.editUserPress) {
+          debugger
+          if(this.editBindingContext.getProperty("username") !== userObject.username){
+            this.editBindingContext.setProperty("username", userObject.username);
+          }
+          if(this.editBindingContext.getObject().company.ID !== userObject.company.ID){
+            this.editBindingContext.setProperty("company_ID", userObject.company.ID);
+          }
+          
+          if(this.hasChangesInRoles){
+            const oModel = this.getView().getModel();
+            const oContextBinding = oModel.bindContext(`/updateRoles(...)`);
+            oContextBinding.setParameter("roles", userObject.roles.map(role => role.role_ID));
+            oContextBinding.setParameter("userId", userObject.ID);
+            await oContextBinding.execute().then(() => {
+              this.hasChangesInRoles = false;
+              if(!oModel.hasPendingChanges()){
+                oModel.refresh();
+              }
+              // MessageToast.show("Roles updated successfully.");
+            }).catch((reject) => {
+              // MessageToast.show("Failed to update roles.");
+            });
+          }
+        }
         this._oDialog.close();
       }
 
       const oTable = this.byId("idTableUsers").getBinding("items");
       
-      if(this.userObject.password){
+      if(!this.editUserPress && this.userObject.password){
         this.aUserTableCreateContext=oTable.create(this.userObject);
         this.aUserTableCreateContext.created().then(function(x,y,z){debugger})
+      }
+
+      if(this.getModel().hasPendingChanges()){
+        this.byId('idSaveUsers').setEnabled(true);
       }
     },
     _validateUserFields: async function (userObject) {
@@ -126,7 +163,6 @@ sap.ui.define([
 
     },
     handleMultiComboSelectionFinish: function (oEvent) {
-      debugger;
       var aSelectedItem = oEvent.getParameter("selectedItems");
       var aRoles = [];
       for (let index = 0; index < aSelectedItem.length; index++) {
@@ -140,6 +176,7 @@ sap.ui.define([
           role_ID: element.getBindingContext().getProperty("ID"),
         })
       }
+      this.hasChangesInRoles = true;
       this.getView().getModel("tempUser").setProperty("/User/roles", aRoles)
     },
     _handlePasswordPopup: function (title, button, userObject) {
@@ -198,19 +235,26 @@ sap.ui.define([
         return;
       }
       this.userObject.password=oPasswordData.NewPassword;
+      this.userObject.company_ID = this.userObject.company.ID;
       let skipFields = [];
       let validated = await this.validateEntityFields("Users", this.userObject, skipFields);
       if (!validated) {
         return;
       }
          
-      
+      if (this.editUserPress) {
+        this.editBindingContext.setProperty("password", this.userObject.password);
+      }
       // let oContext = this._oDialog.getBindingContext();
       // let oContext = this.aUserTableCreateContext;
       // oContext.setProperty("password", oPasswordData.NewPassword);
 
       this.addUserPress = false;
       this.UserPasswordDialog.close();
+
+      if(this.getView().getModel().hasPendingChanges()){
+        this.byId('idSaveUsers').setEnabled(true);
+      }
     },
     clearPasswordFields: function () {
       let oAppViewModel = this.getView().getModel("appView");
@@ -223,8 +267,10 @@ sap.ui.define([
         onConfirmPasswordVST: ""
       });
     },
-    onResetPassword: function (oEvent) {
-      this._handlePasswordPopup("Reset Password", "Update");
+    onResetPassword: function (oEvent) {8887
+      this.editUserPress = true;
+      this.editBindingContext = oEvent.getSource().getBindingContext();
+      this._handlePasswordPopup("Reset Password", "Update", this.editBindingContext.getObject());
     },
     onPasswordChangeCancel: function () {
       this.clearPasswordFields();
@@ -233,8 +279,12 @@ sap.ui.define([
     },
     onUserSelect: async function (oEvent) {
       this.addUserPress = false;
+      this.editUserPress = true;
       let oView = this.getView();
       let oSelectedContext = oEvent.getSource().getBindingContext();
+      if (oSelectedContext){
+        this.editBindingContext = oSelectedContext;
+      }
       const oNewUser = { "User": oSelectedContext.getObject() };
 
       // Create a new context for the dialog (optional - using a JSON model)
@@ -279,8 +329,7 @@ sap.ui.define([
       this.byId("idAdd").setText(button);
       let oRoles = oContext.getObject().roles;
       if (oRoles) {
-        let aRoles = oRoles.map(role => role.ID);
-        // let aRoles = oRoles.map(role => role.role.ID);
+        let aRoles = this.formatSelectedRoles(oRoles);
         this.byId("idRolesMultiCombo").setSelectedKeys(aRoles);
       } else {
         this.byId("idRolesMultiCombo").setSelectedKeys([]);
@@ -362,7 +411,9 @@ sap.ui.define([
             MessageToast.show("Batch operation completed successfully");
           }
         } else {
+          this.byId('idSaveUsers').setEnabled(false);
           MessageToast.show("User details updated successfully.");
+          oModel.refresh();
         }
       }).catch(oError => {
         MessageBox.error("Batch request failed: " + oError.message);
