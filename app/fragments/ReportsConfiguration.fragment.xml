@@ -14,25 +14,21 @@
         </Toolbar>
       </headerToolbar>
 
-      <columns>
-        <Column><Text text="Report ID" /></Column>
-        <Column><Text text="Report Comment" /></Column>
-        <Column><Text text="Workspace ID" /></Column>
-        <Column><Text text="Workspace Comment" /></Column>
-        <Column><Text text="Security Filter Type" /></Column>
+      <columns>      
         <Column><Text text="Service Principal" /></Column>
+        <Column><Text text="Report Name" /></Column>
+        <Column><Text text="Workspace Name" /></Column>
+        <Column><Text text="Description"></Text></Column>
         <Column><Text text="" /></Column>
       </columns>
 
       <items>
         <ColumnListItem type="Active" press="onReportSelect">
           <cells>
-            <Text text="{reportId}" />
-            <Text text="{reportComment}" />
-            <Text text="{workspaceId}" />
-            <Text text="{workspaceComment}" />
-            <Text text="{securityFilterType/name}" />
-            <Text text="{servicePrincipal/biUser}" />
+          <Text text="{servicePrincipal/biUser}" />
+            <Text text="{reportName}" />
+            <Text text="{workspaceName}" />
+            <Text text="{description}"></Text>
             <Button text="Watch Report" type="Emphasized" press=".onLoadReport" />
           </cells>
         </ColumnListItem>

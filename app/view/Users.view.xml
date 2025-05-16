@@ -17,6 +17,7 @@
           <Column><Label text="{i18n>Company}" /></Column>
           <Column><Label text="{i18n>Role}" /></Column>
           <Column><Label text="{i18n>ResetPassword}" /></Column>
+          <Column><Label text="{i18n>Reports}" /></Column>
         </columns>
 
         <items>
@@ -28,6 +29,7 @@
                 <Text text="{role/name}"/>
               </VBox>              
               <Button id="idReset" icon="sap-icon://reset" type="Attention" text="Password" press="onResetPassword" />
+              <Button id="idReportAssign" text="Reports" icon="sap-icon://detail-view" type="Emphasized" press="onOpenUserReports" />
             </cells>
           </ColumnListItem>
         </items>

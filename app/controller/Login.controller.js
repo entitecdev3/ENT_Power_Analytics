@@ -42,7 +42,8 @@ sap.ui.define([
           sessionStorage.setItem("LoggedInUser", JSON.stringify(data.user));
           oViewModel.setProperty("/LoginHeader", false);  
           oViewModel.setProperty("/HomeScreen", true);    
-          oViewModel.setProperty("/navVisible", false);   
+          oViewModel.setProperty("/navVisible", false);  
+          
         })
         .catch(function (jqXhr, textStatus, errorMessage) {
           that.getView().setBusy(false);

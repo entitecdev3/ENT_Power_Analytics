@@ -15,27 +15,25 @@
                 </Toolbar>
             </headerToolbar>
             <columns>
-                <Column><Text text="Security Filter Type ID"/></Column>
+                <Column><Text text="Description"/></Column>
                 <Column><Text text="Schema"/></Column>
-                <Column><Text text="Display Settings ID"/></Column>
+                <Column><Text text="Display Settings"/></Column>
                 <Column><Text text="Operator"/></Column>
                 <Column><Text text="Require Single Selection"/></Column>
                 <Column><Text text="Table Name"/></Column>
                 <Column><Text text="Column Name"/></Column>
-                <Column><Text text="Filter Type"/></Column>
                 <Column><Text text="Value"/></Column>
             </columns>
             <items>
                 <ColumnListItem type="Active" press="onSecurityFilterSelect">
                     <cells>
-                        <Text text="{securityFilterType}"/>
+                        <Text text="{securityUniqueId}"/>
                         <Text text="{schema}"/>
-                        <Text text="{displaySetting}"/>
+                        <Text text="{displaySetting/property}: {displaySetting/value}"/>
                         <Text text="{operator}"/>
                         <CheckBox selected="{requireSingleSelection}"/>
                         <Text text="{table}"/>
                         <Text text="{column}"/>
-                        <Text text="{filterType}"/>
                         <Text text="{values}"/>
                     </cells>
                 </ColumnListItem>

@@ -7,24 +7,22 @@ sap.ui.define(["./BaseController"], function (BaseController) {
       this.getRouter()
         .getRoute("Apps")
         .attachPatternMatched(this._matchedHandler, this);
-
-      
     },
     _matchedHandler: function () {
-
       var oViewModel = this.getView().getModel("appView");
       oViewModel.setProperty("/navVisible", false);
       oViewModel.setProperty("/LoginHeader", false);
       oViewModel.setProperty("/HomeScreen", true);
 
       // Get role data from session storage
-      const userInfo = JSON.parse(sessionStorage.getItem("LoggedInUser") || "{}");
+      const userInfo = JSON.parse(
+        sessionStorage.getItem("LoggedInUser") || "{}"
+      );
       const roles = userInfo.roles || {};
 
       this._setTileVisibility(roles);
     },
     press: function (oEvent) {
-
       var id = oEvent.getSource().getId().split("--")[
         oEvent.getSource().getId().split("--").length - 1
       ];
@@ -56,15 +54,20 @@ sap.ui.define(["./BaseController"], function (BaseController) {
     },
     _setTileVisibility: function (roles) {
       const view = this.getView();
-    
+
       // All users see Reports
       view.byId("idReport").setVisible(true);
-    
+
       // Admin-only tiles
       const isAdmin = roles.Admin === 1;
-    
+
       view.byId("idConfiguration").setVisible(isAdmin);
       view.byId("idUser").setVisible(isAdmin);
+
+      const oConfigMsgStrip = view.byId("configMsgStrip");
+      if (oConfigMsgStrip) {
+        oConfigMsgStrip.setVisible(isAdmin);
+      }
     },
   });
 });
