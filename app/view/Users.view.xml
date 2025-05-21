@@ -20,24 +20,22 @@
         </columns>
 
         <items>
-          <ColumnListItem id="idColumnlist2" type="Active" press="onUserSelect">
+          <ColumnListItem id="idColumnlist2" type="Active" press="onUserSelect" highlight="{= ${appView>/hasChanged} ? 'Information' : 'None' }">
             <cells>
               <Text text="{username}" />
-              <Text text="{company/name}"></Text>
-              <VBox items="{roles}">
-                <Text text="{role/name}"/>
-              </VBox>              
+              <Text text="{path: 'company_ID', formatter: '.formatter.formatCompanyDisplay'}" />
+              <Text text="{path: 'role_ID', formatter: '.formatter.formatRoleDisplay'}" />
               <Button id="idReset" icon="sap-icon://reset" type="Attention" text="Password" press="onResetPassword" />
             </cells>
           </ColumnListItem>
         </items>
       </Table>
-
     </content>
     <footer>
       <OverflowToolbar>
         <ToolbarSpacer />
         <Button id="idSaveUsers" enabled="false" type="Emphasized" text="Save" press="onSaveChanges" />
+        <Button id="idDiscardButton" enabled="false" type="Default" text="Discard Changes" press="onDiscardChanges" />
       </OverflowToolbar>
     </footer>
   </Page>

@@ -2,19 +2,19 @@
   <Dialog id="idEditUsersDialog" class="sapUiResponsiveMargin">
     <VBox class="sapUiSmallMargin" >
       <Label required="true" text="{i18n>Name}" labelFor="idUserName" />
-      <Input id="idUserName" value="{tempUser>/User/username}" />
+      <Input id="idUserName" value="{username}" />
       <Label required="true" text="{i18n>Role}" />
-      <MultiComboBox id="idRolesMultiCombo" width="20vw" items="{/Roles}" selectionFinish="handleMultiComboSelectionFinish">
+      <Select id="idRolesMultiCombo" width="20vw" items="{/Roles}" forceSelection="false" selectedKey="{role_ID}">
         <core:Item key="{ID}" text="{name}" />
-      </MultiComboBox>
+      </Select>
       <Label required="true" text="{i18n>Company_ID}" />
-      <Select width="20vw" items="{/Companies}" forceSelection="false" selectedKey="{tempUser>/User/company/ID}">
+      <Select width="20vw" items="{/Companies}" forceSelection="false" selectedKey="{company_ID}">
         <core:Item key="{ID}" text="{name}" />
       </Select>
     </VBox>
     <buttons>
-      <Button id="idAdd" text="Add" type="Emphasized" press="onSaveEditUserDialog" />
-      <Button text="Cancel" press="onCloseEditUserDialog" />
+      <Button id="idAdd" text="{i18n>ok}" type="Emphasized" press="onSaveEditUserDialog" />
+      <Button text="{i18n>cancel}" press="onCloseEditUserDialog" />
     </buttons>
   </Dialog>
 </core:FragmentDefinition>

@@ -22,12 +22,12 @@ module.exports = function () {
     passport.use(new LocalStrategy(async (username, password, done) => {
         try {
             const db = cds.db;
-            let user = await db.run(SELECT.one.from('portal_Power_Analytics_PowerBIPortal_Users').where({ username }).columns(['ID', 'username', 'password']));
+            let user = await db.run(SELECT.one.from('portal_Power_Analytics_PowerBIPortal_Users').where({ username }).columns(['ID', 'username', 'password', 'role_ID']));
             if (!user) return done(null, false, { message: 'Invalid username or password' });
             const validPassword = await bcrypt.compare(password, user.password);
             if (!validPassword) return done(null, false, { message: 'Invalid username or password' });
-            let userRolesIDs = (await db.run(SELECT.from('portal_Power_Analytics_PowerBIPortal_UserRoles').where({ user_ID:user.ID }).columns(['role_ID']))).map(item=>item.role_ID);
-            let roles = (await db.run(SELECT.from('portal_Power_Analytics_PowerBIPortal_Roles').where({ ID: userRolesIDs }).columns(['name']))).map(item=>item.name);
+            // let userRolesIDs = (await db.run(SELECT.from('portal_Power_Analytics_PowerBIPortal_UserRoles').where({ user_ID:user.ID }).columns(['role_ID']))).map(item=>item.role_ID);
+            let roles = (await db.run(SELECT.from('portal_Power_Analytics_PowerBIPortal_Roles').where({ ID: user.role_ID }).columns(['name']))).map(item=>item.name);
             return done(null, new cds.User({id: user.ID, username: user.username, roles}));
         } catch (err) {
             return done(err);
@@ -43,9 +43,9 @@ module.exports = function () {
     passport.deserializeUser(async (id, done) => {
         try {
             const db = cds.db;
-            let user = await db.run(SELECT.one.from('portal_Power_Analytics_PowerBIPortal_Users').where({ ID:id }).columns(['ID', 'username']));
-            let userRolesIDs = (await db.run(SELECT.from('portal_Power_Analytics_PowerBIPortal_UserRoles').where({ user_ID:user.ID }).columns(['role_ID']))).map(item=>item.role_ID);
-            let roles = (await db.run(SELECT.from('portal_Power_Analytics_PowerBIPortal_Roles').where({ ID: userRolesIDs }).columns(['name']))).map(item=>item.name);
+            let user = await db.run(SELECT.one.from('portal_Power_Analytics_PowerBIPortal_Users').where({ ID:id }).columns(['ID', 'username', 'role_ID']));
+            // let userRolesIDs = (await db.run(SELECT.from('portal_Power_Analytics_PowerBIPortal_UserRoles').where({ user_ID:user.ID }).columns(['role_ID']))).map(item=>item.role_ID);
+            let roles = (await db.run(SELECT.from('portal_Power_Analytics_PowerBIPortal_Roles').where({ ID: user.role_ID }).columns(['name']))).map(item=>item.name);
             return done(null, new cds.User({id: user.ID, username: user.username, roles}));
         } catch (err) {
             done(err);

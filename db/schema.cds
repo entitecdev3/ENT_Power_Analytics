@@ -11,20 +11,15 @@ context PowerBiPortal {
             username      : String(150) not null @mandatory;
             company       : Association to PowerBiPortal.Companies not null @mandatory;
             password      : String(255) not null @mandatory;
-            roles         : Composition of many UserRoles on roles.user = $self;
-            report         : Composition of many UserReports on report.user = $self;
+            role         : Association to PowerBiPortal.Roles;
+            report        : Composition of many UserReports on report.user = $self;
     }
 
     entity Roles: cuid, managed {
             name  : String(100);
-            users : Association to many UserRoles on users.role = $self;
+            users : Association to many PowerBiPortal.Users on users.role = $self;
     }
-
-    entity UserRoles: cuid, managed {
-        user : Association to Users @key;
-        role : Association to Roles @key;
-    }
-
+    
     entity Companies: cuid, managed  {
             name           : String(255);
             contactDetails : String(500);
