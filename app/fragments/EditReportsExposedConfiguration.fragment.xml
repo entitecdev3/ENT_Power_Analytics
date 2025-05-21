@@ -1,26 +1,23 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
   <Dialog id="idEditReportsExposedDialog" class="sapUiResponsiveMargin">
     <VBox class="sapUiSmallMargin">
-      <Label required="true" text="{i18n>REPORT_ID}" />
-      <Input id="idInputReportId" value="{reportId}" />
-      <Label required="true" text="{i18n>REPORT_COMMENT}" />
-      <Input id="idInputReportComment" value="{reportComment}" />
-      <Label required="true" text="{i18n>WORKSPACE_ID}" />
-      <Input id="idInputWorkspaceId" value="{workspaceId}" />
-      <Label required="true" text="{i18n>WORKSPACE_COMMENT}" />
-      <Input id="idInputWorkspaceComment" value="{workspaceComment}" />
-      <Label required="false" text="{i18n>SECURITY_FILTER_TYPE_ID}" />
-      <MultiComboBox id="idSecurityFiltersTypeInput" width="20vw" items="{/SecurityFiltersType}" selectedItems="{securityFilterType_ID}">
-        <core:Item key="{ID}" text="{name}" />
-      </MultiComboBox>
-      <Label required="false" text="{i18n>SERVICE_PRINCIPAL}" />
-      <ComboBox id="idServicePrincipalTypeInput" width="20vw" items="{path:'/PowerBi', templateShareable:false}" selectedKey="{servicePrincipal_ID}">
+      <Label required="true" text="{i18n>SERVICE_PRINCIPAL}" />
+      <ComboBox id="idServicePrincipalTypeInput" width="20vw" items="{path:'/PowerBi', templateShareable:false, sorter: { path: 'biUser' }}" change="onServicePrincipalChange" selectedKey="{tempReport>/ReportsExposed/servicePrincipal_ID}">
         <core:Item key="{ID}" text="{biUser}" />
       </ComboBox>
-
-      <HBox justifyContent="End" class="sapUiTinyMarginTop">
+      <Label required="true" text="{i18n>WORKSPACE}" />
+      <ComboBox id="workspaceSelect" items="" width="20vw" change="onWorkspaceChange" selectedKey="{tempReport>/ReportsExposed/workspaceId}">
+        <core:Item key="{id}" text="{name}" />
+      </ComboBox>
+      <Label required="true" text="{i18n>REPORT}" />
+      <ComboBox id="reportSelect" width="20vw" items="" selectedKey="{tempReport>/ReportsExposed/reportId}">
+        <core:Item key="{id}" text="{name}" />
+      </ComboBox>
+      <Label text="{i18n>Description}"></Label>
+      <Input id="idReportDescription" value="{tempReport>/ReportsExposed/description}" ></Input>
+      <!-- <HBox justifyContent="End" class="sapUiTinyMarginTop">
         <Button icon="sap-icon://broken-link" text="Fetch from URL" type="Emphasized" press=".onOpenFetchDialog" tooltip="Fetch report configuration from a Power BI embed URL" />
-      </HBox>
+      </HBox> -->
     </VBox>
 
     <beginButton>

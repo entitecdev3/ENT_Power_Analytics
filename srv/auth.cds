@@ -7,5 +7,14 @@ type CustomAttributes {
     value: String;
 }
 
-function getCustomAttrbute() returns CustomAttributes;
+type UserInfo {
+    username: String;
+    roles: Array of String;
+
+}
+
+// service AuthService {
+//   function getCustomAttrbute() returns CustomAttributes;
+//   function getUserInfo() returns UserInfo;
+// }
 

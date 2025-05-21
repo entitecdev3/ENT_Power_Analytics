@@ -82,6 +82,7 @@ sap.ui.define([
         onLogOut: function (oEvent) {
             var that = this;
             this.middleWare.callMiddleWare("/logout", "POST").then(function (oData) {
+                window.location.href='/'; 
                 sessionStorage.removeItem("LoggedInUser");
                 that.getRouter().navTo("Login"); 
             }).catch(function (oError) {
