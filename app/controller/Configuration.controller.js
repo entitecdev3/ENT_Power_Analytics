@@ -179,7 +179,6 @@ sap.ui.define(
               reportId: "",
               workspaceId: "",
               description: "",
-              securityFilter_ID: "",
               servicePrincipal_ID: "",
             },
           };
@@ -220,6 +219,7 @@ sap.ui.define(
 
           this._oReportDialog.setTitle(title);
           this.byId("idAddReports").setText(button);
+          this._oReportDialog.setBindingContext(oContext);
           this._oReportDialog.open();
         },
 

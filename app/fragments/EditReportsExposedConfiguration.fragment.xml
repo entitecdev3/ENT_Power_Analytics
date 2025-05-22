@@ -13,7 +13,11 @@
       <ComboBox id="reportSelect" width="20vw" items="" selectedKey="{tempReport>/ReportsExposed/reportId}">
         <core:Item key="{id}" text="{name}" />
       </ComboBox>
-      <Label text="{i18n>Description}"></Label>
+      <Label text="{i18n>SECURITY_FILTERS}" />
+      <MultiComboBox items="{/SecurityFilters}" id="idSecurityFilters">
+        <core:Item key="{ID}" text="{securityUniqueId}"></core:Item>
+      </MultiComboBox>
+      <Label required="true" text="{i18n>Description}"></Label>
       <Input id="idReportDescription" value="{tempReport>/ReportsExposed/description}" ></Input>
       <!-- <HBox justifyContent="End" class="sapUiTinyMarginTop">
         <Button icon="sap-icon://broken-link" text="Fetch from URL" type="Emphasized" press=".onOpenFetchDialog" tooltip="Fetch report configuration from a Power BI embed URL" />

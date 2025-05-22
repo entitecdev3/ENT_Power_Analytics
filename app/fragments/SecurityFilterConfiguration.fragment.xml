@@ -15,7 +15,7 @@
                 </Toolbar>
             </headerToolbar>
             <columns>
-                <Column><Text text="Description"/></Column>
+                <Column><Text text="Security Filter Name"/></Column>
                 <Column><Text text="Schema"/></Column>
                 <Column><Text text="Display Settings"/></Column>
                 <Column><Text text="Operator"/></Column>

@@ -2,7 +2,7 @@ const bcrypt = require("bcryptjs"); // Use bcryptjs instead of bcrypt
 const axios = require("axios");
 
 module.exports = cds.service.impl(async function () {
-  const { Users, ReportsExposed, PowerBi } = this.entities;
+  const { Users, ReportsExposed, PowerBi, ReportsToSecurityFilters, SecurityFilters } = this.entities;
 
   this.before("CREATE", Users, async (req) => {
     // console.log(req.user);
@@ -56,7 +56,7 @@ module.exports = cds.service.impl(async function () {
       grant_type: "client_credentials",
       client_id: config.clientId,
       client_secret: config.clientSecret,
-      scope: "https://analysis.windows.net/powerbi/api/.default",
+      scope: config.scopeBase,
     };
 
     const response = await axios.post(tokenUrl, qs.stringify(params), {
@@ -66,73 +66,88 @@ module.exports = cds.service.impl(async function () {
     return response.data.access_token;
   };
 
-  this.on("READ", ReportsExposed, async (req) => {
-    // Pull base report records yourself
-    const baseReports = await SELECT.from(ReportsExposed).columns(
-      "ID",
-      "description",
-      "reportId",
-      "workspaceId",
-      "servicePrincipal_ID as servicePrincipal_ID"
-    );
+  this.on("READ", ReportsExposed, async (req,next) => {
+  const data = await next();
+  const baseReports=data;
 
-    // Fetch configIds (unique Service Principals)
-    const configIds = [
-      ...new Set(baseReports.map((r) => r.servicePrincipal_ID)),
-    ];
+  for (const report of baseReports) {
+    let config = await SELECT.one.from(PowerBi).where({ ID: report.servicePrincipal.ID });
+    if (!config)
+      config = await SELECT.one.from(PowerBi).where({ ID: report.servicePrincipal_ID });
+      if(!config) continue;
 
-    const powerBiData = {};
-    for (const configId of configIds) {
-      const config = await SELECT.one.from(PowerBi).where({ ID: configId });
-      if (!config) continue;
+    try {
+      const token = await getAccessToken(config);
 
-      try {
-        const token = await getAccessToken(config);
-
-        // Get Workspaces
-        const wsResp = await axios.get(`${config.biApiUrl}v1.0/myorg/groups`, {
+      const wsResp = await axios.get(`${config.biApiUrl}v1.0/myorg/groups`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const workspaces = wsResp.data.value;
+      const workspace = workspaces.find(ws => ws.id === report.workspaceId);
+      const repResp = await axios.get(`${config.biApiUrl}v1.0/myorg/groups/${report.workspaceId}/reports`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        const workspaces = wsResp.data.value;
+      const reports = repResp.data.value;
+      const matchedReport = reports.find(r => r.id === report.reportId);
 
-        // Get Reports per workspace
-        const reportsByWorkspaceId = {};
-        await Promise.all(
-          workspaces.map(async (ws) => {
-            const repResp = await axios.get(
-              `${config.biApiUrl}v1.0/myorg/groups/${ws.id}/reports`,
-              { headers: { Authorization: `Bearer ${token}` } }
-            );
-            reportsByWorkspaceId[ws.id] = repResp.data.value;
-          })
-        );
+      report.workspaceName = workspace?.name || "Unknown Workspace";
+      report.workspaceUrl = `${config.tenantUrl || "https://app.powerbi.com"}/groups/${report.workspaceId}`;
+      report.reportName = matchedReport?.name || "Unknown Report";
+      report.reportUrl = `${report.workspaceUrl}/reports/${report.reportId}`;
 
-        powerBiData[configId] = {
-          workspaces,
-          reportsByWorkspaceId,
-        };
-      } catch (err) {
-        console.error(
-          `Power BI fetch failed for configId ${configId}:`,
-          err.message
-        );
-      }
+    } catch (err) {
+      console.error(`Power BI fetch failed for report ${report.ID}:`, err.message);
+      report.reportName = "Error loading report";
+      report.workspaceName = "Error loading workspace";
     }
-
-    // Return enriched reports
-    return baseReports.map((r) => {
-      const pbi = powerBiData[r.servicePrincipal_ID];
-      const workspace = pbi?.workspaces.find((w) => w.id === r.workspaceId);
-      const report = pbi?.reportsByWorkspaceId?.[r.workspaceId]?.find(
-        (rep) => rep.id === r.reportId
-      );
-
-      return {
-        ...r,
-        servicePrincipal: { ID: r.servicePrincipal_ID }, // Optional
-        workspaceName: workspace?.name,
-        reportName: report?.name
-      };
-    });
+    }
+    return baseReports;
   });
 });
+
+  // Step 6: Enrich and return base reports with nested filters & Power BI data
+  // return baseReports.map(r => {
+  //   const pbi = powerBiData[r.servicePrincipal_ID];
+  //   const workspace = pbi?.workspaces.find(w => w.id === r.workspaceId);
+  //   const report = pbi?.reportsByWorkspaceId?.[r.workspaceId]?.find(rep => rep.id === r.reportId);
+
+  //   return {
+  //     ...r,
+  //     // servicePrincipal: { ID: r.servicePrincipal_ID },
+  //     workspaceName: workspace?.name,
+  //     reportName: report?.name,
+  //     workspaceUrl: workspace ? `${pbi.tenantUrl}/groups/${workspace.id}` : "",
+  //     reportUrl: report && workspace ? `${pbi.tenantUrl}/groups/${workspace.id}/reports/${report.id}` : "",
+  //     // securityFilters: filtersByReportId[r.ID] || []
+  //   };
+
+
+
+
+//  this.on('READ', ReportsExposed, async (req, next) => {
+//     // Example logic
+//     const data = await next();
+//     // each.reportName = await getReportNameFromPowerBI(reportId);
+//     // each.workspaceName = await getWorkspaceNameFromPowerBI(workspaceId);
+//     // each.reportUrl = `https://app.powerbi.com/reports/${each.reportName}`;
+//     // each.workspaceUrl = `https://app.powerbi.com/groups/${each.workspaceName}`;
+
+//     for (const row of data) {
+//       row.reportName = await getReportNameFromPowerBI(row.reportId);
+//       row.workspaceName = await getWorkspaceNameFromPowerBI(row.workspaceId);
+//       row.reportUrl = `https://app.powerbi.com/groups/${row.workspaceId}/reports/${row.reportId}`;
+//       row.workspaceUrl = `https://app.powerbi.com/groups/${row.workspaceId}`;
+//     }
+
+//   return data;
+//   });
+
+//   async function getReportNameFromPowerBI(reportId) {
+//     // Call your Power BI API or mapping logic
+//     return 'Sample Report';
+//   }
+
+//   async function getWorkspaceNameFromPowerBI(workspaceId) {
+//     return 'Sample Workspace';
+  // }
+// });
