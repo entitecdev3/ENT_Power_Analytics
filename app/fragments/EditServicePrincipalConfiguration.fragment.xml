@@ -12,8 +12,8 @@
             <Input value="{tenantId}"/>
         </VBox>
         <buttons>
-            <Button id="idAddConfig" type="Emphasized" press="onSaveEditServicePrincipalDialog"/>
-            <Button text="Cancel" press="onCloseEditServicePrincipalDialog"/>
+            <Button id="idAddConfig" text="{i18n>ok}" type="Emphasized" press="onSaveEditServicePrincipalDialog"/>
+            <Button text="{i18n>cancel}" press="onCloseEditServicePrincipalDialog"/>
         </buttons>
     </Dialog>
 </core:FragmentDefinition>

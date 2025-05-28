@@ -57,25 +57,23 @@ context PowerBiPortal {
         }
 
         entity SecurityFilters : cuid, managed {
-                securityUniqueId       : String(100) not null                                  @mandatory;
-                schema                 : String(100) not null                                  @mandatory;
-                operator               : String(50) not null                                   @mandatory;
-                requireSingleSelection : Boolean not null                                      @mandatory;
-                table                  : String(100) not null                                  @mandatory;
-                column                 : String(100) not null                                  @mandatory;
-                values                 : String(500);
-                displaySetting         : Association to PowerBiPortal.DisplaySettings not null @mandatory;
-                reports                : Association to many ReportsToSecurityFilters on reports.filter = $self;
+                securityUniqueId                  : String(100) not null @mandatory;
+                schema                            : String(100) not null @mandatory;
+                operator                          : String(50) not null  @mandatory;
+                requireSingleSelection            : Boolean not null     @mandatory;
+                table                             : String(100) not null @mandatory;
+                column                            : String(100) not null @mandatory;
+                values                            : String(500);
+                displaySetting_isLockedInViewMode : Boolean default false;
+                displaySetting_isHiddenInViewMode : Boolean default false;
+                displaySetting_displayName        : String(100);
+                reports                           : Association to many ReportsToSecurityFilters
+                                                            on reports.filter = $self;
         }
 
         entity ReportsToSecurityFilters : cuid, managed {
-                report : Association to ReportsExposed @mandatory;
-                filter : Association to SecurityFilters  @mandatory;
-        }
-
-        entity DisplaySettings : cuid, managed {
-                property : String(100);
-                value    : String(255);
+                report : Association to ReportsExposed   @key  @mandatory;
+                filter : Association to SecurityFilters  @key  @mandatory;
         }
 
         entity Configuration : cuid, managed {

@@ -1,2 +1,2 @@
-ID,securityUniqueId,schema,operator,requireSingleSelection,table,column,values,displaySetting_ID,createdAt,createdBy,modifiedAt,modifiedBy
-04484faa-640e-4f38-a39c-cd4e84d08e4a,test,http://powerbi.com/product/schema#basic,In,false,Cliente,Cliente - Agente (code),,44ed7eb0-dddb-420b-919f-180de32a2ae4
+ID,securityUniqueId,schema,operator,requireSingleSelection,table,column,values,displaySetting_isLockedInViewMode,displaySetting_isHiddenInViewMode,displaySetting_displayName,createdAt,createdBy,modifiedAt,modifiedBy
+04484faa-640e-4f38-a39c-cd4e84d08e4a,test,http://powerbi.com/product/schema#basic,In,FALSE,Cliente,Cliente - Agente (code),,TRUE,TRUE,None,,,,

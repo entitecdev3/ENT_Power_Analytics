@@ -39,8 +39,7 @@ sap.ui.define(
       onAddUser: function () {
         this.addUserPress = true;
         this.editUserPress = false;
-        let oContext = this.byId('idTableUsers').getBinding("items").create({});
-        oContext.created().then(function (x, y, z) { debugger });
+        let oContext = this.byId('idTableUsers').getBinding("items").create({}, true, { groupId: "UserChanges" });
         this.openUserDialog("Add User", "Add", oContext);
       },
       onRefreshUsers: function () {
@@ -53,21 +52,30 @@ sap.ui.define(
               if (sAction === MessageBox.Action.OK) {
                 that.byId('idSaveUsers').setEnabled(false);
                 that.byId('idDiscardButton').setEnabled(false);
+                that.onChangeHighlightTableRow("idTableUsers"); // Track changes in row and highlight them
                 oModel.resetChanges("UserChanges");
                 oModel.refresh();
               }
             }
           });
         } else {
-          that.byId('idSaveUsers').setEnabled(false);
-          that.byId('idDiscardButton').setEnabled(false);
+          that.onChangeHighlightTableRow("idTableUsers"); // Track changes in row and highlight them
           oModel.resetChanges("UserChanges");
           oModel.refresh();
         }
       },
-      onCloseEditUserDialog: function () {
-        let oModel = this.getView().getModel();
-        oModel.resetChanges("UserChanges");
+      onCloseEditUserDialog: function (oEvent) {
+        let oContext = oEvent.getSource().getBindingContext();
+        if( oContext.hasPendingChanges("UserChanges") && !oContext.isTransient()) {
+          Object.keys(this._oSelectedUserObject).forEach((key) => {
+              oContext.setProperty(key, this._oSelectedUserObject[key]);
+          })
+        } else {
+          if(oContext.isTransient()){
+            oContext.delete();
+          }
+        }
+        this.onChangeHighlightTableRow("idTableUsers"); // Track changes in row and highlight them
         this._oDialog.close();
       },
       onAccountNewPasswordLiveChange: function (oEvent) {
@@ -103,6 +111,7 @@ sap.ui.define(
           this._oDialog.close();
         }
         if (this.getModel().hasPendingChanges()) {
+          this.onChangeHighlightTableRow("idTableUsers"); // Track changes in row and highlight them
           this.byId('idSaveUsers').setEnabled(true);
           this.byId('idDiscardButton').setEnabled(true);
         }
@@ -196,6 +205,7 @@ sap.ui.define(
         if (this.getView().getModel().hasPendingChanges()) {
           this.byId('idSaveUsers').setEnabled(true);
           this.byId('idDiscardButton').setEnabled(true);
+          this.onChangeHighlightTableRow("idTableUsers"); // Track changes in row and highlight them
         }
       },
       clearPasswordFields: function () {
@@ -224,7 +234,7 @@ sap.ui.define(
         this.editUserPress = true;
         this.bindingContext = oEvent.getSource().getBindingContext();
         this.openUserDialog("Edit User", "Update", this.bindingContext);
-
+        this._oSelectedUserObject = JSON.parse(JSON.stringify(this.bindingContext.getObject()));
       },
       openUserDialog: function (title, button, oContext) {
         let oView = this.getView();
@@ -269,11 +279,15 @@ sap.ui.define(
               MessageBox.warning(sWarningMessage);
             } else {
               MessageToast.show("Batch operation completed successfully");
+              that.onChangeHighlightTableRow("idTableUsers"); // Track changes in row and highlight them
+              that.byId('idSaveUsers').setEnabled(false);
+              that.byId('idDiscardButton').setEnabled(false);
             }
           } else {
-            this.byId('idSaveUsers').setEnabled(false);
-            this.byId('idDiscardButton').setEnabled(false);
+            that.byId('idSaveUsers').setEnabled(false);
+            that.byId('idDiscardButton').setEnabled(false);
             MessageToast.show("User details updated successfully.");
+            that.onChangeHighlightTableRow("idTableUsers"); // Track changes in row and highlight them
             // oModel.refresh();
           }
         }).catch(oError => {
@@ -317,6 +331,7 @@ sap.ui.define(
                 that.byId('idDiscardButton').setEnabled(false);
                 oModel.resetChanges("UserChanges");
                 oModel.refresh();
+                that.onChangeHighlightTableRow("idTableUsers"); // Track changes in row and highlight them
               }
             }
           });

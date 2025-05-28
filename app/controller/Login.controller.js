@@ -14,7 +14,7 @@ sap.ui.define([
     },
     _matchedHandler: function () {
       this.getModel("appView").setProperty("/navVisible", false);
-      this.getModel("appView").setProperty("/LoginHeader", false); 
+      this.getModel("appView").setProperty("/LoginHeader", true); 
     },
     onButtonLoginPress: function (oEvent) {
       var sUsername = this.getView().byId("idUnameInput").getValue();

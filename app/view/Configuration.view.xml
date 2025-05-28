@@ -27,7 +27,8 @@
     <footer>
       <Bar>
         <contentRight>
-          <Button text="Save" type="Emphasized" press="onSaveChanges" />
+          <Button id="idSaveConfig" text="{i18n>save}" type="Emphasized" enabled="false" press="onSaveChanges" />
+          <Button id="idDiscardConfig" text="{i18n>discard}" type="Default" enabled="false" press="onDiscardChanges" />
         </contentRight>
       </Bar>
     </footer>

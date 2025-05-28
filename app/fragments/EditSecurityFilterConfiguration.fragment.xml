@@ -2,16 +2,27 @@
     xmlns:core="sap.ui.core">
     <Dialog id="idEditSecurityFilterDialog" class="sapUiResponsiveMargin">
         <VBox class="sapUiSmallMargin">
-            <Label required="false" text="{i18n>DESCRIPTION}" />
-            <Input value="{description}" />
+            <Label required="false" text="{i18n>SECURITY_FILTER_NAME}" />
+            <Input value="{securityUniqueId}" />
             <Label required="true" text="{i18n>SCHEMA}" />
             <Input value="{schema}"/>
-            <Label required="true" text="{i18n>DISPLAY_SETTINGS}" />
-            <MultiComboBox width="20vw" items="{/DisplaySettings}" selectedItems="{displaySettingsID}">
-                <core:Item key="{DisplaySettingsId}" text="{Property}" />
-            </MultiComboBox>
+            <!-- <Label required="true" text="{i18n>DISPLAY_SETTINGS}" /> -->
+            <!-- <Select width="20vw" items="{/DisplaySettings}" selectedKey="{displaySetting_ID}" forceSelection="false">
+                <core:Item key="{ID}" text="{property}" />
+            </Select> -->
+            <Label required="true" text="{i18n>DISPLAY_SETTINGS_LOCKED_IN_VIEWMODE}" />
+            <CheckBox selected="{displaySetting_isLockedInViewMode}" />
+            <Label required="true" text="{i18n>DISPLAY_SETTINGS_HIDDEN_IN_VIEWMODE}" />
+            <CheckBox selected="{displaySetting_isHiddenInViewMode}" />
+            <Label required="true" text="{i18n>DISPLAY_SETTINGS_DISPLAY_NAME}" />
+            <Input value="{displaySetting_displayName}" />
             <Label required="true" text="{i18n>OPERATOR}" />
-            <Input value="{operator}"/>
+            <Select selectedKey="{operator}" width="auto" forceSelection="false" >
+                <core:Item key="In" text="IN" />
+                <core:Item key="NotIn" text="NOT IN" />
+                <core:Item key="All" text="ALL" />
+            </Select>
+            <!-- <Input value="{operator}"/> -->
             <Label required="true" text="{i18n>REQUIRE_SINGLE_SELECTION}" />
             <CheckBox selected="{requireSingleSelection}"/>
             <Label required="true" text="{i18n>TABLE}" />
@@ -23,8 +34,8 @@
             
         </VBox>
         <buttons>
-            <Button id="idAddSecurityFilter" type="Emphasized" press="onSaveEditSecurityFilterDialog"/>
-            <Button text="Cancel" press="onCloseEditSecurityFilterDialog"/>
+            <Button id="idAddSecurityFilter" text="{i18n>ok}" type="Emphasized" press="onSaveEditSecurityFilterDialog"/>
+            <Button text="{i18n>cancel}" press="onCloseEditSecurityFilterDialog"/>
         </buttons>
     </Dialog>
 </core:FragmentDefinition>

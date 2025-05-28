@@ -16,7 +16,7 @@ service MyService @(path: 'MyService') {
     entity PowerBi                  as projection on PowerBiPortal.PowerBi;
     entity Identity                 as projection on PowerBiPortal.Identity;
     entity SecurityFilters          as projection on PowerBiPortal.SecurityFilters;
-    entity DisplaySettings          as projection on PowerBiPortal.DisplaySettings;
+    // entity DisplaySettings          as projection on PowerBiPortal.DisplaySettings;
     entity Configuration            as projection on PowerBiPortal.Configuration;
     entity ReportsToSecurityFilters as projection on PowerBiPortal.ReportsToSecurityFilters;
     function getCustomAttrbute() returns auth.CustomAttributes;

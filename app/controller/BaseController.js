@@ -5,12 +5,13 @@ sap.ui.define([
     "entitec/pbi/embedding/dbapi/dbapi",
     "sap/ui/core/Fragment",
     "sap/m/MessageBox",
-    "sap/ui/Device"
-], function (Controller, MessageToast, History, dbapi, Fragment, MessageBox, Device) {
+    "sap/ui/Device",
+    "entitec/pbi/embedding/model/formatter",
+], function (Controller, MessageToast, History, dbapi, Fragment, MessageBox, Device, formatter) {
     "use strict";
 
     return Controller.extend("entitec.pbi.embedding.controller.BaseController", {
-
+        formatter: formatter,
         middleWare: dbapi,
         /**
          * Retrieves the router instance for navigation
@@ -201,6 +202,23 @@ sap.ui.define([
                 }
             }
             return true;
+        },
+
+        onChangeHighlightTableRow: function(tableName){
+            let oTable = this.byId(tableName);
+            let oItems = oTable?.getItems() || [];
+            if(oItems && oItems.length > 0){
+                oItems.forEach((item)=>{
+                    // Check if the item has pending changes or not 
+                    let bChanges = item?.getBindingContext()?.hasPendingChanges();
+                    if(bChanges){
+                        item?.setHighlight("Information");
+                    }
+                    else{
+                        item?.setHighlight("None");
+                    }
+                })
+            }
         }
     });
 });

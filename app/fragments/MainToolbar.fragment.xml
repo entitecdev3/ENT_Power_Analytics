@@ -15,7 +15,7 @@
             <Text class="sapUiSmallMarginBegin" text="Version 1.0.0" wrapping="true"
                 visible="{appView>/LoginHeader}" />           
 
-            <ToolbarSpacer visible="{appView>/HomeScreen}" />
+            <!-- <ToolbarSpacer visible="{appView>/HomeScreen}" /> -->
 
             <Button id="idUserProfile" icon="sap-icon://person-placeholder" type="Attention" press="onProfilePress"
                 visible="{appView>/HomeScreen}">
