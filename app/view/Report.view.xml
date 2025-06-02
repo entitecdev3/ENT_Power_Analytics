@@ -3,7 +3,7 @@
   <m:VBox class="sapUiSmallMargin">
     <m:Label text="Select Report to view"></m:Label>
     <m:ComboBox id="idReportList" width="20vw" items="{/ReportsExposed}" class="sapUiLargeMarginBottom" selectionChange="onReportSelectionChange">
-      <Item key="{ID}" text="{reportComment} - {workspaceComment}" />
+      <Item key="{ID}" text="{description}" />
     </m:ComboBox>
 
     <m:Title id="idReportTitle" text="Report" ></m:Title>

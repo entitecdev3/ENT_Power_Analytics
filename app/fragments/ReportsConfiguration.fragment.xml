@@ -2,7 +2,7 @@
   <VBox alignItems="Stretch" fitContainer="true" height="100%" class="sapUiContentPadding">
 
     <Table id="idRCConfigTable" mode="Delete" alternateRowColors="true" items="{path: '/ReportsExposed', parameters: { $$updateGroupId: 'ReportsChanges',
-      $expand: 'securityFilters', $select: 'workspaceId,reportId' }}" fixedLayout="true" delete="onDeleteReport">
+      $expand: 'securityFilters' }}" fixedLayout="true" delete="onDeleteReport">
 
       <headerToolbar>
         <Toolbar>

@@ -12,7 +12,7 @@ sap.ui.define(
     return BaseController.extend(
       "entitec.pbi.embedding.controller.Configuration",
       {
-        onInit: function onInit(oEvent) {
+        onInit: function () {
           this._oRouter = this.getOwnerComponent().getRouter();
           this._oRouter
             .getRoute("Configuration")
@@ -23,28 +23,30 @@ sap.ui.define(
           oViewModel.setProperty("/navVisible", true);
           oViewModel.setProperty("/LoginHeader", false);
           oViewModel.setProperty("/HomeScreen", true);
-          this.getModel().refresh();          
+          this.getModel().refresh();
         },
 
         //------------- Service Principal Configuration ------------------
 
         onAddServicePrincipalConfiguration: function () {
           this.addServicePrincipal = true;
-          let oContext = this.byId('idConfigTable').getBinding("items").create({}, true, { groupId: "ServicePrincipalChanges" });
+          let oContext = this.byId("idConfigTable")
+            .getBinding("items")
+            .create({}, true, { groupId: "ServicePrincipalChanges" });
           this.openConfigDialog("Add Service Principal", "Add", oContext);
         },
-
         onConfigSelect: async function (oEvent) {
           this.addServicePrincipal = false;
           let oSource = oEvent.getSource();
-          this._selectedServicePrincipalObject = JSON.parse(JSON.stringify(oSource.getBindingContext().getObject()));
+          this._selectedServicePrincipalObject = JSON.parse(
+            JSON.stringify(oSource.getBindingContext().getObject())
+          );
           this.openConfigDialog(
             "Edit Service Principal",
             "Update",
             oSource.getBindingContext()
           );
         },
-
         openConfigDialog: function (title, button, oContext) {
           let oView = this.getView();
           if (!this._oDialog) {
@@ -60,7 +62,6 @@ sap.ui.define(
           // this.byId("idAddConfig").setText(button);
           this._oDialog.open();
         },
-
         onDeleteConfig: function (oEvent) {
           var oItem = oEvent.getParameter("listItem");
           var oContext = oItem.getBindingContext();
@@ -84,19 +85,25 @@ sap.ui.define(
             }
           );
         },
-
         onRefreshServicePrincipal: function () {
           var that = this;
           let oModel = this.getView().getModel();
           if (oModel.hasPendingChanges()) {
-            this.showDiscardChangesWarning("Are you sure you want to reload. Your changes will be lost?", null, oModel, "ServicePrincipalChanges", this, ["idSaveConfig", "idDiscardConfig"], 'idConfigTable');
+            this.showDiscardChangesWarning(
+              "Are you sure you want to reload. Your changes will be lost?",
+              null,
+              oModel,
+              "ServicePrincipalChanges",
+              this,
+              ["idSaveConfig", "idDiscardConfig"],
+              "idConfigTable"
+            );
           } else {
             oModel.resetChanges("ServicePrincipalChanges");
             oModel.refresh();
-            this.onChangeHighlightTableRow('idConfigTable'); // Changing the status of the table row 
+            this.onChangeHighlightTableRow("idConfigTable"); // Changing the status of the table row
           }
         },
-
         onSaveEditServicePrincipalDialog: async function () {
           let oContext = this._oDialog.getBindingContext();
           let userObject = oContext.getObject();
@@ -105,13 +112,12 @@ sap.ui.define(
             return;
           }
           this._oDialog.close();
-          if(this.getView().getModel().hasPendingChanges()){
-            this.byId('idSaveConfig').setEnabled(true);
-            this.byId('idDiscardConfig').setEnabled(true);
-            this.onChangeHighlightTableRow('idConfigTable'); // Changing the status of the table row 
+          if (this.getView().getModel().hasPendingChanges()) {
+            this.byId("idSaveConfig").setEnabled(true);
+            this.byId("idDiscardConfig").setEnabled(true);
+            this.onChangeHighlightTableRow("idConfigTable"); // Changing the status of the table row
           }
         },
-
         _validateSPFields: async function (userObject) {
           const isValid = await this.validateEntityFields(
             "PowerBi",
@@ -121,23 +127,27 @@ sap.ui.define(
           if (!isValid) return false;
           return true;
         },
-
         onCloseEditServicePrincipalDialog: function (oEvent) {
           let oContext = oEvent.getSource().getBindingContext();
-          
-          if(oContext?.hasPendingChanges("ServicePrincipalChanges") && !oContext.isTransient()){
+
+          if (
+            oContext?.hasPendingChanges("ServicePrincipalChanges") &&
+            !oContext.isTransient()
+          ) {
             Object.keys(this._selectedServicePrincipalObject).forEach((key) => {
-              oContext.setProperty(key, this._selectedServicePrincipalObject[key]);
-            })
-          }
-          else {
-            if(oContext?.isTransient()){
+              oContext.setProperty(
+                key,
+                this._selectedServicePrincipalObject[key]
+              );
+            });
+          } else {
+            if (oContext?.isTransient()) {
               oContext.delete();
             }
           }
-          this.onChangeHighlightTableRow('idConfigTable'); // Changing the status of the table row 
+          this.onChangeHighlightTableRow("idConfigTable"); // Changing the status of the table row
           this._oDialog.close();
-        },  
+        },
         //------------- Reports Exposed Configuration ------------------
 
         onAddReportsConfiguration: function () {
@@ -161,14 +171,13 @@ sap.ui.define(
           let oNewContext = new Context(oTempModel, "/ReportsExposed");
           this.openReportsConfigDialog("Add Report", "Add", oNewContext);
         },
-
         onReportSelect: async function (oEvent) {
           this.addReport = false;
           let oView = this.getView();
           let oSelectedContext = oEvent.getSource().getBindingContext();
           this._oSelectedReportContext = oSelectedContext; // store globally
 
-          const oNewReport = { Report: oSelectedContext.getObject() };
+          const oNewReport = { ReportsExposed: oSelectedContext.getObject() };
 
           const oTempModel = new sap.ui.model.json.JSONModel(oNewReport);
           oView.setModel(oTempModel, "tempReport");
@@ -176,7 +185,6 @@ sap.ui.define(
           let oNewContext = new Context(oTempModel, "/ReportsExposed");
           this.openReportsConfigDialog("Edit Report", "Update", oNewContext);
         },
-
         openReportsConfigDialog: function (title, button, oContext) {
           let oView = this.getView();
           if (!this._oReportDialog) {
@@ -193,12 +201,23 @@ sap.ui.define(
           this._oReportDialog.setBindingContext(oContext);
           this._oReportDialog.open();
         },
-
         onSaveEditReportsDialog: async function () {
           let oContext = this._oReportDialog.getBindingContext();
           let reportObject = this._oReportDialog
             .getModel("tempReport")
             .getProperty("/ReportsExposed");
+          reportObject.securityFilters = [];
+          let aSecurityFilters = this.getView()
+            .byId("idSecurityFilters")
+            .getSelectedKeys();
+          if (aSecurityFilters && aSecurityFilters.length > 0) {
+            for (let index = 0; index < aSecurityFilters.length; index++) {
+              const element = aSecurityFilters[index];
+              reportObject.securityFilters.push({
+                filter_ID: element,
+              });
+            }
+          }
 
           let validated = await this._validateReportFields(reportObject);
           if (!validated) return;
@@ -207,18 +226,18 @@ sap.ui.define(
 
           if (this.addReport) {
             this.aReportCreateContext = oTable.create(reportObject);
-            this.aReportCreateContext.created().then(function () {
-              debugger;
-            });
+            // this.aReportCreateContext.created().then(function () {
+            //   debugger;
+            // });
           } else if (this._oSelectedReportContext) {
             Object.keys(reportObject).forEach((key) => {
               this._oSelectedReportContext.setProperty(key, reportObject[key]);
             });
           }
-
+          this.byId("idSaveConfig").setEnabled(true);
+          this.byId("idDiscardConfig").setEnabled(true);
           this._oReportDialog.close();
         },
-
         _validateReportFields: async function (reportObject) {
           const isValid = await this.validateEntityFields(
             "ReportsExposed",
@@ -228,13 +247,11 @@ sap.ui.define(
           if (!isValid) return false;
           return true;
         },
-
         onCloseEditReportsDialog: function () {
           let oModel = this.getView().getModel();
           oModel.resetChanges("ReportsChanges");
           this._oReportDialog.close();
         },
-
         onDeleteReport: function (oEvent) {
           var oItem = oEvent.getParameter("listItem");
           var oContext = oItem.getBindingContext();
@@ -248,12 +265,13 @@ sap.ui.define(
             actions: [MessageBox.Action.OK, MessageBox.Action.CANCEL],
             onClose: function (sAction) {
               if (sAction === MessageBox.Action.OK) {
+                this.byId("idSaveConfig").setEnabled(true);
+                this.byId("idDiscardConfig").setEnabled(true);
                 oContext.delete("ReportsChanges");
               }
-            },
+            }.bind(this),
           });
         },
-
         onRefreshReports: function () {
           let oModel = this.getView().getModel();
           if (oModel.hasPendingChanges()) {
@@ -274,35 +292,241 @@ sap.ui.define(
             oModel.refresh();
           }
         },
-
         onLoadReport: async function (oEvent) {
-          const oReport = oEvent.getSource().getBindingContext().getObject();
+          this._oSelectedReport = oEvent
+            .getSource()
+            .getBindingContext()
+            .getObject();
+
+          const reportId = this._oSelectedReport.ID;
+          const oModel = this.getView().getModel("powerBi");
+
+          const sPath = `/ReportsExposed(${reportId})/PowerBiService.getFilterFieldsForReport(...)`;
+
+          const oBinding = oModel.bindContext(sPath);
+          // No parameters? No need to set. Otherwise:
+          // oBinding.setParameter("reportID", reportId);
+
+          try {
+            await oBinding.execute();
+            const oData = oBinding.getBoundContext().getObject();
+
+            if (Array.isArray(oData.value) && oData.value.length > 0) {
+              this._openDynamicFilterDialog(oData.value); // Pass the filter fields to dialog
+            } else {
+              MessageToast.show("No security filters defined for this report.");
+            }
+          } catch (err) {
+            MessageBox.error("Failed to fetch filter fields: " + err.message);
+          }
+        },
+        _openDynamicFilterDialog: function (aFilterFields) {
+          const aFields = aFilterFields.map((f) => ({
+            ...f,
+            tokens: [],
+            value: "",
+          }));
+
+          const oModel = new sap.ui.model.json.JSONModel({
+            fields: aFields,
+          });
+          this.getView().setModel(oModel, "filters");
+          if (!this._pFilterDialog) {
+            this._pFilterDialog = Fragment.load({
+              id: this.getView().getId(),
+              name: "entitec.pbi.embedding.fragments.DynamicFilterDialog",
+              controller: this,
+            }).then((oDialog) => {
+              this.getView().addDependent(oDialog);
+              return oDialog;
+            });
+          }
+
+          this._pFilterDialog.then((oDialog) => oDialog.open());
+        },
+        onCloseFilterDialog: function (oEvent) {
+          oEvent.getSource().getParent().close();
+        },
+        _onSubmitSecurityFilters: function () {
+          const oDialog = this.byId("dynamicFilterDialog");
+          const oTable = oDialog.getContent()[0]; // The Table
+          const oFiltersModel = this.getView().getModel("filters");
+
+          oTable.getItems().forEach((oItem) => {
+            const oContext = oItem.getBindingContext("filters");
+            if (!oContext) return;
+
+            const oData = oContext.getObject();
+            const aCells = oItem.getCells();
+
+            const oVBox = aCells[2]; // Third column: VBox containing Input + MultiInput
+            const aVBoxItems = oVBox.getItems();
+
+            aVBoxItems.forEach((oControl) => {
+              if (oControl.isA("sap.m.Input") && oControl.getVisible()) {
+                // Single value
+                oData.value = oControl.getValue();
+              } else if (
+                oControl.isA("sap.m.MultiInput") &&
+                oControl.getVisible()
+              ) {
+                // Multi values from tokens
+                const aTokens = oControl.getTokens().map((t) => t.getText());
+                oData.value = aTokens;
+              }
+            });
+
+            // Update the model with the correct value
+            oFiltersModel.setProperty(
+              oContext.getPath() + "/value",
+              oData.value
+            );
+          });
+
+          oDialog.close();
+          this._applyFiltersAndEmbedReport();
+        },
+        onTokenUpdate: function (oEvent) {
+          const oMultiInput = oEvent.getSource();
+          const oContext = oMultiInput.getBindingContext("filters");
+          const oModel = oMultiInput.getModel("filters");
+          const sPath = oContext.getPath() + "/tokens";
+
+          // Keep only remaining tokens
+          const aTokens = oMultiInput
+            .getTokens()
+            .map((t) => ({ text: t.getText() }));
+          oModel.setProperty(sPath, aTokens);
+        },
+        onFreeTextSubmit: function (oEvent) {
+          const oMultiInput = oEvent.getSource();
+          const sEnteredValue = oEvent.getParameter("value")?.trim();
+          if (!sEnteredValue) return;
+
+          const oContext = oMultiInput.getBindingContext("filters");
+          const oModel = oMultiInput.getModel("filters");
+          const sPath = oContext.getPath() + "/tokens";
+
+          let aTokens = oModel.getProperty(sPath) || [];
+          debugger;
+          // Avoid duplicates
+          if (!aTokens.find((token) => token.text === sEnteredValue)) {
+            aTokens.push({ text: sEnteredValue });
+            oModel.setProperty(sPath, aTokens);
+          }
+
+          oMultiInput.setValue(""); // Clear input after submit
+        },
+
+        onFreeTextSubmit: function (oEvent) {
+          const oMultiInput = oEvent.getSource();
+          const sEnteredValue = oEvent.getParameter("value")?.trim();
+          if (!sEnteredValue) return;
+
+          const oContext = oMultiInput.getBindingContext("filters");
+          const oModel = oMultiInput.getModel("filters");
+          const sBasePath = oContext.getPath();
+
+          let aTokens = oModel.getProperty(sBasePath + "/tokens") || [];
+
+          if (!aTokens.find((token) => token.text === sEnteredValue)) {
+            aTokens.push({ text: sEnteredValue });
+            oModel.setProperty(sBasePath + "/tokens", aTokens);
+
+            // Also update the value field as array of texts
+            const aTokenTexts = aTokens.map((t) => t.text);
+            oModel.setProperty(sBasePath + "/value", aTokenTexts);
+          }
+
+          oMultiInput.setValue(""); // Clear input after submit
+        },
+
+        _applyFiltersAndEmbedReport: async function () {
+          const oFiltersModel = this.getView().getModel("filters");
+          const aFilterFields = oFiltersModel.getProperty("/fields");
+          const reportId = this._oSelectedReport.ID;
+          debugger;
+          const aFiltersPayload = aFilterFields.map((f) => ({
+            table: f.table,
+            column: f.column,
+            values: Array.isArray(f.value)
+              ? f.value
+              : typeof f.value === "string"
+              ? f.value.split(",").map((v) => v.trim())
+              : [],
+          }));
+
+          const oModel = this.getView().getModel("powerBi");
+
+          const sFunctionPath = `/ReportsExposed(${reportId})/PowerBiService.embedReportWithFiltersAuto(...)`;
+
+          const oBinding = oModel.bindContext(sFunctionPath);
+          oBinding.setParameter("filters", aFiltersPayload);
+
+          try {
+            await oBinding.execute();
+            const oResult = oBinding.getBoundContext().getObject();
+
+            if (oResult && oResult.html) {
+              const oDialog = new sap.m.Dialog({
+                contentWidth: "80%",
+                contentHeight: "80%",
+                resizable: true,
+                draggable: true,
+                content: [
+                  new sap.ui.core.HTML({
+                    content: `<iframe id="reportFrame" width="100%" height="650px" frameborder="0"></iframe>`,
+                  }),
+                ],
+                endButton: new sap.m.Button({
+                  text: "Close",
+                  press: function () {
+                    oDialog.close();
+                  },
+                }),
+                afterClose: function () {
+                  debugger;
+                  oDialog.destroy();
+                }.bind(this),
+              });
+
+              oDialog.open();
+
+              const iframe = document.getElementById("reportFrame");
+              const iframeDoc =
+                iframe.contentDocument || iframe.contentWindow.document;
+              iframeDoc.open();
+              iframeDoc.write(oResult.html);
+              iframeDoc.close();
+            } else {
+              MessageBox.warning("No filtered report returned from backend.");
+            }
+          } catch (err) {
+            MessageBox.error("Error embedding filtered report: " + err.message);
+          }
+        },
+        onCancelUserSelection: function () {
+          this._oUserSelectionDialog.close();
+          this._resetUserSelectionDialog();
+        },
+        _loadAndShowReport: async function (oReport, oUser) {
+          debugger;
           const reportExposedId = oReport.ID;
           const reportName = oReport.reportComment;
           let oModel = this.getView().getModel("powerBi");
 
-          if (!reportExposedId) {
-            MessageBox.error("Report not found in the database!");
-            return;
-          }
-
-          const sPath = `/ReportsExposed(${reportExposedId})/PowerBiService.getEmbedDetails(...)`;
-          const oBinding = oModel.bindContext(sPath);
-
           try {
+            const sPath = `/ReportsExposed(${reportExposedId})/PowerBiService.getEmbedDetails(...)`; // You can pass oUser.ID as a parameter in the path if needed
+            const oBinding = oModel.bindContext(sPath);
+
             const oResult = await new Promise((resolve, reject) => {
               oBinding
                 .execute()
-                .then(() => {
-                  const oContext = oBinding.getBoundContext();
-                  const oData = oContext.getObject();
-                  resolve(oData);
-                })
-                .catch((reject) => {});
+                .then(() => resolve(oBinding.getBoundContext().getObject()))
+                .catch(reject);
             });
 
             if (oResult && oResult.html) {
-              // Create and open the Dialog
               const oDialog = new sap.m.Dialog({
                 title: reportName,
                 contentWidth: "80%",
@@ -321,8 +545,9 @@ sap.ui.define(
                   },
                 }),
                 afterClose: function () {
+                  debugger;
                   oDialog.destroy();
-                },
+                }.bind(this),
               });
 
               oDialog.open();
@@ -333,6 +558,7 @@ sap.ui.define(
               iframeDoc.open();
               iframeDoc.write(oResult.html);
               iframeDoc.close();
+              this._oSelectedUser = null;
             } else {
               MessageToast.show("No embed HTML received.");
             }
@@ -557,15 +783,21 @@ sap.ui.define(
 
         onAddSecurityFilterConfiguration: function () {
           this.addSecurityFilter = true;
-          let oContext = this.byId('idConfigSecurityFilterTable').getBinding('items').create({
-            securityUniqueId: "",
-            schema: "",
-            operator: "",
-            values: "",
-            column: "",
-            table: "",
-            requireSingleSelection: false,
-          }, true, { groupId: "SecurityFilterChanges" });
+          let oContext = this.byId("idConfigSecurityFilterTable")
+            .getBinding("items")
+            .create(
+              {
+                securityUniqueId: "",
+                schema: "https://powerbi.com/product/schema#basic",
+                operator: "",
+                values: "",
+                column: "",
+                table: "",
+                requireSingleSelection: false,
+              },
+              true,
+              { groupId: "SecurityFilterChanges" }
+            );
           this.openSecurityFilterConfigDialog(
             "Add Security Filter",
             "Add",
@@ -575,10 +807,12 @@ sap.ui.define(
 
         onSecurityFilterSelect: async function (oEvent) {
           let oSelectedContext = oEvent.getSource().getBindingContext();
-          this._selectedSecurityFilterObject = JSON.parse(JSON.stringify(oSelectedContext.getObject())); // store globally
+          this._selectedSecurityFilterObject = JSON.parse(
+            JSON.stringify(oSelectedContext.getObject())
+          ); // store globally
           this.openSecurityFilterConfigDialog(
             "Edit Security Filter",
-            "Update",
+            "OK",
             oSelectedContext
           );
         },
@@ -596,6 +830,7 @@ sap.ui.define(
           this._oSecurityFilterDialog.setBindingContext(oContext);
           this._oSecurityFilterDialog.setTitle(title);
           // this.byId("idAddSecurityFilter").setText(button);
+
           this._oSecurityFilterDialog.open();
         },
 
@@ -610,10 +845,10 @@ sap.ui.define(
             return;
           }
           this._oSecurityFilterDialog.close();
-          if(this.getView().getModel().hasPendingChanges()){
-            this.byId('idSaveConfig').setEnabled(true);
-            this.byId('idDiscardConfig').setEnabled(true);
-            this.onChangeHighlightTableRow('idConfigSecurityFilterTable'); // Changing the status of the table row 
+          if (this.getView().getModel().hasPendingChanges()) {
+            this.byId("idSaveConfig").setEnabled(true);
+            this.byId("idDiscardConfig").setEnabled(true);
+            this.onChangeHighlightTableRow("idConfigSecurityFilterTable"); // Changing the status of the table row
           }
         },
 
@@ -628,23 +863,29 @@ sap.ui.define(
 
         onCloseEditSecurityFilterDialog: function (oEvent) {
           let oContext = oEvent.getSource().getBindingContext();
-          debugger
-          if(oContext?.hasPendingChanges("SecurityFilterChanges") && !oContext?.isTransient()){
+          debugger;
+          if (
+            oContext?.hasPendingChanges("SecurityFilterChanges") &&
+            !oContext?.isTransient()
+          ) {
             Object.keys(this._selectedSecurityFilterObject).forEach((key) => {
-              oContext.setProperty(key, this._selectedSecurityFilterObject[key]);
-            })
-          }
-          else {
-            if(oContext?.isTransient()){
+              oContext.setProperty(
+                key,
+                this._selectedSecurityFilterObject[key]
+              );
+            });
+          } else {
+            if (oContext?.isTransient()) {
               oContext?.delete();
             }
           }
-          this.onChangeHighlightTableRow('idConfigSecurityFilterTable'); // Changing the status of the table row 
+          this.onChangeHighlightTableRow("idConfigSecurityFilterTable"); // Changing the status of the table row
           this._oSecurityFilterDialog?.close();
         },
 
         onDeleteSecurityFilterConfig: function (oEvent) {
-          var oContext = oEvent.getSource().getBindingContext();
+          var oItem = oEvent.getParameter("listItem");
+          var oContext = oItem.getBindingContext();
 
           if (!oContext) {
             MessageToast.show("No Security Filter selected for deletion.");
@@ -658,8 +899,10 @@ sap.ui.define(
               onClose: function (sAction) {
                 if (sAction === MessageBox.Action.OK) {
                   oContext.delete("SecurityFilterChanges");
+                  this.byId("idSaveConfig").setEnabled(true);
+                  this.byId("idDiscardConfig").setEnabled(true);
                 }
-              },
+              }.bind(this),
             }
           );
         },
@@ -667,18 +910,26 @@ sap.ui.define(
         onRefreshSecurityFilters: function () {
           let oModel = this.getView().getModel();
           if (oModel.hasPendingChanges()) {
-            this.showDiscardChangesWarning("Are you sure you want to reload. Your changes will be lost?", null, oModel, "SecurityFilterChanges", this, ["idSaveConfig", "idDiscardConfig"], 'idConfigSecurityFilterTable');
+            this.showDiscardChangesWarning(
+              "Are you sure you want to reload. Your changes will be lost?",
+              null,
+              oModel,
+              "SecurityFilterChanges",
+              this,
+              ["idSaveConfig", "idDiscardConfig"],
+              "idConfigSecurityFilterTable"
+            );
           } else {
             oModel.resetChanges("SecurityFilterChanges");
             oModel.refresh();
-            this.onChangeHighlightTableRow('idConfigSecurityFilterTable'); // Changing the status of the table row
+            this.onChangeHighlightTableRow("idConfigSecurityFilterTable"); // Changing the status of the table row
           }
         },
 
         // --------- End Fragments --------------------
 
         onSaveChanges: async function () {
-          debugger
+          debugger;
           var that = this;
           let oIconTabBar = this.byId("idConfigurationMenu");
           let oModel = this.getView().getModel();
@@ -726,7 +977,7 @@ sap.ui.define(
                     MessageToast.show("Batch operation completed successfully");
                     that.byId("idSaveConfig")?.setEnabled(false);
                     that.byId("idDiscardConfig")?.setEnabled(false);
-                    that.onChangeHighlightTableRow('idConfigTable'); // Changing the status of the table row
+                    that.onChangeHighlightTableRow("idConfigTable"); // Changing the status of the table row
                   }
                 } else {
                   MessageToast.show(
@@ -734,7 +985,7 @@ sap.ui.define(
                   );
                   that.byId("idSaveConfig")?.setEnabled(false);
                   that.byId("idDiscardConfig")?.setEnabled(false);
-                  that.onChangeHighlightTableRow('idConfigTable'); // Changing the status of the table row
+                  that.onChangeHighlightTableRow("idConfigTable"); // Changing the status of the table row
                 }
               })
               .catch((oError) => {
@@ -781,9 +1032,13 @@ sap.ui.define(
                     MessageBox.warning(sWarningMessage);
                   } else {
                     MessageToast.show("Batch operation completed successfully");
+                    that.byId("idSaveConfig")?.setEnabled(false);
+                    that.byId("idDiscardConfig")?.setEnabled(false);
                   }
                 } else {
                   MessageToast.show("Report details updated successfully.");
+                  that.byId("idSaveConfig")?.setEnabled(false);
+                  that.byId("idDiscardConfig")?.setEnabled(false);
                 }
               })
               .catch((oError) => {
@@ -833,13 +1088,15 @@ sap.ui.define(
                     MessageToast.show("Batch operation completed successfully");
                     that.byId("idSaveConfig")?.setEnabled(false);
                     that.byId("idDiscardConfig")?.setEnabled(false);
-                    that.onChangeHighlightTableRow('idConfigSecurityFilterTable'); // Changing the status of the table row
+                    that.onChangeHighlightTableRow(
+                      "idConfigSecurityFilterTable"
+                    ); // Changing the status of the table row
                   }
                 } else {
                   MessageToast.show("Report details updated successfully.");
                   that.byId("idSaveConfig")?.setEnabled(false);
                   that.byId("idDiscardConfig")?.setEnabled(false);
-                  that.onChangeHighlightTableRow('idConfigSecurityFilterTable'); // Changing the status of the table row
+                  that.onChangeHighlightTableRow("idConfigSecurityFilterTable"); // Changing the status of the table row
                 }
               })
               .catch((oError) => {
@@ -853,14 +1110,46 @@ sap.ui.define(
           let oModel = this.getView().getModel();
 
           if (sSelectedKey.includes("idServicePrincipalConfig")) {
-            this.showDiscardChangesWarning("Are you sure you want to discard your changes?", null, oModel, "ServicePrincipalChanges", this, ["idSaveConfig", "idDiscardConfig"], 'idConfigTable');
+            this.showDiscardChangesWarning(
+              "Are you sure you want to discard your changes?",
+              null,
+              oModel,
+              "ServicePrincipalChanges",
+              this,
+              ["idSaveConfig", "idDiscardConfig"],
+              "idConfigTable"
+            );
           } else if (sSelectedKey.includes("idReportConfig")) {
-            this.showDiscardChangesWarning("Are you sure you want to discard your changes?", null, oModel, "ReportsChanges", this, ["idSaveConfig", "idDiscardConfig"], null);
+            this.showDiscardChangesWarning(
+              "Are you sure you want to discard your changes?",
+              null,
+              oModel,
+              "ReportsChanges",
+              this,
+              ["idSaveConfig", "idDiscardConfig"],
+              null
+            );
           } else if (sSelectedKey.includes("idSecurityFilterConfig")) {
-            this.showDiscardChangesWarning("Are you sure you want to discard your changes?", null, oModel, "SecurityFilterChanges", this, ["idSaveConfig", "idDiscardConfig"], "idConfigSecurityFilterTable"); 
+            this.showDiscardChangesWarning(
+              "Are you sure you want to discard your changes?",
+              null,
+              oModel,
+              "SecurityFilterChanges",
+              this,
+              ["idSaveConfig", "idDiscardConfig"],
+              "idConfigSecurityFilterTable"
+            );
           }
         },
-        showDiscardChangesWarning: function (message, callBack, model, groupId, view, buttonIds = [], sourceTable) {
+        showDiscardChangesWarning: function (
+          message,
+          callBack,
+          model,
+          groupId,
+          view,
+          buttonIds = [],
+          sourceTable
+        ) {
           var that = this;
           MessageBox.warning(message, {
             actions: [MessageBox.Action.OK, MessageBox.Action.CANCEL],
@@ -871,7 +1160,7 @@ sap.ui.define(
                   model.refresh();
                 }
                 if (view && buttonIds.length > 0) {
-                  buttonIds.forEach(id => {
+                  buttonIds.forEach((id) => {
                     view.byId(id)?.setEnabled(false);
                   });
                 }
@@ -882,38 +1171,33 @@ sap.ui.define(
                   callBack();
                 }
               }
-            }
+            },
           });
         },
         formatServicePrincipal: async function (ID) {
-          const oModel = this.getView().getModel('powerBi');
+          const oModel = this.getView().getModel("powerBi");
           const oBinding = oModel.bindList("/PowerBi");
 
           const aContexts = await oBinding.requestContexts(0, 1000); // fetch up to 1000 companies
-          const aData = aContexts.map(oContext => oContext.getObject());
+          const aData = aContexts.map((oContext) => oContext.getObject());
           let oData = aData.find((role) => role.ID === ID);
           if (oData) {
             return oData.biUser;
           }
           return "";
         },
-        formatWorkspaceId : async function (ID) {
-          if(ID){
+        formatWorkspaceId: async function (ID) {
+          if (ID) {
             // debugger
             // const oModel = this.getView().getModel('powerBi');
             // const oBinding = oModel.bindContext("/LiveWorkspaces");
-  
             // const aContexts = await oBinding.requestContexts(0, 100); // fetch up to 1000 workspaces
             // const aData = aContexts.map(oContext => oContext.getObject());
-          }
-          else {
+          } else {
             return "";
           }
-         
         },
-        formatReportId : async function (ID) {
-          
-        }
+        formatReportId: async function (ID) {},
       }
     );
   }

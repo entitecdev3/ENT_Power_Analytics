@@ -41,6 +41,13 @@ sap.ui.define([], function () {
         return `${oSetting.property} :${oSetting.value}`;
       }
       return "";
+    },
+    formatSchemaName: function(schema){
+      if(schema && schema.includes("basic")){
+        return "Basic";
+      }else{
+        return '';
+      }
     }
   };
 });

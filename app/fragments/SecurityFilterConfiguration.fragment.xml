@@ -30,7 +30,7 @@
                 <ColumnListItem type="Active" press="onSecurityFilterSelect">
                     <cells>
                         <Text text="{securityUniqueId}"/>
-                        <Text text="{schema}"/>
+                        <Text text="{path: 'schema', formatter: '.formatter.formatSchemaName'}"/>
                         <CheckBox  selected="{displaySetting_isLockedInViewMode}" editable="false"/>
                         <CheckBox selected="{displaySetting_isHiddenInViewMode}" editable="false"/>
                         <Text text="{displaySetting_displayName}"/>

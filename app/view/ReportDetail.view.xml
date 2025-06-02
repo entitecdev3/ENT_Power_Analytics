@@ -1,0 +1,11 @@
+<mvc:View
+  controllerName="entitec.pbi.embedding.controller.ReportDetail"
+  xmlns:mvc="sap.ui.core.mvc"
+  xmlns="sap.m"
+  xmlns:html="http://www.w3.org/1999/xhtml">
+
+  <VBox class="sapUiSmallMargin">
+    <Title id="idReportTitleDetail" text="{appView>/selectedReport/description}"  level="H2" class="sapUiMediumMarginBottom" />
+    <html:iframe id="embedHTML" width="100%" height="600px" frameborder="0" />
+  </VBox>
+</mvc:View>

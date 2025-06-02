@@ -5,17 +5,13 @@
             <Label required="false" text="{i18n>SECURITY_FILTER_NAME}" />
             <Input value="{securityUniqueId}" />
             <Label required="true" text="{i18n>SCHEMA}" />
-            <Input value="{schema}"/>
-            <!-- <Label required="true" text="{i18n>DISPLAY_SETTINGS}" /> -->
-            <!-- <Select width="20vw" items="{/DisplaySettings}" selectedKey="{displaySetting_ID}" forceSelection="false">
-                <core:Item key="{ID}" text="{property}" />
-            </Select> -->
-            <Label required="true" text="{i18n>DISPLAY_SETTINGS_LOCKED_IN_VIEWMODE}" />
-            <CheckBox selected="{displaySetting_isLockedInViewMode}" />
-            <Label required="true" text="{i18n>DISPLAY_SETTINGS_HIDDEN_IN_VIEWMODE}" />
-            <CheckBox selected="{displaySetting_isHiddenInViewMode}" />
-            <Label required="true" text="{i18n>DISPLAY_SETTINGS_DISPLAY_NAME}" />
-            <Input value="{displaySetting_displayName}" />
+            <Input value="{path: 'schema', formatter: '.formatter.formatSchemaName'}" enabled="false"/>
+            <Label text="{i18n>LOCKED}"></Label>
+            <CheckBox selected="{displaySetting_isLockedInViewMode}"></CheckBox>
+            <Label text="{i18n>HIDDEN}"></Label>
+            <CheckBox selected="{displaySetting_isHiddenInViewMode}"></CheckBox>
+            <Label text="{i18n>DISPLAY_NAME}"></Label>
+            <Input value="{displaySetting_displayName}"></Input>
             <Label required="true" text="{i18n>OPERATOR}" />
             <Select selectedKey="{operator}" width="auto" forceSelection="false" >
                 <core:Item key="In" text="IN" />

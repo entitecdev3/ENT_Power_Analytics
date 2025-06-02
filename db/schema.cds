@@ -48,7 +48,7 @@ context PowerBiPortal {
                         workspaceId      : UUID not null                                 @mandatory;
                         description      : String not null                               @mandatory;
                         servicePrincipal : Association to PowerBiPortal.PowerBi not null @mandatory;
-                        securityFilters  : Association to many ReportsToSecurityFilters on securityFilters.report = $self;
+                        securityFilters  : Composition of many ReportsToSecurityFilters on securityFilters.report = $self;
                         
                 virtual reportName       : String;
                 virtual workspaceName    : String;
@@ -58,9 +58,9 @@ context PowerBiPortal {
 
         entity SecurityFilters : cuid, managed {
                 securityUniqueId                  : String(100) not null @mandatory;
-                schema                            : String(100) not null @mandatory;
+                schema                            : String(100) default 'https://powerbi.com/product/schema#basic' not null @mandatory;
                 operator                          : String(50) not null  @mandatory;
-                requireSingleSelection            : Boolean not null     @mandatory;
+                requireSingleSelection            : Boolean default false;
                 table                             : String(100) not null @mandatory;
                 column                            : String(100) not null @mandatory;
                 values                            : String(500);

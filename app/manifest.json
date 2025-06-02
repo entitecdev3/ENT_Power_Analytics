@@ -155,9 +155,23 @@
                     "target": "Configuration"
                 },
                 {
+                    "pattern": "ReportList",
+                    "name": "ReportList",
+                    "target": "Report"
+                },
+                {
                     "pattern": "Report",
                     "name": "Report",
-                    "target": "Report"
+                    "target": [
+                        "ReportList"
+                    ]
+                },
+                {
+                    "pattern": "ReportDetail/{reportId}",
+                    "name": "ReportDetail",
+                    "target": [
+                        "ReportDetail"
+                    ]
                 }
             ],
             "targets": {
@@ -203,6 +217,18 @@
                     "viewName": "Report",
                     "viewId": "Report",
                     "viewLevel": 3,
+                    "layout": "OneColumn"
+                },
+                "ReportList": {
+                    "viewName": "ReportList",
+                    "viewLevel": 1,
+                    "viewId": "reportList",
+                    "layout": "OneColumn"
+                },
+                "ReportDetail": {
+                    "viewName": "ReportDetail",
+                    "viewLevel": 2,
+                    "viewId": "reportDetail",
                     "layout": "OneColumn"
                 }
             }
