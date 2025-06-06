@@ -27,7 +27,7 @@
       <items>
         <ColumnListItem type="Active" press="onReportSelect">
           <cells>
-            <Text text="{servicePrincipal/biUser}" />
+            <Text text="{parts: [{path : 'servicePrincipal_ID'},{path : 'appView>/ServicePrincipalData'}] , formatter: '.formatter.formatServicePrincipal' }" />
             <Link text="{reportName}" href="{reportUrl}" target="_blank" />
             <Link text="{workspaceName}" href="{workspaceUrl}" target="_blank" />
             <Text text="{description}"></Text>

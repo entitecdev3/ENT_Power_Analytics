@@ -33,9 +33,37 @@ sap.ui.define(
         oViewModel.setProperty("/navVisible", true);
         oViewModel.setProperty("/LoginHeader", false);
         oViewModel.setProperty("/HomeScreen", true);
+        // get the company data set in the appView model for the formatting 
+        this.getCompanyData();
+        this.getRolesData();
+
         this.getModel().refresh();
       },
 
+      getCompanyData: async function () {
+        let oViewModel = this.getView().getModel("appView");
+        let oModel = this.getView().getModel();
+        let oBinding = oModel.bindList("/Companies");
+
+        let aContexts = await oBinding.requestContexts(0, 1000); // fetch up to 1000 companies
+        let aData = aContexts.map(oContext => oContext.getObject());
+
+        if (aData.length > 0) {
+          oViewModel.setProperty("/Companies", aData);
+        }
+      },
+      getRolesData: async function () {
+        let oViewModel = this.getView().getModel("appView");
+        let oModel = this.getView().getModel();
+        let oBinding = oModel.bindList("/Roles");
+
+        let aContexts = await oBinding.requestContexts(0, 1000); // fetch up to 1000 roles
+        let aData = aContexts.map(oContext => oContext.getObject());
+
+        if (aData.length > 0) {
+          oViewModel.setProperty("/Roles", aData);
+        }
+      },
       onAddUser: function () {
         this.addUserPress = true;
         this.editUserPress = false;

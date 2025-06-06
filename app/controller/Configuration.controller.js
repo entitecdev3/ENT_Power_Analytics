@@ -24,8 +24,29 @@ sap.ui.define(
           oViewModel.setProperty("/LoginHeader", false);
           oViewModel.setProperty("/HomeScreen", true);
           this.getModel().refresh();
+
+          this.getServicePrincipalData(); // Fetch Service Principal data
+          // this.getLiveWorkSpacesData(); // Fetch Live Workspaces data
         },
 
+        getServicePrincipalData: async function(){
+          let oViewModel = this.getView().getModel("appView");
+          let oModel = this.getView().getModel("powerBi");
+          let oBinding = oModel.bindList("/PowerBi");
+
+          let aContexts = await oBinding.requestContexts(0, 1000); // fetch up to 1000 companies
+          let aData = aContexts.map((oContext) => oContext.getObject());
+          oViewModel.setProperty("/ServicePrincipalData", aData);
+        },
+        getLiveWorkSpacesData: async function(){
+          debugger
+          let oModel = this.getView().getModel('powerBi');
+          let oBinding = oModel.bindList("/LiveWorkspaces");
+          let aContexts = await oBinding.requestContexts(0, 1000); // fetch up to 1000 workspaces
+          let aData = aContexts.map((oContext) => oContext.getObject());
+          this.getView().getModel("appView").setProperty("/LiveWorkspaces", aData);
+          this.getView().getModel("appView").refresh(true);
+        },
         //------------- Service Principal Configuration ------------------
 
         onAddServicePrincipalConfiguration: function () {
@@ -135,6 +156,7 @@ sap.ui.define(
             !oContext.isTransient()
           ) {
             Object.keys(this._selectedServicePrincipalObject).forEach((key) => {
+              if(key.includes("isTransient")) return;
               oContext.setProperty(
                 key,
                 this._selectedServicePrincipalObject[key]
@@ -184,6 +206,11 @@ sap.ui.define(
 
           let oNewContext = new Context(oTempModel, "/ReportsExposed");
           this.openReportsConfigDialog("Edit Report", "Update", oNewContext);
+
+          this.byId("idServicePrincipalTypeInput").fireChange();
+          // checked the sercurity filter combo box on select
+          let oSecurityFilterCombo = oSelectedContext.getObject().securityFilters?.map((filter) => filter.filter.ID) || []
+          this.byId("idSecurityFilters").setSelectedKeys(oSecurityFilterCombo);
         },
         openReportsConfigDialog: function (title, button, oContext) {
           let oView = this.getView();
@@ -197,28 +224,24 @@ sap.ui.define(
           }
 
           this._oReportDialog.setTitle(title);
-          this.byId("idAddReports").setText(button);
+          // this.byId("idAddReports").setText(button);
           this._oReportDialog.setBindingContext(oContext);
           this._oReportDialog.open();
+        },
+        onSecurityFilterSelection: function (oEvent) {
+          let aSelectedKeys = oEvent.getSource().getSelectedKeys(), filterArray = [];
+          if (aSelectedKeys.length !== 0) {
+            aSelectedKeys.forEach((key)=>{
+                filterArray.push({"filter_ID": key})
+            })
+          }
+          oEvent.getSource().getModel("tempReport").setProperty("/ReportsExposed/securityFilters", filterArray);
         },
         onSaveEditReportsDialog: async function () {
           let oContext = this._oReportDialog.getBindingContext();
           let reportObject = this._oReportDialog
             .getModel("tempReport")
             .getProperty("/ReportsExposed");
-          reportObject.securityFilters = [];
-          let aSecurityFilters = this.getView()
-            .byId("idSecurityFilters")
-            .getSelectedKeys();
-          if (aSecurityFilters && aSecurityFilters.length > 0) {
-            for (let index = 0; index < aSecurityFilters.length; index++) {
-              const element = aSecurityFilters[index];
-              reportObject.securityFilters.push({
-                filter_ID: element,
-              });
-            }
-          }
-
           let validated = await this._validateReportFields(reportObject);
           if (!validated) return;
 
@@ -226,16 +249,40 @@ sap.ui.define(
 
           if (this.addReport) {
             this.aReportCreateContext = oTable.create(reportObject);
-            // this.aReportCreateContext.created().then(function () {
-            //   debugger;
-            // });
           } else if (this._oSelectedReportContext) {
+            // let oSecurityFilterCombo = this._oSelectedReportContext.getObject().securityFilters?.map((filter) => filter.filter.ID)
+            // if(oSecurityFilterCombo && oSecurityFilterCombo.length > 0) {
+            // }
+            let oModel = this.getView().getModel();
+            let sPath = "/ReportsExposed(" + this._oSelectedReportContext.getObject().ID + ")";
+            let oContextBinding = oModel.bindList(sPath+"/securityFilters", null, [], [], {
+              $$updateGroupId: "ReportsChanges"
+            })
+
+            await oContextBinding.requestContexts().then((oData) => {
+              if(oData && oData.length > 0) {
+                oData.forEach((oContext)=>{
+                  oContext?.delete("ReportsChanges")
+                })
+              }
+            })
+            if (reportObject.securityFilters && reportObject.securityFilters.length > 0) {
+              await reportObject.securityFilters?.forEach((role)=>{
+                oContextBinding.create(role, {
+                  groupId: "ReportsChanges",
+                })
+              })
+            }
+            // updating the 
             Object.keys(reportObject).forEach((key) => {
+              if(key.includes("securityFilters")) return; 
               this._oSelectedReportContext.setProperty(key, reportObject[key]);
             });
           }
-          this.byId("idSaveConfig").setEnabled(true);
-          this.byId("idDiscardConfig").setEnabled(true);
+          if(this.getView().getModel().hasPendingChanges("ReportsChanges")) {
+            this.byId("idSaveConfig").setEnabled(true);
+            this.byId("idDiscardConfig").setEnabled(true);
+          }
           this._oReportDialog.close();
         },
         _validateReportFields: async function (reportObject) {
@@ -753,19 +800,30 @@ sap.ui.define(
           }
 
           // Reset report select
-          const oReportSelect = this.byId("reportSelect");
-          oReportSelect.unbindItems();
+          const oWorkSpaceSelect = this.byId("reportSelect");
+          oWorkSpaceSelect.unbindItems();
+          
+          if(!this.addReport) {
+            this.byId("workspaceSelect").fireChange(); // Trigger workspace change to update reports
+          }
         },
-
+        
         onWorkspaceChange: function (oEvent) {
           const selectedWorkspaceId = oEvent.getSource().getSelectedKey();
           const selectedConfigId = this.byId(
             "idServicePrincipalTypeInput"
           ).getSelectedKey();
-
-          if (!selectedWorkspaceId || !selectedConfigId) return;
-
+          
           const oReportSelect = this.byId("reportSelect");
+          // add the name of the workspace to the table binding context 
+          if(oEvent.getParameter('itemPressed')){
+            this._oReportDialog.getModel("tempReport").setProperty("/ReportsExposed/workspaceName", oEvent.getParameter('value'));
+            oReportSelect.unbindItems();
+            oReportSelect.setSelectedKey("")
+          }
+          if (!selectedWorkspaceId || !selectedConfigId) return;
+          // const oReportSelect = this.byId("reportSelect");
+          
           oReportSelect.bindItems({
             path: "powerBi>/LiveReports",
             filters: [
@@ -777,6 +835,12 @@ sap.ui.define(
               text: "{powerBi>name}",
             }),
           });
+        },
+
+        onReportChange: function (oEvent) {
+          if(oEvent.getParameter('itemPressed')){
+            this._oReportDialog.getModel("tempReport").setProperty("/ReportsExposed/reportName", oEvent.getParameter('value'));
+          }
         },
 
         //------------- Security Filters Configuration ------------------
@@ -868,6 +932,7 @@ sap.ui.define(
             oContext?.hasPendingChanges("SecurityFilterChanges") &&
             !oContext?.isTransient()
           ) {
+            if(key.includes("isTransient")) return;
             Object.keys(this._selectedSecurityFilterObject).forEach((key) => {
               oContext.setProperty(
                 key,
@@ -1037,6 +1102,7 @@ sap.ui.define(
                   }
                 } else {
                   MessageToast.show("Report details updated successfully.");
+                  oModel.refresh();
                   that.byId("idSaveConfig")?.setEnabled(false);
                   that.byId("idDiscardConfig")?.setEnabled(false);
                 }
@@ -1174,30 +1240,6 @@ sap.ui.define(
             },
           });
         },
-        formatServicePrincipal: async function (ID) {
-          const oModel = this.getView().getModel("powerBi");
-          const oBinding = oModel.bindList("/PowerBi");
-
-          const aContexts = await oBinding.requestContexts(0, 1000); // fetch up to 1000 companies
-          const aData = aContexts.map((oContext) => oContext.getObject());
-          let oData = aData.find((role) => role.ID === ID);
-          if (oData) {
-            return oData.biUser;
-          }
-          return "";
-        },
-        formatWorkspaceId: async function (ID) {
-          if (ID) {
-            // debugger
-            // const oModel = this.getView().getModel('powerBi');
-            // const oBinding = oModel.bindContext("/LiveWorkspaces");
-            // const aContexts = await oBinding.requestContexts(0, 100); // fetch up to 1000 workspaces
-            // const aData = aContexts.map(oContext => oContext.getObject());
-          } else {
-            return "";
-          }
-        },
-        formatReportId: async function (ID) {},
       }
     );
   }

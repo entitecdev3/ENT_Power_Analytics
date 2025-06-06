@@ -14,7 +14,7 @@
         <core:Item key="{id}" text="{name}" />
       </ComboBox>
       <Label text="{i18n>SECURITY_FILTERS}" />
-      <MultiComboBox items="{/SecurityFilters}" id="idSecurityFilters">
+      <MultiComboBox items="{/SecurityFilters}" id="idSecurityFilters" selectionFinish="onSecurityFilterSelection">
         <core:Item key="{ID}" text="{securityUniqueId}"></core:Item>
       </MultiComboBox>
       <Label required="true" text="{i18n>Description}"></Label>
@@ -22,10 +22,10 @@
     </VBox>
 
     <beginButton>
-      <Button id="idAddReports" type="Emphasized" press="onSaveEditReportsDialog" />
+      <Button id="idAddReports" text="{i18n>ok}" type="Emphasized" press="onSaveEditReportsDialog" />
     </beginButton>
     <endButton>
-      <Button text="Cancel" press="onCloseEditReportsDialog" />
+      <Button text="{i18n>cancel}" press="onCloseEditReportsDialog" />
     </endButton>
   </Dialog>
 </core:FragmentDefinition>
