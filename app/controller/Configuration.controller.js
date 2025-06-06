@@ -400,40 +400,7 @@ sap.ui.define(
         },
         _onSubmitSecurityFilters: function () {
           const oDialog = this.byId("dynamicFilterDialog");
-          const oTable = oDialog.getContent()[0]; // The Table
-          const oFiltersModel = this.getView().getModel("filters");
-
-          oTable.getItems().forEach((oItem) => {
-            const oContext = oItem.getBindingContext("filters");
-            if (!oContext) return;
-
-            const oData = oContext.getObject();
-            const aCells = oItem.getCells();
-
-            const oVBox = aCells[2]; // Third column: VBox containing Input + MultiInput
-            const aVBoxItems = oVBox.getItems();
-
-            aVBoxItems.forEach((oControl) => {
-              if (oControl.isA("sap.m.Input") && oControl.getVisible()) {
-                // Single value
-                oData.value = oControl.getValue();
-              } else if (
-                oControl.isA("sap.m.MultiInput") &&
-                oControl.getVisible()
-              ) {
-                // Multi values from tokens
-                const aTokens = oControl.getTokens().map((t) => t.getText());
-                oData.value = aTokens;
-              }
-            });
-
-            // Update the model with the correct value
-            oFiltersModel.setProperty(
-              oContext.getPath() + "/value",
-              oData.value
-            );
-          });
-
+          
           oDialog.close();
           this._applyFiltersAndEmbedReport();
         },
