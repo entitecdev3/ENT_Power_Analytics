@@ -1,8 +1,7 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:layout="sap.ui.layout.form">
   <VBox alignItems="Stretch" fitContainer="true" height="100%" class="sapUiContentPadding">
 
-    <Table id="idRCConfigTable" mode="Delete" alternateRowColors="true" items="{path: '/ReportsExposed', parameters: { $$updateGroupId: 'ReportsChanges',
-      $expand: 'securityFilters' }}" fixedLayout="true" delete="onDeleteReport">
+    <Table id="idRCConfigTable" mode="Delete" alternateRowColors="true" items="{path: '/ReportsExposed', parameters: { $$updateGroupId: 'ReportsChanges'}}" fixedLayout="true" delete="onDeleteReport">
 
       <headerToolbar>
         <Toolbar>
@@ -21,6 +20,8 @@
         <Column><Text text="Workspace Name" /></Column>
         <Column><Text text="Description"></Text></Column>
         <Column><Text text="Security Filters"></Text></Column>
+        <Column><Text text="Roles"></Text></Column>
+        <Column><Text text="External Roles"></Text></Column>
         <Column><Text text="" /></Column>
       </columns>
 
@@ -33,9 +34,15 @@
             <Text text="{description}"></Text>
             <VBox items="{securityFilters}">
               <items>
-                <Text text="{filter/securityUniqueId}"></Text>
+                <Text text="{parts : [{path: 'filter_ID'}, {path : 'appView>/SecurityFilters'}], formatter: '.formatter.formatSecurityFilters', targetType: 'any'}" />
               </items>
             </VBox>
+            <VBox items="{roles}">
+              <items>
+                <Text text="{parts : [{path: 'role_ID'}, {path: 'appView>/AssignableRoles'}], formatter: '.formatter.formatRoleDisplay'}"/>
+              </items>
+            </VBox>
+            <Text text="{path: 'externalRoles', formatter: '.formatter.formatExternalRoles'}" />
             <Button text="Preview Report" type="Emphasized" press=".onLoadReport" />
           </cells>
         </ColumnListItem>

@@ -33,6 +33,15 @@ sap.ui.define([], function () {
       }else{
         return '';
       }
+    },
+    formatSecurityFilters: function (ID, filterData){
+      if (ID && filterData) {
+        let oFilter = filterData?.find((filter) => filter.ID === ID);
+        if (oFilter) {
+          return oFilter.securityUniqueId;
+        }
+      }
+      return "";
     }
   };
 });

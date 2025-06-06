@@ -14,9 +14,21 @@
         <core:Item key="{id}" text="{name}" />
       </ComboBox>
       <Label text="{i18n>SECURITY_FILTERS}" />
-      <MultiComboBox items="{/SecurityFilters}" id="idSecurityFilters" selectionFinish="onSecurityFilterSelection">
+      <MultiComboBox items="{/SecurityFilters}" width="20vw" id="idSecurityFilters" selectionFinish="onSecurityFilterSelection">
         <core:Item key="{ID}" text="{securityUniqueId}"></core:Item>
       </MultiComboBox>
+      <Label text="{i18n>ROLES}" />
+      <MultiComboBox items="{/AssignableRoles}" width="20vw" id="idRoles" selectionFinish="onInternalRoleSelection">
+        <core:Item key="{ID}" text="{name}" />
+      </MultiComboBox>
+      <Label text="{i18n>EXTERNAL_ROLES}" />
+      <MultiInput id="idExtRoles" width="20vw" value="{path: 'tempReport>/ReportsExposed/externalRole'}" tokenUpdate="onExternalRoleUpdate">
+        <tokens>
+          <Token key="User" text="User"/>
+          <Token key="Manager" text="Manager"/>
+          <Token key="Area Manager" text="Area Manager"/>
+        </tokens>
+      </MultiInput>
       <Label required="true" text="{i18n>Description}"></Label>
       <Input id="idReportDescription" value="{tempReport>/ReportsExposed/description}" ></Input>
     </VBox>
