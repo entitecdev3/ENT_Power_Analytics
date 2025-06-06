@@ -1,13 +1,11 @@
 <mvc:View controllerName="entitec.pbi.embedding.controller.ReportList" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:layout="sap.ui.layout">
-  <VBox class="sapUiTinyMargin">
-    <!-- <ScrollContainer vertical="true"> -->
-    <!-- <HBox items="{local>/tiles}"> -->
+  <VBox class="sapUiTinyMargin sapUiResponsiveMargin">
     <VBox justifyContent="Start" items="{local>/tiles}" class="sapUiSmallMarginTop">
       <!-- <core:Fragment fragmentName="entitec.pbi.embedding.fragments.TileItem" type="XML" /> -->
       <VBox>
         <MessageStrip visible="{= ${local>isHeader} === true }" text="{local>name}" type="Information" class="sapUiSmallMarginTop sapUiTinyMarginBottom" />
-        <HBox class="sapUiTinyMarginTop" renderType="Div" items="{local>tiles}">
-          <GenericTile sizeBehavior="Small" frameType="OneByHalf" class="sapUiTinyMarginBegin tileLayout" visible="{= ${local>isHeader} === false }" header="{local>description}" press="onTilePress">
+        <HBox direction="Row" wrap="Wrap" class="sapUiSmallMargin tileContainer" renderType="Div" items="{local>tiles}">
+          <GenericTile sizeBehavior="Small" frameType="OneByOne" class="tileLayout" visible="{= ${local>isHeader} === false }" header="{local>description}" press="onTilePress">
             <customData>
               <core:CustomData key="reportId" value="{local>ID}" />
             </customData>

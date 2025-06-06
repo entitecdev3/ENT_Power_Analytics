@@ -1,18 +1,34 @@
 <mvc:View controllerName="entitec.pbi.embedding.controller.Launchpad" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:mvc="sap.ui.core.mvc" xmlns:core="sap.ui.core" xmlns="sap.m">
   <Page id="idLaunchpad" showHeader="false">
 
+    <!-- First Message Strip and Tile Section -->
     <MessageStrip text="Apps" type="Information" class="sapUiTinyMarginBegin sapUiTinyMarginEnd sapUiMediumMarginTop" />
 
-    <GenericTile sizeBehavior="Small" class="sapUiSmallMarginBegin sapUiSmallMarginTop tileLayout" header="Report" id="idReport" press="press" visible="true">
-      <TileContent />
-    </GenericTile>
+    <FlexBox direction="Row" wrap="Wrap" justifyContent="Start" class="sapUiSmallMargin tileContainer">
+      <GenericTile frameType="OneByOne" class="tileLayout" header="Report" subheader="Power BI Embedded" tooltip="Open Report" id="idReport" press="press">
+        <TileContent>
+          <ImageContent src="sap-icon://filter-analytics" />
+        </TileContent>
+      </GenericTile>
+    </FlexBox>
 
+    <!-- Second Message Strip and Tile Section -->
     <MessageStrip id="configMsgStrip" text="Configuration" type="Information" class="sapUiTinyMarginBegin sapUiTinyMarginEnd sapUiMediumMarginTop" />
-    <GenericTile sizeBehavior="Small" class="sapUiSmallMarginBegin sapUiSmallMarginTop tileLayout" header="Configuration" id="idConfiguration" press="press" visible="true">
-      <TileContent />
-    </GenericTile>
-    <GenericTile sizeBehavior="Small" class="sapUiSmallMarginBegin sapUiSmallMarginTop tileLayout" header="Register Users" id="idUser" press="press" visible="true">
-      <TileContent />
-    </GenericTile>
+
+    <FlexBox direction="Row" wrap="Wrap" justifyContent="Start" class="sapUiSmallMargin tileContainer">
+
+      <GenericTile frameType="OneByOne" class="tileLayout" header="Configuration" subheader="Settings Overview" tooltip="View Configuration" id="idConfiguration" press="press">
+        <TileContent>
+          <ImageContent src="sap-icon://action-settings" />
+        </TileContent>
+      </GenericTile>
+
+      <GenericTile frameType="OneByOne" class="tileLayout" header="Register Users" subheader="Manage Access" tooltip="Add or remove users" id="idUser" press="press">
+        <TileContent>
+          <ImageContent src="sap-icon://account" />
+        </TileContent>
+      </GenericTile>
+
+    </FlexBox>
   </Page>
 </mvc:View>
