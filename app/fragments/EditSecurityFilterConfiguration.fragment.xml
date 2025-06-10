@@ -25,8 +25,8 @@
             <Input value="{table}"/>
             <Label required="true" text="{i18n>COLUMN}" />
             <Input value="{column}"/>
-            <Label required="true" text="{i18n>VALUE}" />
-            <Input value="{values}"/>
+            <!-- <Label required="true" text="{i18n>VALUE}" />
+            <Input value="{values}"/> -->
             
         </VBox>
         <buttons>

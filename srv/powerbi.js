@@ -55,6 +55,21 @@ module.exports = cds.service.impl(async function () {
     return undefined;
   }
 
+  this.on("READ", PowerBi, async (req, next)=>{
+    let data = await next();
+
+    if (Array.isArray(data)) {
+      data.forEach(entry => {
+        if (entry.clientSecret) {
+          entry.clientSecret = maskSecret(entry.clientSecret);
+        }
+      });
+    } else if (data && data.clientSecret) {
+      data.clientSecret = maskSecret(data.clientSecret);
+    }
+    return data;
+  });
+
   this.on("getEmbedDetails", async (req) => {
     const db = cds.db;
     const reportExposedId = req.params[0];

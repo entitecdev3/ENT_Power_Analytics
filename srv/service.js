@@ -1,6 +1,11 @@
 const bcrypt = require("bcryptjs"); // Use bcryptjs instead of bcrypt
 const axios = require("axios");
 
+function maskSecret(secret) {
+  if (!secret || secret.length <= 3) return '***';
+  return secret.slice(0, 3) + '*'.repeat(secret.length - 3);
+}
+
 module.exports = cds.service.impl(async function () {
   const {
     Users,
@@ -16,6 +21,21 @@ module.exports = cds.service.impl(async function () {
       const saltRounds = 10;
       req.data.password = await bcrypt.hash(req.data.password, saltRounds);
     }
+  });
+
+  this.on("READ", PowerBi, async (req, next)=>{
+    let data = await next();
+
+    if (Array.isArray(data)) {
+      data.forEach(entry => {
+        if (entry.clientSecret) {
+          entry.clientSecret = maskSecret(entry.clientSecret);
+        }
+      });
+    } else if (data && data.clientSecret) {
+      data.clientSecret = maskSecret(data.clientSecret);
+    }
+    return data;
   });
 
   this.on("getCustomAttrbute", async (req) => {

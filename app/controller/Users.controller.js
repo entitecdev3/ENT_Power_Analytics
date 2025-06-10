@@ -33,36 +33,10 @@ sap.ui.define(
         oViewModel.setProperty("/navVisible", true);
         oViewModel.setProperty("/LoginHeader", false);
         oViewModel.setProperty("/HomeScreen", true);
-        // get the company data set in the appView model for the formatting 
-        this.getCompanyData();
-        this.getRolesData();
+        this.getCallData(oViewModel, this.getView().getModel(), "/Companies", "/Companies");
+        this.getCallData(oViewModel, this.getView().getModel(), "/Roles", "/Roles");
 
         this.getModel().refresh();
-      },
-
-      getCompanyData: async function () {
-        let oViewModel = this.getView().getModel("appView");
-        let oModel = this.getView().getModel();
-        let oBinding = oModel.bindList("/Companies");
-
-        let aContexts = await oBinding.requestContexts(0, 1000); // fetch up to 1000 companies
-        let aData = aContexts.map(oContext => oContext.getObject());
-
-        if (aData.length > 0) {
-          oViewModel.setProperty("/Companies", aData);
-        }
-      },
-      getRolesData: async function () {
-        let oViewModel = this.getView().getModel("appView");
-        let oModel = this.getView().getModel();
-        let oBinding = oModel.bindList("/Roles");
-
-        let aContexts = await oBinding.requestContexts(0, 1000); // fetch up to 1000 roles
-        let aData = aContexts.map(oContext => oContext.getObject());
-
-        if (aData.length > 0) {
-          oViewModel.setProperty("/Roles", aData);
-        }
       },
       onAddUser: function () {
         this.addUserPress = true;
@@ -94,12 +68,12 @@ sap.ui.define(
       },
       onCloseEditUserDialog: function (oEvent) {
         let oContext = oEvent.getSource().getBindingContext();
-        if( oContext.hasPendingChanges("UserChanges") && !oContext.isTransient()) {
+        if (oContext.hasPendingChanges("UserChanges") && !oContext.isTransient()) {
           Object.keys(this._oSelectedUserObject).forEach((key) => {
-              oContext.setProperty(key, this._oSelectedUserObject[key]);
+            oContext.setProperty(key, this._oSelectedUserObject[key]);
           })
         } else {
-          if(oContext.isTransient()){
+          if (oContext.isTransient()) {
             oContext.delete();
           }
         }
@@ -128,6 +102,30 @@ sap.ui.define(
           this.getView().getModel('appView').setProperty("/Password/ConfirmPasswordVST", "Password must contain atleast 8 characters,\n including Upper/lowercase, numbers,\n and special character");
         }
       },
+      onNewPasswordLiveChange: function (oEvent) {
+        var getConfirmPass = oEvent.getParameter('value');
+        var pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        if (pattern.test(getConfirmPass)) {
+          this.getView().getModel('appView').setProperty("/Password/NewPasswordValueState", "None");
+          this.getView().getModel('appView').setProperty("/Password/NewPasswordVST", "");
+        } else {
+          this.getView().getModel('appView').setProperty("/Password/NewPasswordValueState", "Error");
+          this.getView().getModel('appView').setProperty("/Password/NewPasswordVST", "Password must contain atleast 8 characters,\n including Upper/lowercase, numbers,\n and special character");
+        }
+        this.getView().getModel('appView').setProperty("/Password/NewPassword", oEvent.getParameter("value"));
+      },
+      onConfirmPasswordLiveChange: function (oEvent) {
+        var getConfirmPass = oEvent.getParameter('value');
+        var pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        if (pattern.test(getConfirmPass)) {
+          this.getView().getModel('appView').setProperty("/Password/ConfirmPasswordValueState", "None");
+          this.getView().getModel('appView').setProperty("/Password/ConfirmPasswordVST", "");
+        } else {
+          this.getView().getModel('appView').setProperty("/Password/ConfirmPasswordValueState", "Error");
+          this.getView().getModel('appView').setProperty("/Password/ConfirmPasswordVST", "Password must contain atleast 8 characters,\n including Upper/lowercase, numbers,\n and special character");
+        }
+        this.getView().getModel('appView').setProperty("/Password/ConfirmPassword", getConfirmPass);
+      },
       onSaveEditUserDialog: async function () {
         let oContext = this.bindingContext || this._oDialog.getBindingContext();
         if (this.addUserPress) {
@@ -145,19 +143,6 @@ sap.ui.define(
         }
       },
       _validateUserFields: async function (userObject) {
-
-        if (this.addUserPress) {
-          this.aUserTableCreateContext = oTable.create(this.userObject);
-          this.aUserTableCreateContext.created().then(function (x, y, z) {
-            debugger;
-          });
-        } else if (this._oSelectedContext) {
-          // Update only the UI with setProperty
-          Object.keys(userObject).forEach(key => {
-            this._oSelectedContext.setProperty(key, userObject[key]);
-          });
-        }
-        this._oDialog.close();
         const isValid = await this.validateEntityFields("Users", userObject);
         if (!isValid) return false;
         return true;
@@ -183,9 +168,6 @@ sap.ui.define(
         this.UserPasswordDialog.setTitle(title);
         this.byId("idPasswordSave").setText(button);
         this.UserPasswordDialog.open();
-      },
-      onResetPassword: function (oEvent) {
-        this._handlePasswordPopup("Reset Password", "Update");
       },
       onPasswordChangeCancel: function () {
         this.clearPasswordFields();

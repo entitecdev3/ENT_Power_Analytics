@@ -24,7 +24,7 @@
                 <Column><Text text="{i18n>REQUIRE_SINGLE_SELECTION}"/></Column>
                 <Column><Text text="{i18n>TABLE}"/></Column>
                 <Column><Text text="{i18n>COLUMN}"/></Column>
-                <Column><Text text="{i18n>VALUE}"/></Column>
+                <!-- <Column><Text text="{i18n>VALUE}"/></Column> -->
             </columns>
             <items>
                 <ColumnListItem type="Active" press="onSecurityFilterSelect">
@@ -39,7 +39,7 @@
                         <CheckBox selected="{requireSingleSelection}" editable="false"/>
                         <Text text="{table}"/>
                         <Text text="{column}"/>
-                        <Text text="{values}"/>
+                        <!-- <Text text="{values}"/> -->
                     </cells>
                 </ColumnListItem>
             </items>

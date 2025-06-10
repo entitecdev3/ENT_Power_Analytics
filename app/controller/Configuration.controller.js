@@ -196,6 +196,17 @@ sap.ui.define(
 
           let oAssignableRolesCombo = oSelectedContext.getObject().roles?.map((role) => role.role_ID) || []
           this.byId("idRoles").setSelectedKeys(oAssignableRolesCombo);
+
+          let aExternalRoles = oSelectedContext.getObject().externalRoles?.split(','), oExternalRoles = [];
+          if(aExternalRoles && aExternalRoles.length > 0){
+            aExternalRoles.forEach((token)=>{
+              oExternalRoles.push({text: token});
+            })
+          }
+          if(oExternalRoles && oExternalRoles.length > 0){
+            oTempModel.setProperty('/ReportsExposed/tokens', oExternalRoles)
+          }
+          
         },
         openReportsConfigDialog: function (title, button, oContext) {
           let oView = this.getView();
@@ -232,19 +243,54 @@ sap.ui.define(
           oEvent.getSource().getModel("tempReport").setProperty("/ReportsExposed/roles", filterArray);
 
         },
+        onFreeTextSubmitRoles: function (oEvent) {
+          const oMultiInput = oEvent.getSource();
+          const sEnteredValue = oEvent.getParameter("value")?.trim();
+          if (!sEnteredValue) return;
+          const oModel = oMultiInput.getModel("tempReport");
+          let aTokens = oModel.getProperty("/ReportsExposed/tokens") || [];
+
+          if (!aTokens.find((token) => token.text === sEnteredValue)) {
+            aTokens.push({ text: sEnteredValue });
+            oModel.setProperty("/ReportsExposed/tokens", aTokens);
+          }
+
+          oMultiInput.setValue(""); // Clear input after submit
+        },
         onExternalRoleUpdate : function (oEvent){
-          debugger
+          const oMultiInput = oEvent.getSource();
+          const oModel = oMultiInput.getModel("tempReport");
+          const sPath = "/ReportsExposed/tokens";
+          let aTokens = oMultiInput
+            .getTokens()
+            .map((t) => ({ text: t.getText() }));
+          // check type
+          let type = oEvent.getParameter('type')
+          if(type === 'removed'){
+            let tok = oEvent.getParameter('removedTokens'), removeText = tok[0].getText();
+            aTokens = aTokens.filter(obj => obj.text !== removeText);
+          }
+          // Keep only remaining tokens
+          oModel.setProperty(sPath, aTokens);
         },
         onSaveEditReportsDialog: async function () {
           let oContext = this._oReportDialog.getBindingContext();
           let reportObject = this._oReportDialog
             .getModel("tempReport")
             .getProperty("/ReportsExposed");
-          let validated = await this._validateReportFields(reportObject);
+          let validated = await this._validateReportFields(reportObject, ['roles', 'externalRoles']);
           if (!validated) return;
 
           const oTable = this.byId("idRCConfigTable").getBinding("items");
 
+          // Remove the token parts from the data object
+          if(reportObject?.tokens){
+            let aTokenTexts = reportObject?.tokens?.map((t) => t.text);
+            if(aTokenTexts && aTokenTexts.length > 0){
+              reportObject.externalRoles = aTokenTexts.join(", ");
+            }
+            delete reportObject.tokens;
+          }
           if (this.addReport) {
             this.aReportCreateContext = oTable.create(reportObject);
           } else if (this._oSelectedReportContext) {
@@ -275,11 +321,12 @@ sap.ui.define(
             nonPrimitiveValueEdit('roles', reportObject.roles)
             // Roles Edit Part
             Object.keys(reportObject).forEach((key) => {
-              if(key.includes("securityFilters") || key.includes("roles")) return; 
+              if(key === "securityFilters" || key === 'roles') return; 
               this._oSelectedReportContext.setProperty(key, reportObject[key]);
             });
           }
           if(this.getView().getModel().hasPendingChanges("ReportsChanges")) {
+            this.onChangeHighlightTableRow('idRCConfigTable');
             this.byId("idSaveConfig").setEnabled(true);
             this.byId("idDiscardConfig").setEnabled(true);
           }
@@ -287,10 +334,11 @@ sap.ui.define(
           this._oReportDialog.destroy();
           this._oReportDialog = null;
         },
-        _validateReportFields: async function (reportObject) {
+        _validateReportFields: async function (reportObject, skipField) {
           const isValid = await this.validateEntityFields(
             "ReportsExposed",
-            reportObject
+            reportObject,
+            skipField
           );
 
           if (!isValid) return false;
@@ -411,30 +459,36 @@ sap.ui.define(
           const sPath = oContext.getPath() + "/tokens";
 
           // Keep only remaining tokens
-          const aTokens = oMultiInput
+          let aTokens = oMultiInput
             .getTokens()
             .map((t) => ({ text: t.getText() }));
+
+          let type = oEvent.getParameter('type')
+          if(type === 'removed'){
+            let token = oEvent.getParameter('removedTokens'), removeText = token[0].getText();
+            aTokens = aTokens.filter(obj => obj.text !== removeText);
+          }
           oModel.setProperty(sPath, aTokens);
         },
-        onFreeTextSubmit: function (oEvent) {
-          const oMultiInput = oEvent.getSource();
-          const sEnteredValue = oEvent.getParameter("value")?.trim();
-          if (!sEnteredValue) return;
+        // onFreeTextSubmit: function (oEvent) {
+        //   const oMultiInput = oEvent.getSource();
+        //   const sEnteredValue = oEvent.getParameter("value")?.trim();
+        //   if (!sEnteredValue) return;
 
-          const oContext = oMultiInput.getBindingContext("filters");
-          const oModel = oMultiInput.getModel("filters");
-          const sPath = oContext.getPath() + "/tokens";
+        //   const oContext = oMultiInput.getBindingContext("filters");
+        //   const oModel = oMultiInput.getModel("filters");
+        //   const sPath = oContext.getPath() + "/tokens";
 
-          let aTokens = oModel.getProperty(sPath) || [];
-          debugger;
-          // Avoid duplicates
-          if (!aTokens.find((token) => token.text === sEnteredValue)) {
-            aTokens.push({ text: sEnteredValue });
-            oModel.setProperty(sPath, aTokens);
-          }
+        //   let aTokens = oModel.getProperty(sPath) || [];
+        //   debugger;
+        //   // Avoid duplicates
+        //   if (!aTokens.find((token) => token.text === sEnteredValue)) {
+        //     aTokens.push({ text: sEnteredValue });
+        //     oModel.setProperty(sPath, aTokens);
+        //   }
 
-          oMultiInput.setValue(""); // Clear input after submit
-        },
+        //   oMultiInput.setValue(""); // Clear input after submit
+        // },
 
         onFreeTextSubmit: function (oEvent) {
           const oMultiInput = oEvent.getSource();
@@ -965,7 +1019,6 @@ sap.ui.define(
         // --------- End Fragments --------------------
 
         onSaveChanges: async function () {
-          debugger;
           var that = this;
           let oIconTabBar = this.byId("idConfigurationMenu");
           let oModel = this.getView().getModel();
@@ -1068,6 +1121,7 @@ sap.ui.define(
                     MessageBox.warning(sWarningMessage);
                   } else {
                     MessageToast.show("Batch operation completed successfully");
+                    that.onChangeHighlightTableRow('idRCConfigTable');
                     that.byId("idSaveConfig")?.setEnabled(false);
                     that.byId("idDiscardConfig")?.setEnabled(false);
                   }
@@ -1076,6 +1130,7 @@ sap.ui.define(
                   if(!that.addReport){
                     oModel.refresh();
                   }
+                  that.onChangeHighlightTableRow('idRCConfigTable');
                   that.byId("idSaveConfig")?.setEnabled(false);
                   that.byId("idDiscardConfig")?.setEnabled(false);
                 }

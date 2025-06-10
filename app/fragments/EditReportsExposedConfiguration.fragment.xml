@@ -6,13 +6,10 @@
         <core:Item key="{ID}" text="{biUser}" />
       </ComboBox>
       <Label required="true" text="{i18n>WORKSPACE}" />
-      <ComboBox id="workspaceSelect" items="" width="20vw" change="onWorkspaceChange" selectedKey="{tempReport>/ReportsExposed/workspaceId}">
-        <core:Item key="{id}" text="{name}" />
-      </ComboBox>
+      <ComboBox id="workspaceSelect" width="20vw" change="onWorkspaceChange" selectedKey="{tempReport>/ReportsExposed/workspaceId}" />
       <Label required="true" text="{i18n>REPORT}" />
-      <ComboBox id="reportSelect" width="20vw" items="" change="onReportChange" selectedKey="{tempReport>/ReportsExposed/reportId}">
-        <core:Item key="{id}" text="{name}" />
-      </ComboBox>
+      <ComboBox id="reportSelect" width="20vw" change="onReportChange" selectedKey="{tempReport>/ReportsExposed/reportId}" />
+        
       <Label text="{i18n>SECURITY_FILTERS}" />
       <MultiComboBox items="{/SecurityFilters}" width="20vw" id="idSecurityFilters" selectionFinish="onSecurityFilterSelection">
         <core:Item key="{ID}" text="{securityUniqueId}"></core:Item>
@@ -22,11 +19,9 @@
         <core:Item key="{ID}" text="{name}" />
       </MultiComboBox>
       <Label text="{i18n>EXTERNAL_ROLES}" />
-      <MultiInput id="idExtRoles" width="20vw" value="{path: 'tempReport>/ReportsExposed/externalRole'}" tokenUpdate="onExternalRoleUpdate">
+      <MultiInput id="idExtRoles" width="20vw" tokens="{path: 'tempReport>/ReportsExposed/tokens'}" showValueHelp="false" tokenUpdate="onExternalRoleUpdate" submit="onFreeTextSubmitRoles">
         <tokens>
-          <Token key="User" text="User"/>
-          <Token key="Manager" text="Manager"/>
-          <Token key="Area Manager" text="Area Manager"/>
+          <Token text="{tempReport>text}"/>
         </tokens>
       </MultiInput>
       <Label required="true" text="{i18n>Description}"></Label>

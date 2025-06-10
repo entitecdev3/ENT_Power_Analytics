@@ -1,48 +1,79 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:layout="sap.ui.layout.form">
   <VBox alignItems="Stretch" fitContainer="true" height="100%" class="sapUiContentPadding">
 
-    <Table id="idRCConfigTable" mode="Delete" alternateRowColors="true" items="{path: '/ReportsExposed', parameters: { $$updateGroupId: 'ReportsChanges'}}" fixedLayout="true" delete="onDeleteReport">
+    <Table id="idRCConfigTable" mode="Delete" alternateRowColors="true"
+      items="{
+      path : '/ReportsExposed', 
+      parameters: {
+        $$updateGroupId: 'ReportsChanges',
+        $expand: 'securityFilters($select=ID,filter_ID),roles($select=ID,role_ID)'
+      }
+    }"
+      fixedLayout="true" delete="onDeleteReport">
 
       <headerToolbar>
         <Toolbar>
           <Title text="Manage Reports" level="H3" />
           <ToolbarSpacer />
 
-          <Button icon="sap-icon://inspection" text="Test Report URL" type="Emphasized" press=".onTestReportURL" tooltip="Open and test a report URL in a popup" class="sapUiTinyMarginBegin" />
-          <Button icon="sap-icon://refresh" text="{i18n>Refresh}" tooltip="{i18n>Refresh}" press="onRefreshReports" />
-          <Button id="idRCAddButton" icon="sap-icon://add" tooltip="Add Report" text="{i18n>Add}" press="onAddReportsConfiguration" />
+          <Button icon="sap-icon://inspection" text="Test Report URL" type="Emphasized"
+            press=".onTestReportURL" tooltip="Open and test a report URL in a popup"
+            class="sapUiTinyMarginBegin" />
+          <Button icon="sap-icon://refresh" text="{i18n>Refresh}" tooltip="{i18n>Refresh}"
+            press="onRefreshReports" />
+          <Button id="idRCAddButton" icon="sap-icon://add" tooltip="Add Report" text="{i18n>Add}"
+            press="onAddReportsConfiguration" />
         </Toolbar>
       </headerToolbar>
 
       <columns>
-        <Column><Text text="Service Principal" /></Column>
-        <Column><Text text="Report Name" /></Column>
-        <Column><Text text="Workspace Name" /></Column>
-        <Column><Text text="Description"></Text></Column>
-        <Column><Text text="Security Filters"></Text></Column>
-        <Column><Text text="Roles"></Text></Column>
-        <Column><Text text="External Roles"></Text></Column>
-        <Column><Text text="" /></Column>
+        <Column>
+          <Text text="Service Principal" />
+        </Column>
+        <Column>
+          <Text text="Report Name" />
+        </Column>
+        <Column>
+          <Text text="Workspace Name" />
+        </Column>
+        <Column>
+          <Text text="Description"></Text>
+        </Column>
+        <Column>
+          <Text text="Security Filters"></Text>
+        </Column>
+        <Column>
+          <Text text="Roles"></Text>
+        </Column>
+        <Column>
+          <Text text="External Roles"></Text>
+        </Column>
+        <Column>
+          <Text text="" />
+        </Column>
       </columns>
 
       <items>
         <ColumnListItem type="Active" press="onReportSelect">
           <cells>
-            <Text text="{parts: [{path : 'servicePrincipal_ID'},{path : 'appView>/ServicePrincipalData'}] , formatter: '.formatter.formatServicePrincipal' }" />
+            <Text
+              text="{parts: [{path : 'servicePrincipal_ID'},{path : 'appView>/ServicePrincipalData'}] , formatter: '.formatter.formatServicePrincipal' }" />
             <Link text="{reportName}" href="{reportUrl}" target="_blank" />
             <Link text="{workspaceName}" href="{workspaceUrl}" target="_blank" />
             <Text text="{description}"></Text>
             <VBox items="{securityFilters}">
               <items>
-                <Text text="{parts : [{path: 'filter_ID'}, {path : 'appView>/SecurityFilters'}], formatter: '.formatter.formatSecurityFilters', targetType: 'any'}" />
+                <Text
+                  text="{parts : [{path: 'filter_ID'}, {path : 'appView>/SecurityFilters'}], formatter: '.formatter.formatSecurityFilters', targetType: 'any'}" />
               </items>
             </VBox>
             <VBox items="{roles}">
               <items>
-                <Text text="{parts : [{path: 'role_ID'}, {path: 'appView>/AssignableRoles'}], formatter: '.formatter.formatRoleDisplay'}"/>
+                <Text
+                  text="{parts : [{path: 'role_ID'}, {path: 'appView>/AssignableRoles'}], formatter: '.formatter.formatRoleDisplay'}" />
               </items>
             </VBox>
-            <Text text="{path: 'externalRoles', formatter: '.formatter.formatExternalRoles'}" />
+            <Text text="{path: 'externalRoles'}" />
             <Button text="Preview Report" type="Emphasized" press=".onLoadReport" />
           </cells>
         </ColumnListItem>

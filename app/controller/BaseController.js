@@ -222,9 +222,9 @@ sap.ui.define([
         },
         getCallData: async function (localModel, oModel, sPath, path) {
           let oBinding = oModel.bindList(sPath);
-          let aContexts = await oBinding.requestContexts(0, 1000); // fetch up to 1000 items
-          let aData = aContexts.map((oContext) => oContext.getObject());
-          localModel.setProperty(path, aData);
+          let aContexts = await oBinding.requestContexts(0, 1000);
+          let aData = aContexts?.map((oContext) => oContext?.getObject());
+          localModel.setProperty(path, aData || []);
         },
     });
 });
