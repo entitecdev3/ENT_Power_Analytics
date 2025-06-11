@@ -23,10 +23,9 @@ sap.ui.define(
           const wsModel = this.getView().getModel("powerBi");
 
           // Load all reports
+          // Load all reports (filtered securely by role from backend)
           const aReports = await oModel
-            .bindList("/ReportsExposed", null, null, null, {
-              $expand: 'roles'
-            })
+            .bindList("/MyReports")
             .requestContexts()
             .then((ctxs) => ctxs.map((ctx) => ctx.getObject()));
 

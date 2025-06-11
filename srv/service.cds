@@ -6,15 +6,15 @@ using auth from './auth';
 
 @requires: 'authenticated-user'
 service MyService @(path: 'MyService') {
-    entity Roles @cds.redirection.target as projection on PowerBiPortal.Roles;
-    entity Companies                     as projection on PowerBiPortal.Companies;
-    entity ReportsExposed                as projection on PowerBiPortal.ReportsExposed;
+    entity Roles @cds.redirection.target          as projection on PowerBiPortal.Roles;
+    entity Companies                              as projection on PowerBiPortal.Companies;
+    entity ReportsExposed @cds.redirection.target as projection on PowerBiPortal.ReportsExposed;
 
 
     @(requires: ['Admin'])
-    entity Users                         as projection on PowerBiPortal.Users;
+    entity Users                                  as projection on PowerBiPortal.Users;
 
-    entity AssignableRoles               as
+    entity AssignableRoles                        as
         projection on PowerBiPortal.Roles {
             ID,
             name
@@ -22,12 +22,13 @@ service MyService @(path: 'MyService') {
         where
             name != 'Admin';
 
-    entity PowerBi                       as projection on PowerBiPortal.PowerBi;
-    entity Identity                      as projection on PowerBiPortal.Identity;
-    entity SecurityFilters               as projection on PowerBiPortal.SecurityFilters;
-    entity Configuration                 as projection on PowerBiPortal.Configuration;
-    entity ReportsToSecurityFilters      as projection on PowerBiPortal.ReportsToSecurityFilters;
-    entity ReportsToRoles                as projection on PowerBiPortal.ReportsToRoles;
+    entity PowerBi                                as projection on PowerBiPortal.PowerBi;
+    entity Identity                               as projection on PowerBiPortal.Identity;
+    entity SecurityFilters                        as projection on PowerBiPortal.SecurityFilters;
+    entity Configuration                          as projection on PowerBiPortal.Configuration;
+    entity ReportsToSecurityFilters               as projection on PowerBiPortal.ReportsToSecurityFilters;
+    entity ReportsToRoles                         as projection on PowerBiPortal.ReportsToRoles;
+    entity MyReports                              as projection on PowerBiPortal.ReportsExposed;
     function getCustomAttrbute() returns auth.CustomAttributes;
     function getUserInfo()       returns auth.UserInfo;
 
