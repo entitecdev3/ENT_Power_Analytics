@@ -13,6 +13,7 @@ module.exports = cds.service.impl(async function () {
     PowerBi,
     ReportsToSecurityFilters,
     SecurityFilters,
+    Roles
   } = this.entities;
 
   this.before("CREATE", Users, async (req) => {
@@ -153,6 +154,8 @@ module.exports = cds.service.impl(async function () {
   // });
   this.on("READ", ReportsExposed, async (req, next) => {
   // Ensure $select contains the required fields
+  const userRole = Object.keys(req.user.roles)[0]
+
   const cols = req.query?.SELECT?.columns || [];
   const requiredFields = ["reportId", "workspaceId", "servicePrincipal_ID"];
 
@@ -167,7 +170,32 @@ module.exports = cds.service.impl(async function () {
   console.log("READ Triggered");
 
   // Normalize to array for consistent handling
-  const reports = Array.isArray(data) ? data : [data];
+  let reports = Array.isArray(data) ? data : [data];
+  
+  // Extra Step to filter the report from the roles 
+  if(userRole && userRole !== 'Admin'){
+    //Data all the roles 
+    const allRoles = await SELECT.from(Roles);
+    let currentRoleID = '';
+    allRoles.forEach((role)=>{
+      if(role.name === userRole){
+        currentRoleID = role.ID
+      }
+    });
+
+    const filteredReports = [];
+    data.forEach(report => {
+      const reportRoles = report.roles || [];
+
+      for (const role of reportRoles) {
+        if (role.role_ID === currentRoleID) {
+          filteredReports.push(report);
+          break; // No need to check more roles for this report
+        }
+      }
+    });
+    reports = filteredReports;
+  }
 
   // Check if all reports have required IDs to fetch Power BI data
   const allComplete = reports.every(
