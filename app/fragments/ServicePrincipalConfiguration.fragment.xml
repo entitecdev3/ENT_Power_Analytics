@@ -1,20 +1,43 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:layout="sap.ui.layout.form">
   <VBox alignItems="Center" fitContainer="true" height="100%" class="sapUiContentPadding">
 
-    <Table id="idConfigTable" mode="Delete" alternateRowColors="true" items="{path: '/PowerBi', parameters: { $$updateGroupId: 'ServicePrincipalChanges' }}" fixedLayout="true" delete="onDeleteConfig">
+    <Table id="idConfigTable" mode="Delete" alternateRowColors="true"
+      items="{path: '/PowerBi', parameters: { $$updateGroupId: 'ServicePrincipalChanges' }}"
+      fixedLayout="true" delete="onDeleteConfig">
       <headerToolbar>
         <Toolbar>
           <Title text="Manage Service Principal" level="H3" />
           <ToolbarSpacer />
-          <Button icon="sap-icon://refresh" text="{i18n>Refresh}" visible="true" tooltip="{i18n>Refresh}" press="onRefreshServicePrincipal" />
-          <Button id="idAddButton" icon="sap-icon://add" tooltip="Add Service Principal" text="{i18n>Add}" press="onAddServicePrincipalConfiguration" />
+          <Button icon="sap-icon://refresh" text="{i18n>Refresh}" visible="true"
+            tooltip="{i18n>Refresh}" press="onRefreshServicePrincipal" />
+          <Button id="idAddButton" icon="sap-icon://add" tooltip="Add Service Principal"
+            text="{i18n>Add}" press="onAddServicePrincipalConfiguration" />
         </Toolbar>
       </headerToolbar>
       <columns>
-        <Column><Text text="BI Account Username" /></Column>
-        <Column><Text text="Client ID" /></Column>
-        <Column><Text text="Client Secret" /></Column>
-        <Column><Text text="Tenant ID" /></Column>
+        <Column>
+          <Text text="BI Account Username" />
+        </Column>
+        <Column>
+          <Text text="Client ID" />
+        </Column>
+        <Column>
+          <HBox alignItems="Center" justifyContent="Start">
+            <Text text="Client Secret" />
+            <core:Icon
+              width="1rem"
+              src="sap-icon://message-information"
+              class="sapUiTinyMarginBegin"
+              color="#4db1ff"
+              press="checkOldInfo"
+              hoverColor="orange"
+              tooltip="{i18n>clientSecretMsg}"
+            />
+          </HBox>
+        </Column>
+        <Column>
+          <Text text="Tenant ID" />
+        </Column>
         <!-- <Column><Text text="Reports Exposed ID" /></Column> -->
         <!-- <Column><Text text="" /></Column> -->
       </columns>
@@ -26,7 +49,8 @@
             <Text text="{clientSecret}" />
             <Text text="{tenantId}" />
             <!-- <Text text="{reportsExposedId}" /> -->
-            <!-- <Button text="Make Default" tooltip="Make this Service Principal as Default Service Principal"></Button> -->
+            <!-- <Button text="Make Default" tooltip="Make this Service Principal as Default Service
+            Principal"></Button> -->
           </cells>
         </ColumnListItem>
       </items>

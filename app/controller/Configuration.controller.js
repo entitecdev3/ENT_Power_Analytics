@@ -33,6 +33,7 @@ sap.ui.define(
 
         onAddServicePrincipalConfiguration: function () {
           this.addServicePrincipal = true;
+          this.getView().getModel('appView').setProperty('/visClientSecret', true);
           let oContext = this.byId("idConfigTable")
             .getBinding("items")
             .create({}, true, { groupId: "ServicePrincipalChanges" });
@@ -40,9 +41,10 @@ sap.ui.define(
         },
         onConfigSelect: async function (oEvent) {
           this.addServicePrincipal = false;
-          let oSource = oEvent.getSource();
+          let oSource = oEvent.getSource(), oContext = oSource.getBindingContext();
+          this.getView().getModel('appView').setProperty('/visClientSecret', oContext.isTransient()? true : false );
           this._selectedServicePrincipalObject = JSON.parse(
-            JSON.stringify(oSource.getBindingContext().getObject())
+            JSON.stringify(oContext.getObject())
           );
           this.openConfigDialog(
             "Edit Service Principal",
@@ -317,8 +319,8 @@ sap.ui.define(
                 })
               } 
             }
-            nonPrimitiveValueEdit('securityFilters', reportObject.securityFilters)
-            nonPrimitiveValueEdit('roles', reportObject.roles)
+            await nonPrimitiveValueEdit('securityFilters', reportObject.securityFilters)
+            await nonPrimitiveValueEdit('roles', reportObject.roles)
             // Roles Edit Part
             Object.keys(reportObject).forEach((key) => {
               if(key === "securityFilters" || key === 'roles') return; 
@@ -346,7 +348,7 @@ sap.ui.define(
         },
         onCloseEditReportsDialog: function () {
           let oModel = this.getView().getModel();
-          oModel.resetChanges("ReportsChanges");
+          // oModel.resetChanges("ReportsChanges");
           this._oReportDialog.close();
           this._oReportDialog.destroy();
           this._oReportDialog = null;

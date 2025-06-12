@@ -7,7 +7,7 @@
             <Label required="true" text="{i18n>CLIENT_ID}" />
             <Input value="{clientId}"/>
             <Label required="true" text="{i18n>CLIENT_SECRET}" />
-            <Input value="{clientSecret}"/>
+            <Input value="{clientSecret}" editable="{appView>/visClientSecret}"/>
             <Label required="true" text="{i18n>TENANT_ID}" />
             <Input value="{tenantId}"/>
         </VBox>

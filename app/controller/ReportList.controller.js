@@ -25,7 +25,9 @@ sap.ui.define(
           // Load all reports
           // Load all reports (filtered securely by role from backend)
           const aReports = await oModel
-            .bindList("/MyReports")
+            .bindList("/MyReports", null, null, null, {
+              $expand: 'roles'
+            })
             .requestContexts()
             .then((ctxs) => ctxs.map((ctx) => ctx.getObject()));
 

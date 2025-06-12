@@ -40,6 +40,49 @@ module.exports = cds.service.impl(async function () {
     return data;
   });
 
+  this.on("READ", MyReports, async (req, next) => {
+    const userRole = Object.keys(req.user.roles)[0];
+    let data = await next(), filteredReports = [];;
+    if(data && data.length > 0){
+      data.forEach(report=>{
+        delete report.reportId;
+        delete report.servicePrincipal;
+        delete report.securityFilters;
+        delete report.modifiedAt;
+        delete report.modifiedBy;
+        delete report.createdBy;
+        delete report.createdAt;
+      })
+    }
+    if (userRole && userRole !== "Admin") {
+      //Data all the roles
+      const allRoles = await SELECT.from(Roles);
+      let currentRoleID = "";
+      allRoles.forEach((role) => {
+        if (role.name === userRole) {
+          currentRoleID = role.ID;
+        }
+      });
+
+      data.forEach((report) => {
+        const reportRoles = report.roles || [];
+        for (const role of reportRoles) {
+          if (role.role_ID === currentRoleID) {
+            delete report.roles;
+            filteredReports.push(report);
+            break; // No need to check more roles for this report
+          }
+        }
+      });
+    }
+    if(data && data.length > 0 && userRole === 'Admin'){
+      data.forEach(report=>{
+        delete report.roles;
+      })
+    }
+    return userRole === 'Admin' ? data : filteredReports;
+  });
+
   this.on("getCustomAttrbute", async (req) => {
     const db = srv.tx(req);
     const config = await db.run(
@@ -155,8 +198,6 @@ module.exports = cds.service.impl(async function () {
   // });
   this.on("READ", ReportsExposed, async (req, next) => {
     // Ensure $select contains the required fields
-    const userRole = Object.keys(req.user.roles)[0];
-
     const cols = req.query?.SELECT?.columns || [];
     const requiredFields = ["reportId", "workspaceId", "servicePrincipal_ID"];
 
@@ -171,32 +212,7 @@ module.exports = cds.service.impl(async function () {
     console.log("READ Triggered");
 
     // Normalize to array for consistent handling
-    let reports = Array.isArray(data) ? data : [data];
-
-    // Extra Step to filter the report from the roles
-    if (userRole && userRole !== "Admin") {
-      //Data all the roles
-      const allRoles = await SELECT.from(Roles);
-      let currentRoleID = "";
-      allRoles.forEach((role) => {
-        if (role.name === userRole) {
-          currentRoleID = role.ID;
-        }
-      });
-
-      const filteredReports = [];
-      data.forEach((report) => {
-        const reportRoles = report.roles || [];
-
-        for (const role of reportRoles) {
-          if (role.role_ID === currentRoleID) {
-            filteredReports.push(report);
-            break; // No need to check more roles for this report
-          }
-        }
-      });
-      reports = filteredReports;
-    }
+    const reports = Array.isArray(data) ? data : [data];
 
     // Check if all reports have required IDs to fetch Power BI data
     const allComplete = reports.every(
