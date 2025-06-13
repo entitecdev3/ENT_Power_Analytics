@@ -8,7 +8,7 @@ using auth from './auth';
 service MyService @(path: 'MyService') {
     entity Roles @cds.redirection.target          as projection on PowerBiPortal.Roles;
     entity Companies                              as projection on PowerBiPortal.Companies;
-    entity ReportsExposed @cds.redirection.target as projection on PowerBiPortal.ReportsExposed;
+    entity MyReports                              as projection on PowerBiPortal.ReportsExposed;
 
 
     @(requires: ['Admin'])
@@ -36,8 +36,7 @@ service MyService @(path: 'MyService') {
     @(requires: ['Admin'])
     entity ReportsToRoles                         as projection on PowerBiPortal.ReportsToRoles;
     @(requires: ['Admin'])
-    entity MyReports                              as projection on PowerBiPortal.ReportsExposed;
-    @(requires: ['Admin'])
+    entity ReportsExposed @cds.redirection.target as projection on PowerBiPortal.ReportsExposed;
     function getCustomAttrbute() returns auth.CustomAttributes;
     function getUserInfo()       returns auth.UserInfo;
 

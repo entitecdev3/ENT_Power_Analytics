@@ -25,7 +25,6 @@ service PowerBiService @(path: '/powerbi/PowerBiService') {
   @(requires: ['Admin'])
   entity ReportsToSecurityFilters as projection on pa.ReportsToSecurityFilters;
 
-  @(requires: ['Admin'])
   entity ReportsExposed           as projection on pa.ReportsExposed
     actions {
       function getEmbedDetails()                         returns EmbedDetails;
