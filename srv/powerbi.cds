@@ -14,12 +14,18 @@ service PowerBiService @(path: '/powerbi/PowerBiService') {
     message    : String;
   }
 
+  @(requires: ['Admin'])
   entity PowerBi                  as projection on pa.PowerBi;
+  @(requires: ['Admin'])
   action checkReportAccess(url : String) returns AccessStatus;
+  @(requires: ['Admin'])
   entity Users                    as projection on pa.Users;
+  @(requires: ['Admin'])
   entity SecurityFilters          as projection on pa.SecurityFilters;
+  @(requires: ['Admin'])
   entity ReportsToSecurityFilters as projection on pa.ReportsToSecurityFilters;
 
+  @(requires: ['Admin'])
   entity ReportsExposed           as projection on pa.ReportsExposed
     actions {
       function getEmbedDetails()                         returns EmbedDetails;
@@ -45,7 +51,7 @@ service PowerBiService @(path: '/powerbi/PowerBiService') {
         name     : String;
         configId : UUID;
   }
-
+  @(requires: ['Admin'])
   @cds.persistence.skip
   entity LiveReports {
     key id          : UUID;

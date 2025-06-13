@@ -18,6 +18,7 @@ sap.ui.define(
           appModel.setProperty("/navVisible", true);
           appModel.setProperty("/LoginHeader", false);
           appModel.setProperty("/HomeScreen", true);
+          appModel.setProperty('/subHeaderTitle', 'Reports');
 
           const oModel = this.getView().getModel();
           const wsModel = this.getView().getModel("powerBi");
@@ -25,9 +26,7 @@ sap.ui.define(
           // Load all reports
           // Load all reports (filtered securely by role from backend)
           const aReports = await oModel
-            .bindList("/MyReports", null, null, null, {
-              $expand: 'roles'
-            })
+            .bindList("/MyReports")
             .requestContexts()
             .then((ctxs) => ctxs.map((ctx) => ctx.getObject()));
 

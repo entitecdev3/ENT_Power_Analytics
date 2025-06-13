@@ -25,6 +25,7 @@ sap.ui.define(
           oViewModel.setProperty("/HomeScreen", true);
           oViewModel.setProperty('/visSaveButton', false);
           oViewModel.setProperty('/visDiscardButton', false);
+          oViewModel.setProperty('/subHeaderTitle', 'Configuration');
           this.getModel().refresh();
 
           this.getCallData(oViewModel, this.getView().getModel("powerBi"), "/PowerBi", "/ServicePrincipalData");

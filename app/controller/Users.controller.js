@@ -35,6 +35,7 @@ sap.ui.define(
         oViewModel.setProperty("/HomeScreen", true);
         oViewModel.setProperty("/visSaveButton", false);
         oViewModel.setProperty("/visDiscardButton", false);
+        oViewModel.setProperty('/subHeaderTitle', 'Users');
         this.getCallData(oViewModel, this.getView().getModel(), "/Companies", "/Companies");
         this.getCallData(oViewModel, this.getView().getModel(), "/Roles", "/Roles");
 

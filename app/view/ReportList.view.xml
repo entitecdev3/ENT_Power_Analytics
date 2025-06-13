@@ -1,23 +1,30 @@
 <mvc:View controllerName="entitec.pbi.embedding.controller.ReportList" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:layout="sap.ui.layout">
-  <VBox class="sapUiTinyMargin sapUiResponsiveMargin">
-    <VBox justifyContent="Start" items="{local>/tiles}" class="sapUiSmallMarginTop">
-      <!-- <core:Fragment fragmentName="entitec.pbi.embedding.fragments.TileItem" type="XML" /> -->
-      <VBox>
-        <MessageStrip visible="{= ${local>isHeader} === true }" text="{local>name}" type="Information" class="sapUiSmallMarginTop sapUiTinyMarginBottom" />
-        <HBox direction="Row" wrap="Wrap" class="sapUiSmallMargin tileContainer" renderType="Div" items="{local>tiles}">
-          <GenericTile sizeBehavior="Small" frameType="OneByOne" class="tileLayout" visible="{= ${local>isHeader} === false }" header="{local>description}" press="onTilePress">
-            <customData>
-              <core:CustomData key="reportId" value="{local>ID}" />
-            </customData>
-            <TileContent>
-              <!-- <ImageContent src="sap-icon://business-objects-experience" /> -->
-              <NumericContent value=" " icon="sap-icon://business-objects-experience" withMargin="false"></NumericContent>
-            </TileContent>
-          </GenericTile>
-        </HBox>
+  <Page showHeader="false">
+    <subHeader>
+      <core:Fragment fragmentName="entitec.pbi.embedding.fragments.SubHeaderToolbar" type="XML" />
+    </subHeader>
+    <content>
+      <VBox class="sapUiTinyMargin sapUiResponsiveMargin">
+        <VBox justifyContent="Start" items="{local>/tiles}" class="sapUiSmallMarginTop">
+          <!-- <core:Fragment fragmentName="entitec.pbi.embedding.fragments.TileItem" type="XML" /> -->
+          <VBox>
+            <MessageStrip visible="{= ${local>isHeader} === true }" text="{local>name}" type="Information" class="sapUiSmallMarginTop sapUiTinyMarginBottom" />
+            <HBox direction="Row" wrap="Wrap" class="sapUiSmallMargin tileContainer" renderType="Div" items="{local>tiles}">
+              <GenericTile sizeBehavior="Small" frameType="OneByOne" class="tileLayout" visible="{= ${local>isHeader} === false }" header="{local>description}" press="onTilePress">
+                <customData>
+                  <core:CustomData key="reportId" value="{local>ID}" />
+                </customData>
+                <TileContent>
+                  <!-- <ImageContent src="sap-icon://business-objects-experience" /> -->
+                  <NumericContent value=" " icon="sap-icon://business-objects-experience" withMargin="false"></NumericContent>
+                </TileContent>
+              </GenericTile>
+            </HBox>
+          </VBox>
+        </VBox>
+        <!-- </HBox> -->
+        <!-- </ScrollContainer> -->
       </VBox>
-    </VBox>
-    <!-- </HBox> -->
-    <!-- </ScrollContainer> -->
-  </VBox>
+    </content>
+  </Page>
 </mvc:View>

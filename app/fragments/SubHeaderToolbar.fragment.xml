@@ -1,0 +1,10 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:tnt="sap.tnt">
+    <tnt:ToolHeader width="100%" height="auto">
+        <Button icon="sap-icon://nav-back" type="Transparent" press="onNavBack"
+            visible="{appView>/navVisible}" />
+        <Title class="sapUiTinyMarginBegin sapUiTinyMarginTop" text="{appView>/subHeaderTitle}" wrapping="true"
+            level="H6"
+            visible="true" />
+        <ToolbarSpacer />
+    </tnt:ToolHeader>
+</core:FragmentDefinition>

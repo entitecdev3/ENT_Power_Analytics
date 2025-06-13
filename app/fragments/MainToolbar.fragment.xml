@@ -1,7 +1,7 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:tnt="sap.tnt">
     <tnt:ToolHeader id="idToolHeader" width="100%" height="auto">
-     <Button id="idNavBack" icon="sap-icon://nav-back" type="Transparent" press="onNavBack"
-                visible="{appView>/navVisible}" />
+     <!-- <Button id="idNavBack" icon="sap-icon://nav-back" type="Transparent" press="onNavBack"
+                visible="{appView>/navVisible}" /> -->
             <Image class="coverImage sapUiTinyMarginBegin" src="./images/logo_medium.png" width="155px" height="40px"
                 visible="{appView>/LoginHeader}" />
 

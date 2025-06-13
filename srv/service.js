@@ -41,7 +41,7 @@ module.exports = cds.service.impl(async function () {
     return data;
   });
 
-  this.on("READ", MyReports, async (req, next) => {
+  this.on("READ", MyReports, async (req) => {
     // 1. Get user's role_ID
     const user = await SELECT.one
       .from(Users)
