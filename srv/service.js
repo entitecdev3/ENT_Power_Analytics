@@ -13,6 +13,7 @@ module.exports = cds.service.impl(async function () {
     PowerBi,
     ReportsToSecurityFilters,
     SecurityFilters,
+    ReportsToRoles,
     Roles,
     MyReports,
   } = this.entities;
@@ -41,46 +42,41 @@ module.exports = cds.service.impl(async function () {
   });
 
   this.on("READ", MyReports, async (req, next) => {
-    const userRole = Object.keys(req.user.roles)[0];
-    let data = await next(), filteredReports = [];;
-    if(data && data.length > 0){
-      data.forEach(report=>{
-        delete report.reportId;
-        delete report.servicePrincipal;
-        delete report.securityFilters;
-        delete report.modifiedAt;
-        delete report.modifiedBy;
-        delete report.createdBy;
-        delete report.createdAt;
-      })
-    }
-    if (userRole && userRole !== "Admin") {
-      //Data all the roles
-      const allRoles = await SELECT.from(Roles);
-      let currentRoleID = "";
-      allRoles.forEach((role) => {
-        if (role.name === userRole) {
-          currentRoleID = role.ID;
-        }
-      });
+    // 1. Get user's role_ID
+    const user = await SELECT.one
+      .from(Users)
+      .where({ username: req.user.username })
+      .columns('role_ID');
 
-      data.forEach((report) => {
-        const reportRoles = report.roles || [];
-        for (const role of reportRoles) {
-          if (role.role_ID === currentRoleID) {
-            delete report.roles;
-            filteredReports.push(report);
-            break; // No need to check more roles for this report
-          }
-        }
-      });
+    if (!user || !user.role_ID) return []; // Defensive check
+
+    // 2. Get the role name
+    const userRole = await SELECT.one
+      .from(Roles)
+      .where({ ID: user.role_ID })
+      .columns('name');
+
+    if (!userRole || !userRole.name) return []; // Defensive check
+
+    // 3. Conditionally run query based on role
+    let reports;
+
+    if (userRole.name === 'Admin') {
+      // Admin gets all reports
+      reports = await SELECT.from(ReportsExposed).columns(['ID', 'workspaceId', 'servicePrincipal_ID', 'externalRoles', 'description']);
+    } else {
+      // Non-admins: Filter reports by role
+      const subQuery = SELECT
+        .from(ReportsToRoles)
+        .columns('report_ID')
+        .where({ role_ID: user.role_ID });
+
+      reports = await SELECT
+        .from(ReportsExposed)
+        .where({ ID: { in: subQuery } }).columns(['ID', 'workspaceId', 'servicePrincipal_ID', 'externalRoles', 'description']);
     }
-    if(data && data.length > 0 && userRole === 'Admin'){
-      data.forEach(report=>{
-        delete report.roles;
-      })
-    }
-    return userRole === 'Admin' ? data : filteredReports;
+
+    return reports;
   });
 
   this.on("getCustomAttrbute", async (req) => {

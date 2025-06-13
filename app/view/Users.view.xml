@@ -34,8 +34,8 @@
     <footer>
       <OverflowToolbar>
         <ToolbarSpacer />
-        <Button id="idSaveUsers" enabled="false" type="Emphasized" text="Save" press="onSaveChanges" />
-        <Button id="idDiscardButton" enabled="false" type="Default" text="Discard Changes" press="onDiscardChanges" />
+        <Button id="idSaveUsers" enabled="{appView>/visSaveButton}" type="Emphasized" text="Save" press="onSaveChanges" />
+        <Button id="idDiscardButton" enabled="{appView>/visDiscardButton}" type="Default" text="Discard Changes" press="onDiscardChanges" />
       </OverflowToolbar>
     </footer>
   </Page>

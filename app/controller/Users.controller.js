@@ -33,6 +33,8 @@ sap.ui.define(
         oViewModel.setProperty("/navVisible", true);
         oViewModel.setProperty("/LoginHeader", false);
         oViewModel.setProperty("/HomeScreen", true);
+        oViewModel.setProperty("/visSaveButton", false);
+        oViewModel.setProperty("/visDiscardButton", false);
         this.getCallData(oViewModel, this.getView().getModel(), "/Companies", "/Companies");
         this.getCallData(oViewModel, this.getView().getModel(), "/Roles", "/Roles");
 
@@ -47,16 +49,15 @@ sap.ui.define(
       onRefreshUsers: function () {
         var that = this;
         let oModel = this.getView().getModel();
-        if (oModel.hasPendingChanges()) {
+        if (oModel.hasPendingChanges('UserChanges')) {
           MessageBox.warning("Are you sure you want to reload. Your changes will be lost?", {
             actions: [MessageBox.Action.OK, MessageBox.Action.CANCEL],
             onClose: function (sAction) {
               if (sAction === MessageBox.Action.OK) {
-                that.byId('idSaveUsers').setEnabled(false);
-                that.byId('idDiscardButton').setEnabled(false);
-                that.onChangeHighlightTableRow("idTableUsers"); // Track changes in row and highlight them
                 oModel.resetChanges("UserChanges");
                 oModel.refresh();
+                that.visSaveDiscardButton('UserChanges');
+                that.onChangeHighlightTableRow("idTableUsers"); // Track changes in row and highlight them
               }
             }
           });
@@ -79,28 +80,6 @@ sap.ui.define(
         }
         this.onChangeHighlightTableRow("idTableUsers"); // Track changes in row and highlight them
         this._oDialog.close();
-      },
-      onAccountNewPasswordLiveChange: function (oEvent) {
-        var getConfirmPass = oEvent.getParameter('value');
-        var pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-        if (pattern.test(getConfirmPass)) {
-          this.getView().getModel('appView').setProperty("/Password/NewPasswordValueState", "None");
-          this.getView().getModel('appView').setProperty("/Password/NewPasswordVST", "");
-        } else {
-          this.getView().getModel('appView').setProperty("/Password/NewPasswordValueState", "Error");
-          this.getView().getModel('appView').setProperty("/Password/NewPasswordVST", "Password must contain atleast 8 characters,\n including Upper/lowercase, numbers,\n and special character");
-        }
-      },
-      onAccountConfirmPasswordLiveChange: function (oEvent) {
-        var getConfirmPass = oEvent.getParameter('value');
-        var pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-        if (pattern.test(getConfirmPass)) {
-          this.getView().getModel('appView').setProperty("/Password/ConfirmPasswordValueState", "None");
-          this.getView().getModel('appView').setProperty("/Password/ConfirmPasswordVST", "");
-        } else {
-          this.getView().getModel('appView').setProperty("/Password/ConfirmPasswordValueState", "Error");
-          this.getView().getModel('appView').setProperty("/Password/ConfirmPasswordVST", "Password must contain atleast 8 characters,\n including Upper/lowercase, numbers,\n and special character");
-        }
       },
       onNewPasswordLiveChange: function (oEvent) {
         var getConfirmPass = oEvent.getParameter('value');
@@ -138,8 +117,7 @@ sap.ui.define(
         }
         if (this.getModel().hasPendingChanges()) {
           this.onChangeHighlightTableRow("idTableUsers"); // Track changes in row and highlight them
-          this.byId('idSaveUsers').setEnabled(true);
-          this.byId('idDiscardButton').setEnabled(true);
+          this.visSaveDiscardButton("UserChanges")
         }
       },
       _validateUserFields: async function (userObject) {
@@ -212,9 +190,8 @@ sap.ui.define(
 
         this.addUserPress = false;
         this.UserPasswordDialog.close();
-        if (this.getView().getModel().hasPendingChanges()) {
-          this.byId('idSaveUsers').setEnabled(true);
-          this.byId('idDiscardButton').setEnabled(true);
+        if (this.getView().getModel().hasPendingChanges('UserChanges')) {
+          this.visSaveDiscardButton('UserChanges');
           this.onChangeHighlightTableRow("idTableUsers"); // Track changes in row and highlight them
         }
       },
@@ -290,12 +267,10 @@ sap.ui.define(
             } else {
               MessageToast.show("Batch operation completed successfully");
               that.onChangeHighlightTableRow("idTableUsers"); // Track changes in row and highlight them
-              that.byId('idSaveUsers').setEnabled(false);
-              that.byId('idDiscardButton').setEnabled(false);
+              that.visSaveDiscardButton('UserChanges')
             }
           } else {
-            that.byId('idSaveUsers').setEnabled(false);
-            that.byId('idDiscardButton').setEnabled(false);
+            that.visSaveDiscardButton('UserChanges')
             MessageToast.show("User details updated successfully.");
             that.onChangeHighlightTableRow("idTableUsers"); // Track changes in row and highlight them
             // oModel.refresh();
@@ -321,9 +296,8 @@ sap.ui.define(
           onClose: function (sAction) {
             if (sAction === MessageBox.Action.OK) {
               oContext.delete("UserChanges");
-              if (that.getView().getModel().hasPendingChanges()) {
-                that.byId('idSaveUsers').setEnabled(true);
-                that.byId('idDiscardButton').setEnabled(true);
+              if (that.getView().getModel().hasPendingChanges('UserChanges')) {
+                that.visSaveDiscardButton('UserChanges')
               }
             }
           }
@@ -337,10 +311,9 @@ sap.ui.define(
             actions: [MessageBox.Action.OK, MessageBox.Action.CANCEL],
             onClose: function (sAction) {
               if (sAction === MessageBox.Action.OK) {
-                that.byId('idSaveUsers').setEnabled(false);
-                that.byId('idDiscardButton').setEnabled(false);
                 oModel.resetChanges("UserChanges");
                 oModel.refresh();
+                that.visSaveDiscardButton('UserChanges');
                 that.onChangeHighlightTableRow("idTableUsers"); // Track changes in row and highlight them
               }
             }

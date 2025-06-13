@@ -2,7 +2,7 @@
   <Page showHeader="false">
     <content>
     <Title text="Configuration" class="sapUiSmallMargin"></Title>
-      <IconTabBar id="idConfigurationMenu" tabDensityMode="Inherit" backgroundDesign="Transparent">
+      <IconTabBar id="idConfigurationMenu" tabDensityMode="Inherit" backgroundDesign="Transparent" select="onIconTabBarChange">
         <items>
           <IconTabFilter id="idServicePrincipalConfig" text="Service Principal " icon="sap-icon://key" design="Horizontal">
             <VBox>
@@ -27,8 +27,8 @@
     <footer>
       <Bar>
         <contentRight>
-          <Button id="idSaveConfig" text="{i18n>save}" type="Emphasized" enabled="false" press="onSaveChanges" />
-          <Button id="idDiscardConfig" text="{i18n>discard}" type="Default" enabled="false" press="onDiscardChanges" />
+          <Button id="idSaveConfig" text="{i18n>save}" type="Emphasized" enabled="{appView>/visSaveButton}" press="onSaveChanges" />
+          <Button id="idDiscardConfig" text="{i18n>discard}" type="Default" enabled="{appView>/visDiscardButton}" press="onDiscardChanges" />
         </contentRight>
       </Bar>
     </footer>

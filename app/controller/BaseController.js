@@ -226,5 +226,11 @@ sap.ui.define([
           let aData = aContexts?.map((oContext) => oContext?.getObject());
           localModel.setProperty(path, aData || []);
         },
+        visSaveDiscardButton : function(groupId){
+            let oModel = this.getView().getModel(), oViewModel = this.getView().getModel('appView'),
+            bPendingChanges = oModel.hasPendingChanges(groupId);
+            oViewModel.setProperty('/visSaveButton', bPendingChanges);
+            oViewModel.setProperty('/visDiscardButton', bPendingChanges);
+        }
     });
 });

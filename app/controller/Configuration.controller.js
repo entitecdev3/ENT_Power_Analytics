@@ -23,6 +23,8 @@ sap.ui.define(
           oViewModel.setProperty("/navVisible", true);
           oViewModel.setProperty("/LoginHeader", false);
           oViewModel.setProperty("/HomeScreen", true);
+          oViewModel.setProperty('/visSaveButton', false);
+          oViewModel.setProperty('/visDiscardButton', false);
           this.getModel().refresh();
 
           this.getCallData(oViewModel, this.getView().getModel("powerBi"), "/PowerBi", "/ServicePrincipalData");
@@ -83,8 +85,7 @@ sap.ui.define(
               onClose: function (sAction) {
                 if (sAction === MessageBox.Action.OK) {
                   oContext.delete("ServicePrincipalChanges");
-                  this.byId("idSaveConfig").setEnabled(true);
-                  this.byId("idDiscardConfig").setEnabled(true);
+                  this.visSaveDiscardButton("ServicePrincipalChanges")
                 }
               }.bind(this),
             }
@@ -100,7 +101,7 @@ sap.ui.define(
               oModel,
               "ServicePrincipalChanges",
               this,
-              ["idSaveConfig", "idDiscardConfig"],
+              ["visDiscardButton", "visSaveButton"],
               "idConfigTable"
             );
           } else {
@@ -117,9 +118,8 @@ sap.ui.define(
             return;
           }
           this._oDialog.close();
-          if (this.getView().getModel().hasPendingChanges()) {
-            this.byId("idSaveConfig").setEnabled(true);
-            this.byId("idDiscardConfig").setEnabled(true);
+          if (this.getView().getModel().hasPendingChanges('ServicePrincipalChanges')) {
+            this.visSaveDiscardButton('ServicePrincipalChanges');
             this.onChangeHighlightTableRow("idConfigTable"); // Changing the status of the table row
           }
         },
@@ -276,7 +276,7 @@ sap.ui.define(
           oModel.setProperty(sPath, aTokens);
         },
         onSaveEditReportsDialog: async function () {
-          let oContext = this._oReportDialog.getBindingContext();
+          let oContext = this._oReportDialog.getBindingContext(), oModel = this.getView().getModel();
           let reportObject = this._oReportDialog
             .getModel("tempReport")
             .getProperty("/ReportsExposed");
@@ -329,8 +329,7 @@ sap.ui.define(
           }
           if(this.getView().getModel().hasPendingChanges("ReportsChanges")) {
             this.onChangeHighlightTableRow('idRCConfigTable');
-            this.byId("idSaveConfig").setEnabled(true);
-            this.byId("idDiscardConfig").setEnabled(true);
+            this.visSaveDiscardButton('ReportsChanges')
           }
           this._oReportDialog.close();
           this._oReportDialog.destroy();
@@ -366,16 +365,15 @@ sap.ui.define(
             actions: [MessageBox.Action.OK, MessageBox.Action.CANCEL],
             onClose: function (sAction) {
               if (sAction === MessageBox.Action.OK) {
-                this.byId("idSaveConfig").setEnabled(true);
-                this.byId("idDiscardConfig").setEnabled(true);
                 oContext.delete("ReportsChanges");
+                this.visSaveDiscardButton('ReportsChanges')
               }
             }.bind(this),
           });
         },
         onRefreshReports: function () {
-          let oModel = this.getView().getModel();
-          if (oModel.hasPendingChanges()) {
+          let oModel = this.getView().getModel(), that = this;
+          if (oModel.hasPendingChanges('ReportsChanges')) {
             MessageBox.warning(
               "Are you sure you want to reload. Your changes will be lost?",
               {
@@ -384,6 +382,7 @@ sap.ui.define(
                   if (sAction === MessageBox.Action.OK) {
                     oModel.resetChanges("ReportsChanges");
                     oModel.refresh();
+                    that.visSaveDiscardButton('ReportsChanges');
                   }
                 },
               }
@@ -936,9 +935,8 @@ sap.ui.define(
             return;
           }
           this._oSecurityFilterDialog.close();
-          if (this.getView().getModel().hasPendingChanges()) {
-            this.byId("idSaveConfig").setEnabled(true);
-            this.byId("idDiscardConfig").setEnabled(true);
+          if (this.getView().getModel().hasPendingChanges('SecurityFilterChanges')) {
+            this.visSaveDiscardButton('SecurityFilterChanges')
             this.onChangeHighlightTableRow("idConfigSecurityFilterTable"); // Changing the status of the table row
           }
         },
@@ -991,8 +989,7 @@ sap.ui.define(
               onClose: function (sAction) {
                 if (sAction === MessageBox.Action.OK) {
                   oContext.delete("SecurityFilterChanges");
-                  this.byId("idSaveConfig").setEnabled(true);
-                  this.byId("idDiscardConfig").setEnabled(true);
+                  this.visSaveDiscardButton('SecurityFilterChanges')
                 }
               }.bind(this),
             }
@@ -1008,7 +1005,7 @@ sap.ui.define(
               oModel,
               "SecurityFilterChanges",
               this,
-              ["idSaveConfig", "idDiscardConfig"],
+              ["visDiscardButton", "visSaveButton"],
               "idConfigSecurityFilterTable"
             );
           } else {
@@ -1066,16 +1063,14 @@ sap.ui.define(
                     MessageBox.warning(sWarningMessage);
                   } else {
                     MessageToast.show("Batch operation completed successfully");
-                    that.byId("idSaveConfig")?.setEnabled(false);
-                    that.byId("idDiscardConfig")?.setEnabled(false);
+                    that.visSaveDiscardButton('ServicePrincipalChanges');
                     that.onChangeHighlightTableRow("idConfigTable"); // Changing the status of the table row
                   }
                 } else {
                   MessageToast.show(
                     "Service Principal details updated successfully."
                   );
-                  that.byId("idSaveConfig")?.setEnabled(false);
-                  that.byId("idDiscardConfig")?.setEnabled(false);
+                  that.visSaveDiscardButton('ServicePrincipalChanges')
                   that.onChangeHighlightTableRow("idConfigTable"); // Changing the status of the table row
                 }
               })
@@ -1124,8 +1119,7 @@ sap.ui.define(
                   } else {
                     MessageToast.show("Batch operation completed successfully");
                     that.onChangeHighlightTableRow('idRCConfigTable');
-                    that.byId("idSaveConfig")?.setEnabled(false);
-                    that.byId("idDiscardConfig")?.setEnabled(false);
+                    that.visSaveDiscardButton('ReportsChanges')
                   }
                 } else {
                   MessageToast.show("Report details updated successfully.");
@@ -1133,8 +1127,7 @@ sap.ui.define(
                     oModel.refresh();
                   }
                   that.onChangeHighlightTableRow('idRCConfigTable');
-                  that.byId("idSaveConfig")?.setEnabled(false);
-                  that.byId("idDiscardConfig")?.setEnabled(false);
+                  that.visSaveDiscardButton('ReportsChanges')
                 }
               })
               .catch((oError) => {
@@ -1182,16 +1175,14 @@ sap.ui.define(
                     MessageBox.warning(sWarningMessage);
                   } else {
                     MessageToast.show("Batch operation completed successfully");
-                    that.byId("idSaveConfig")?.setEnabled(false);
-                    that.byId("idDiscardConfig")?.setEnabled(false);
+                    that.visSaveDiscardButton('SecurityFilterChanges')
                     that.onChangeHighlightTableRow(
                       "idConfigSecurityFilterTable"
                     ); // Changing the status of the table row
                   }
                 } else {
                   MessageToast.show("Report details updated successfully.");
-                  that.byId("idSaveConfig")?.setEnabled(false);
-                  that.byId("idDiscardConfig")?.setEnabled(false);
+                  that.visSaveDiscardButton('SecurityFilterChanges')
                   that.onChangeHighlightTableRow("idConfigSecurityFilterTable"); // Changing the status of the table row
                 }
               })
@@ -1212,7 +1203,7 @@ sap.ui.define(
               oModel,
               "ServicePrincipalChanges",
               this,
-              ["idSaveConfig", "idDiscardConfig"],
+              ["visDiscardButton", "visSaveButton"],
               "idConfigTable"
             );
           } else if (sSelectedKey.includes("idReportConfig")) {
@@ -1222,8 +1213,8 @@ sap.ui.define(
               oModel,
               "ReportsChanges",
               this,
-              ["idSaveConfig", "idDiscardConfig"],
-              null
+              ["visDiscardButton", "visSaveButton"],
+              "idRCConfigTable"
             );
           } else if (sSelectedKey.includes("idSecurityFilterConfig")) {
             this.showDiscardChangesWarning(
@@ -1232,7 +1223,7 @@ sap.ui.define(
               oModel,
               "SecurityFilterChanges",
               this,
-              ["idSaveConfig", "idDiscardConfig"],
+              ["visDiscardButton", "visSaveButton"],
               "idConfigSecurityFilterTable"
             );
           }
@@ -1244,9 +1235,11 @@ sap.ui.define(
           groupId,
           view,
           buttonIds = [],
-          sourceTable
+          sourceTable,
+          cancelFunction
         ) {
           var that = this;
+          let oViewModel = this.getView().getModel('appView')
           MessageBox.warning(message, {
             actions: [MessageBox.Action.OK, MessageBox.Action.CANCEL],
             onClose: function (sAction) {
@@ -1257,7 +1250,8 @@ sap.ui.define(
                 }
                 if (view && buttonIds.length > 0) {
                   buttonIds.forEach((id) => {
-                    view.byId(id)?.setEnabled(false);
+                    // view.byId(id)?.setEnabled(false);
+                    oViewModel.setProperty(`/${id}`, false);
                   });
                 }
                 if (sourceTable) {
@@ -1267,9 +1261,77 @@ sap.ui.define(
                   callBack();
                 }
               }
+              if (sAction === MessageBox.Action.CANCEL && cancelFunction){
+                cancelFunction();
+              }
             },
           });
         },
+        onIconTabBarChange: function(oEvent){
+          let oModel = this.getView().getModel(), 
+          previousKey = oEvent.getParameter('previousKey');
+
+          const cancelFunction = ()=>{
+            this.byId("idConfigurationMenu").setSelectedKey(previousKey)
+          }
+
+          const callBack = ()=>{
+
+          }
+
+          if(previousKey.includes("idServicePrincipalConfig")){
+            // 1. Check if there is any pending changes in the model 
+            let bChange = oModel.hasPendingChanges('ServicePrincipalChanges');
+            // 2. show the warning msg box
+            if(bChange){
+              // 3. if Ok then discard all the changes and navigate to the selected tab
+              this.showDiscardChangesWarning(
+                "You have unsaved changes. Press OK to discard them and proceed, or Cancel to go back and save your changes.",
+                null,
+                oModel,
+                "ServicePrincipalChanges",
+                this,
+                ["visDiscardButton", "visSaveButton"],
+                "idConfigTable",
+                cancelFunction.bind(this)
+              );
+            }
+          } else if (previousKey.includes("idReportConfig")){
+            // 1. Check if there is any pending changes in the model 
+            let bChange = oModel.hasPendingChanges('ReportsChanges');
+            // 2. show the warning msg box
+            if(bChange){
+              // 3. if Ok then discard all the changes and navigate to the selected tab
+              this.showDiscardChangesWarning(
+                "You have unsaved changes. Press OK to discard them and proceed, or Cancel to go back and save your changes.",
+                null,
+                oModel,
+                "ReportsChanges",
+                this,
+                ["visDiscardButton", "visSaveButton"],
+                "idRCConfigTable",
+                cancelFunction.bind(this)
+              );
+            }
+          } else if(previousKey.includes("idSecurityFilterConfig")){
+            // 1. Check if there is any pending changes in the model 
+            let bChange = oModel.hasPendingChanges('SecurityFilterChanges');
+            // 2. show the warning msg box
+            if(bChange){
+              // 3. if Ok then discard all the changes and navigate to the selected tab
+              this.showDiscardChangesWarning(
+                "You have unsaved changes. Press OK to discard them and proceed, or Cancel to go back and save your changes.",
+                null,
+                oModel,
+                "SecurityFilterChanges",
+                this,
+                ["visDiscardButton", "visSaveButton"],
+                "idConfigSecurityFilterTable",
+                cancelFunction.bind(this)
+              );
+            }
+          }
+        }
       }
     );
   }
