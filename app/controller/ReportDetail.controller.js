@@ -21,6 +21,7 @@ sap.ui.define(
           oViewModel.setProperty("/navVisible", true);
           oViewModel.setProperty("/LoginHeader", false);
           oViewModel.setProperty("/HomeScreen", true);
+          oViewModel.setProperty("/subHeaderTitle", oViewModel.getProperty("/selectedReport/description"))
           this.getView().getModel().refresh(); // optional
           const sReportId = oEvent.getParameter("arguments").reportId;
           const oModel = this.getView().getModel("powerBi");
