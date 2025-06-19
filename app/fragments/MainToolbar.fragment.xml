@@ -1,27 +1,32 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:tnt="sap.tnt">
-    <tnt:ToolHeader id="idToolHeader" width="100%" height="auto">
-     <!-- <Button id="idNavBack" icon="sap-icon://nav-back" type="Transparent" press="onNavBack"
-                visible="{appView>/navVisible}" /> -->
-            <Image class="coverImage sapUiTinyMarginBegin" src="./images/logo_medium.png" width="155px" height="40px"
-                visible="{appView>/LoginHeader}" />
+  <tnt:ToolHeader id="idToolHeader" width="100%">
+    <HBox width="100%" justifyContent="SpaceBetween" alignItems="Center">
 
-            <ToolbarSpacer />
+      <!-- LEFT SECTION: Logo -->
+      <HBox width="150px" alignItems="Center" justifyContent="Start">
+        <Image src="./images/logo_medium.png" width="130px" height="30px" class="sapUiTinyMarginBegin" visible="{ parts: ['appView>/LoginHeader', 'appView>/HomeScreen', 'device>/system/phone'], formatter: '.formatter.showLogo' }" />
+      </HBox>
 
-            <Title class="sapUiSmallMarginBegin" text="Power Analytics Portal" wrapping="true" level="H3"
-                visible="true" />
+      <!-- CENTER SECTION: Title (Responsive) -->
+      <HBox alignItems="Center" justifyContent="Center" class="titleBox" >
+        <Title text="Power Analytics Portal" level="H3" wrapping="false" class="responsiveTitle">
+          <!-- <layoutData>
+            <FlexItemData growFactor="1" />
+          </layoutData> -->
+        </Title>
+      </HBox>
 
-            <ToolbarSpacer />
+      <!-- RIGHT SECTION: Version + Profile -->
+      <HBox width="180px" alignItems="Center" justifyContent="End" renderType="Bare">
+        <Text text="Version 1.0.0" class="sapUiTinyMarginEnd" visible="{ parts: ['appView>/LoginHeader', 'device>/system/phone'], formatter: '.formatter.showVersion' }" />
 
-            <Text class="sapUiSmallMarginBegin" text="Version 1.0.0" wrapping="true"
-                visible="{appView>/LoginHeader}" />           
+        <Button id="idUserProfile" icon="sap-icon://person-placeholder" type="Attention" press="onProfilePress" class="sapUiTinyMarginEnd" visible="{path: 'appView>/HomeScreen'}">
+          <layoutData>
+            <OverflowToolbarLayoutData priority="NeverOverflow" />
+          </layoutData>
+        </Button>
+      </HBox>
 
-            <!-- <ToolbarSpacer visible="{appView>/HomeScreen}" /> -->
-
-            <Button id="idUserProfile" icon="sap-icon://person-placeholder" type="Attention" press="onProfilePress"
-                visible="{appView>/HomeScreen}">
-                <layoutData>
-                    <OverflowToolbarLayoutData id="idOverFlowToolbar" priority="NeverOverflow" />
-                </layoutData>
-            </Button>
-    </tnt:ToolHeader>
+    </HBox>
+  </tnt:ToolHeader>
 </core:FragmentDefinition>

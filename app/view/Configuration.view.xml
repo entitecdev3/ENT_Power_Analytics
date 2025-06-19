@@ -1,11 +1,11 @@
 <mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" xmlns:layout="sap.ui.layout.form" xmlns:core="sap.ui.core" controllerName="entitec.pbi.embedding.controller.Configuration">
-  <Page showHeader="false">
+  <Page showHeader="false" backgroundDesign="Standard">
     <subHeader>
       <core:Fragment fragmentName="entitec.pbi.embedding.fragments.SubHeaderToolbar" type="XML" />
     </subHeader>
     <content>
     <!-- <Title class="sapUiSmallMargin"></Title> -->
-      <IconTabBar id="idConfigurationMenu" tabDensityMode="Inherit" backgroundDesign="Transparent" select="onIconTabBarChange">
+      <IconTabBar id="idConfigurationMenu" tabDensityMode="Compact" class="sapUiTinyMargin" backgroundDesign="Transparent" headerBackgroundDesign="Solid" select="onIconTabBarChange">
         <items>
           <IconTabFilter id="idServicePrincipalConfig" text="Service Principal " icon="sap-icon://key" design="Horizontal">
             <VBox>

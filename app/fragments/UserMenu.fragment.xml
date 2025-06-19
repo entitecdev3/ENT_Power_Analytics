@@ -1,8 +1,14 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
-	<Menu  title="" >
-		<items>
-			<MenuItem  text="{/getUserInfo/username}" icon="sap-icon://account" />
-			<MenuItem  text="Logout" icon="sap-icon://log" press="onLogOut"/>
-		</items>
-	</Menu>
+    <Menu>
+        <items>
+            <MenuItem text="{userInfo>/username}" icon="sap-icon://account" />
+            <MenuItem text="{i18n>THEME}" icon="sap-icon://palette">
+				<items>
+					<MenuItem  text="{i18n>dark}" icon="sap-icon://navigation-right-arrow" press="onThemeChangeDark"/>
+					<MenuItem text="{i18n>light}" icon="sap-icon://navigation-right-arrow" press="onThemeChange"/>
+				</items>
+			</MenuItem>
+            <MenuItem text="Logout" icon="sap-icon://log" press="onLogOut"/>
+        </items>
+    </Menu>
 </core:FragmentDefinition>

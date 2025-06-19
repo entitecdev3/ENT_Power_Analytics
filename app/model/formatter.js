@@ -4,7 +4,7 @@ sap.ui.define([], function () {
   return {
     formatRoles: function (roles) {
       if (!roles || roles.length === 0) return "";
-      return roles.map(r => r.name).join(", ");
+      return roles.map((r) => r.name).join(", ");
     },
     formatCompanyDisplay: function (ID, aData) {
       let oCompany = aData?.find((company) => company.ID === ID);
@@ -27,14 +27,14 @@ sap.ui.define([], function () {
       }
       return "";
     },
-    formatSchemaName: function(schema){
-      if(schema && schema.includes("basic")){
+    formatSchemaName: function (schema) {
+      if (schema && schema.includes("basic")) {
         return "Basic";
-      }else{
-        return '';
+      } else {
+        return "";
       }
     },
-    formatSecurityFilters: function (ID, filterData){
+    formatSecurityFilters: function (ID, filterData) {
       if (ID && filterData) {
         let oFilter = filterData?.find((filter) => filter.ID === ID);
         if (oFilter) {
@@ -42,6 +42,15 @@ sap.ui.define([], function () {
         }
       }
       return "";
-    }
+    },
+    showLogo: function (isLogin, isHome, isPhone) {
+      // Show logo: on login OR (on home screen and not phone)
+      return isLogin || (isHome && !isPhone);
+    },
+
+    showVersion: function (isLogin, isPhone) {
+      // Show version: only on login and not on phone
+      return isLogin && !isPhone;
+    },
   };
 });
