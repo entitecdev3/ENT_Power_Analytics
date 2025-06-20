@@ -5,7 +5,7 @@
 >
     <VBox alignItems="Center" fitContainer="true" height="100%" class="sapUiContentPadding">
 
-        <Table id="idConfigSecurityFilterTable" mode="Delete" alternateRowColors="true" items="{path: '/SecurityFilters', parameters: { $$updateGroupId: 'SecurityFilterChanges' }}" fixedLayout="true" delete="onDeleteSecurityFilterConfig">
+        <Table id="idConfigSecurityFilterTable" autoPopinMode="true" mode="Delete" alternateRowColors="true" items="{path: '/SecurityFilters', parameters: { $$updateGroupId: 'SecurityFilterChanges' }}" fixedLayout="true" delete="onDeleteSecurityFilterConfig">
             <headerToolbar>
                 <Toolbar>
                     <Title text="Manage Security Filters" level="H3"/>

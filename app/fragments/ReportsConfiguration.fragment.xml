@@ -1,7 +1,7 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:layout="sap.ui.layout.form">
   <VBox alignItems="Stretch" fitContainer="true" height="100%" class="sapUiContentPadding">
 
-    <Table id="idRCConfigTable" mode="Delete" alternateRowColors="true"
+    <Table id="idRCConfigTable" mode="Delete" autoPopinMode="true" alternateRowColors="true"
       items="{
       path : '/ReportsExposed', 
       parameters: {
@@ -30,25 +30,25 @@
         <Column>
           <Text text="Service Principal" />
         </Column>
-        <Column>
+        <Column demandPopin="true" minScreenWidth="Tablet" priority="Low">
           <Text text="Report Name" />
         </Column>
-        <Column>
+        <Column demandPopin="true" minScreenWidth="Tablet" priority="Low">
           <Text text="Workspace Name" />
         </Column>
-        <Column>
+        <Column demandPopin="true" minScreenWidth="Tablet" priority="Low">
           <Text text="Description"></Text>
         </Column>
-        <Column>
+        <Column demandPopin="true" minScreenWidth="Tablet" priority="Low">
           <Text text="Security Filters"></Text>
         </Column>
-        <Column>
+        <Column demandPopin="true" minScreenWidth="Tablet" priority="Low">
           <Text text="Roles"></Text>
         </Column>
-        <Column>
+        <Column demandPopin="true" minScreenWidth="Tablet" priority="Low">
           <Text text="External Roles"></Text>
         </Column>
-        <Column>
+        <Column demandPopin="false">
           <Text text="" />
         </Column>
       </columns>

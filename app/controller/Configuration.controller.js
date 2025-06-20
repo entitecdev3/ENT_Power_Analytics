@@ -383,6 +383,7 @@ sap.ui.define(
                   if (sAction === MessageBox.Action.OK) {
                     oModel.resetChanges("ReportsChanges");
                     oModel.refresh();
+                    that.onChangeHighlightTableRow("idRCConfigTable");
                     that.visSaveDiscardButton('ReportsChanges');
                   }
                 },

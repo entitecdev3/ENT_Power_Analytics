@@ -4,7 +4,7 @@
       <core:Fragment fragmentName="entitec.pbi.embedding.fragments.SubHeaderToolbar" type="XML" />
     </subHeader>
     <content>
-      <Table id="idTableUsers" updateFinished=".onUpdateFinished" mode="Delete" items="{path: '/Users', parameters: { $$updateGroupId: 'UserChanges' }}" fixedLayout="false" alternateRowColors="true" delete="onDeleteUser">
+      <Table id="idTableUsers" autoPopinMode="true" updateFinished=".onUpdateFinished" mode="Delete" items="{path: '/Users', parameters: { $$updateGroupId: 'UserChanges' }}" fixedLayout="false" alternateRowColors="true" delete="onDeleteUser">
 
         <headerToolbar>
           <Toolbar id="lineItemsToolbar">
