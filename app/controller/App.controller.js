@@ -38,6 +38,11 @@ sap.ui.define([
         oViewModel.setProperty("/User", JSON.parse(sUser));
       }
 
+      let selectedTheme = sessionStorage.theme
+          ? sessionStorage.theme
+          : "sap_horizon_dark";
+        sap.ui.getCore().applyTheme(selectedTheme);
+
     },
 
 

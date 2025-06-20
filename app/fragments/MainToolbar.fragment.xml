@@ -4,7 +4,7 @@
 
       <!-- LEFT SECTION: Logo -->
       <HBox width="150px" alignItems="Center" justifyContent="Start">
-        <Image src="./images/logo_medium.png" width="130px" height="30px" class="sapUiTinyMarginBegin" visible="{ parts: ['appView>/LoginHeader', 'appView>/HomeScreen', 'device>/system/phone'], formatter: '.formatter.showLogo' }" />
+        <Image src="./images/logo_medium.png" width="130px" height="30px" class="" visible="{ parts: ['appView>/LoginHeader', 'appView>/HomeScreen', 'device>/system/phone'], formatter: '.formatter.showLogo' }" />
       </HBox>
 
       <!-- CENTER SECTION: Title (Responsive) -->

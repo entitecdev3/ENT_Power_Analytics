@@ -43,7 +43,7 @@ html {
 
 .tileLayout {
   border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(199, 187, 187, 0.08);
+  /* box-shadow: 0 4px 12px rgba(199, 187, 187, 0.08); */
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   background-color: var(--sapTile_Background);
 }
@@ -61,7 +61,7 @@ html {
 .dark-theme .tileLayout {
   background-color: #1f1f1f;
   color: white;
-  border: 1px solid #333;
+  /* border: 1px solid #333; */
 }
 
 .dark-theme .sapMText,

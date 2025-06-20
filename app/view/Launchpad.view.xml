@@ -5,7 +5,7 @@
     <MessageStrip text="Apps" type="Information" class="sapUiTinyMarginBegin sapUiTinyMarginEnd sapUiMediumMarginTop" />
 
     <FlexBox direction="Row" wrap="Wrap" justifyContent="Start" class="sapUiSmallMargin tileContainer">
-      <GenericTile frameType="OneByOne" class="tileLayout" header="Report" subheader="Power BI Embedded" tooltip="Open Report" id="idReport" press="press">
+      <GenericTile frameType="OneByOne" class="--sapTile_Hover_Background tileLayout" header="Report" subheader="Power BI Embedded" tooltip="Open Report" id="idReport" press="press">
         <TileContent>
           <ImageContent src="sap-icon://filter-analytics" />
         </TileContent>
@@ -17,13 +17,13 @@
 
     <FlexBox direction="Row" wrap="Wrap" justifyContent="Start" class="sapUiSmallMargin tileContainer">
 
-      <GenericTile frameType="OneByOne" class="tileLayout" header="Configuration" subheader="Settings Overview" tooltip="View Configuration" id="idConfiguration" press="press">
+      <GenericTile frameType="OneByOne" class="--sapTile_Hover_Background tileLayout" header="Configuration" subheader="Settings Overview" tooltip="View Configuration" id="idConfiguration" press="press">
         <TileContent>
           <ImageContent src="sap-icon://action-settings" />
         </TileContent>
       </GenericTile>
 
-      <GenericTile frameType="OneByOne" class="tileLayout" header="Register Users" subheader="Manage Access" tooltip="Add or remove users" id="idUser" press="press">
+      <GenericTile frameType="OneByOne" class="--sapTile_Hover_Background tileLayout" header="Register Users" subheader="Manage Access" tooltip="Add or remove users" id="idUser" press="press">
         <TileContent>
           <ImageContent src="sap-icon://account" />
         </TileContent>
