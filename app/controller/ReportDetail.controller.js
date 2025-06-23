@@ -1,9 +1,6 @@
 sap.ui.define(
-  [
-    "entitec/pbi/embedding/controller/BaseController",
-    "sap/ui/core/routing/History",
-  ],
-  function (BaseController, History) {
+  ["entitec/pbi/embedding/controller/BaseController", "sap/ui/Device"],
+  function (BaseController, Device) {
     "use strict";
 
     return BaseController.extend(
@@ -21,15 +18,25 @@ sap.ui.define(
           oViewModel.setProperty("/navVisible", true);
           oViewModel.setProperty("/LoginHeader", false);
           oViewModel.setProperty("/HomeScreen", true);
-          oViewModel.setProperty("/subHeaderTitle", oViewModel.getProperty("/selectedReport/description"))
+          oViewModel.setProperty(
+            "/subHeaderTitle",
+            oViewModel.getProperty("/selectedReport/description")
+          );
           this.getView().getModel().refresh(); // optional
           const sReportId = oEvent.getParameter("arguments").reportId;
           const oModel = this.getView().getModel("powerBi");
+          let sDeviceType = "desktop";
+          if (Device.system.phone) {
+            sDeviceType = "phone";
+          } else if (Device.system.tablet) {
+            sDeviceType = "tablet";
+          }
 
           try {
             const oBinding = oModel.bindContext(
               `/ReportsExposed('${sReportId}')/PowerBiService.getEmbedDetails(...)`
             );
+            oBinding.setParameter("deviceType", sDeviceType);
 
             await oBinding.execute(); // Executes the function call
 

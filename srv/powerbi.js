@@ -55,11 +55,11 @@ module.exports = cds.service.impl(async function () {
     return undefined;
   }
 
-  this.on("READ", PowerBi, async (req, next)=>{
+  this.on("READ", PowerBi, async (req, next) => {
     let data = await next();
 
     if (Array.isArray(data)) {
-      data.forEach(entry => {
+      data.forEach((entry) => {
         if (entry.clientSecret) {
           entry.clientSecret = maskSecret(entry.clientSecret);
         }
@@ -73,6 +73,7 @@ module.exports = cds.service.impl(async function () {
   this.on("getEmbedDetails", async (req) => {
     const db = cds.db;
     const reportExposedId = req.params[0];
+    const deviceType = req.data.deviceType || "desktop";
 
     try {
       const reportDetails = await db.run(
@@ -160,6 +161,13 @@ module.exports = cds.service.impl(async function () {
         requireSingleSelection: f.requireSingleSelection,
       }));
 
+      let layoutType = "Custom";
+      let expanded = true;
+      if (deviceType === "phone") {
+        layoutType = "MobilePortrait";
+        expanded = false
+      } else if (deviceType === "tablet") layoutType = "Master";
+
       const embedHTML = `
         <div id="reportContainer" style="height:100%;width:100%"></div>
         <script src="https://cdn.jsdelivr.net/npm/powerbi-client@2.19.1/dist/powerbi.js"></script>
@@ -167,21 +175,19 @@ module.exports = cds.service.impl(async function () {
           var models = window['powerbi-client'].models;
           var embedConfiguration = {
             type: 'report',
-            tokenType: models.TokenType.Embed,
+            tokenType: models.TokenType.Embed,            
             accessToken: '${embedToken}',
             embedUrl: '${embedInfo.embedUrl}',
             settings: {
+              layoutType: models.LayoutType.${layoutType},
               panes: {
-                filters: { visible: true, expanded: true }
+                filters: { visible: true, expanded: ${expanded} }
               }
             }
           };
           var reportContainer = document.getElementById('reportContainer');
           var report = powerbi.embed(reportContainer, embedConfiguration);
 
-          report.on("loaded", function () {
-            
-          });
         </script>
       `;
 
@@ -440,8 +446,8 @@ module.exports = cds.service.impl(async function () {
           displaySettings: {
             isLockedInViewMode: def.displaySetting_isLockedInViewMode,
             isHiddenInViewMode: def.displaySetting_isHiddenInViewMode,
-            displayName: def.displaySetting_displayName
-          }
+            displayName: def.displaySetting_displayName,
+          },
         };
       });
 
@@ -455,7 +461,8 @@ module.exports = cds.service.impl(async function () {
           tokenType: models.TokenType.Embed,
           accessToken: '${embedToken}',
           embedUrl: '${embedInfo.embedUrl}',
-          settings: {
+          settings: {          
+            layoutType: models.LayoutType.MobilePortrait,
             panes: {
               filters: { visible: true, expanded: true }
             }
