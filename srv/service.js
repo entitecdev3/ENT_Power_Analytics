@@ -1,5 +1,6 @@
 const bcrypt = require("bcryptjs"); // Use bcryptjs instead of bcrypt
 const axios = require("axios");
+const { validate: isUUID } = require('uuid');
 
 function maskSecret(secret) {
   if (!secret || secret.length <= 3) return "***";
@@ -42,42 +43,107 @@ module.exports = cds.service.impl(async function () {
   });
 
   this.on("READ", MyReports, async (req) => {
-    // 1. Get user's role_ID
-    const user = await SELECT.one
-      .from(Users)
-      .where({ username: req.user.username })
-      .columns('role_ID');
-
-    if (!user || !user.role_ID) return []; // Defensive check
-
-    // 2. Get the role name
-    const userRole = await SELECT.one
-      .from(Roles)
-      .where({ ID: user.role_ID })
-      .columns('name');
-
-    if (!userRole || !userRole.name) return []; // Defensive check
-
-    // 3. Conditionally run query based on role
-    let reports;
-
-    if (userRole.name === 'Admin') {
-      // Admin gets all reports
-      reports = await SELECT.from(ReportsExposed).columns(['ID', 'workspaceId', 'servicePrincipal_ID', 'externalRoles', 'description']);
-    } else {
-      // Non-admins: Filter reports by role
+    const userInfo = req.user || cds.context.user;
+  
+    if (!userInfo || !userInfo.id) {
+      req.reject(401, "Unauthorized: Missing user info");
+      return;
+    }
+  
+    const userId = userInfo.id;
+    const db = cds.db;
+  
+    // Utility: Normalize any structure to lowercase array of strings
+    const normalizeRoles = (val) => {
+      if (Array.isArray(val)) return val.map(r => r.toLowerCase());
+      if (typeof val === 'object' && val !== null) return Object.keys(val).map(r => r.toLowerCase());
+      if (typeof val === 'string') return val.split(',').map(r => r.trim().toLowerCase());
+      return [];
+    };
+  
+    // Case 1: Traditional login (UUID id)
+    if (isUUID(userId)) {
+      const user = await SELECT.one
+        .from(Users)
+        .where({ ID: userId })
+        .columns('role_ID');
+  
+      if (!user || !user.role_ID) {
+        req.reject(403, "Forbidden: No role assigned to user");
+        return;
+      }
+  
+      const role = await SELECT.one
+        .from(Roles)
+        .where({ ID: user.role_ID })
+        .columns('name');
+  
+      if (!role || !role.name) {
+        req.reject(403, "Forbidden: Role not found");
+        return;
+      }
+  
+      const isAdmin = role.name.toLowerCase() === 'admin';
+  
+      if (isAdmin) {
+        return await SELECT
+          .from(ReportsExposed)
+          .columns('ID', 'workspaceId', 'servicePrincipal_ID', 'externalRoles', 'description');
+      }
+  
       const subQuery = SELECT
         .from(ReportsToRoles)
         .columns('report_ID')
         .where({ role_ID: user.role_ID });
-
-      reports = await SELECT
+  
+      return await SELECT
         .from(ReportsExposed)
-        .where({ ID: { in: subQuery } }).columns(['ID', 'workspaceId', 'servicePrincipal_ID', 'externalRoles', 'description']);
+        .where({ ID: { in: subQuery } })
+        .columns('ID', 'workspaceId', 'servicePrincipal_ID', 'externalRoles', 'description');
     }
-
-    return reports;
+  
+    // Case 2: SSO login (non-UUID)
+    const userRoles = normalizeRoles(userInfo.roles);          
+    const userExternalRoles = normalizeRoles(userInfo.externalRoles); 
+  
+    const allReports = await SELECT.from(ReportsExposed)
+      .columns('ID', 'workspaceId', 'servicePrincipal_ID', 'externalRoles', 'description');
+  
+    const matched = [];
+  
+    for (const report of allReports) {
+      // Match externalRoles
+      if (!report.externalRoles) continue;
+  
+      const reportExternalRoles = report.externalRoles
+        .split(',')
+        .map(r => r.trim().toLowerCase());
+  
+      const matchesExternal = reportExternalRoles.some(r => userExternalRoles.includes(r));
+      if (!matchesExternal) continue; // Must match external roles
+  
+      // Match linked Roles
+      const reportRoleLinks = await SELECT.from(ReportsToRoles)
+        .where({ report_ID: report.ID })
+        .columns('role_ID');
+  
+      const linkedRoleNames = await SELECT.from(Roles)
+        .where({ ID: { in: reportRoleLinks.map(r => r.role_ID) } })
+        .columns('name');
+  
+      const matchesInternal = linkedRoleNames
+        .map(r => r.name.toLowerCase())
+        .some(name => userRoles.includes(name));
+  
+      if (matchesInternal) {
+        matched.push(report); // ✅ Only if both external & internal matched
+      }
+    }
+  
+    return matched;
   });
+  
+
 
   this.on("getCustomAttrbute", async (req) => {
     const db = srv.tx(req);
@@ -97,6 +163,7 @@ module.exports = cds.service.impl(async function () {
     return {
       username: user.username,
       roles: user.roles || [],
+      referer: user.referer
     };
   });
 
@@ -261,9 +328,8 @@ module.exports = cds.service.impl(async function () {
           );
 
           report.workspaceName = workspace?.name || "Unknown Workspace";
-          report.workspaceUrl = `${
-            config.tenantUrl || "https://app.powerbi.com"
-          }/groups/${report.workspaceId}`;
+          report.workspaceUrl = `${config.tenantUrl || "https://app.powerbi.com"
+            }/groups/${report.workspaceId}`;
           report.reportName = matchedReport?.name || "Unknown Report";
           report.reportUrl = `${report.workspaceUrl}/reports/${report.reportId}`;
         } catch (err) {
@@ -285,46 +351,6 @@ module.exports = cds.service.impl(async function () {
 
 });
 
-// Step 6: Enrich and return base reports with nested filters & Power BI data
-// return baseReports.map(r => {
-//   const pbi = powerBiData[r.servicePrincipal_ID];
-//   const workspace = pbi?.workspaces.find(w => w.id === r.workspaceId);
-//   const report = pbi?.reportsByWorkspaceId?.[r.workspaceId]?.find(rep => rep.id === r.reportId);
 
-//   return {
-//     ...r,
-//     // servicePrincipal: { ID: r.servicePrincipal_ID },
-//     workspaceName: workspace?.name,
-//     reportName: report?.name,
-//     workspaceUrl: workspace ? `${pbi.tenantUrl}/groups/${workspace.id}` : "",
-//     reportUrl: report && workspace ? `${pbi.tenantUrl}/groups/${workspace.id}/reports/${report.id}` : "",
-//     // securityFilters: filtersByReportId[r.ID] || []
-//   };
 
-//  this.on('READ', ReportsExposed, async (req, next) => {
-//     // Example logic
-//     const data = await next();
-//     // each.reportName = await getReportNameFromPowerBI(reportId);
-//     // each.workspaceName = await getWorkspaceNameFromPowerBI(workspaceId);
-//     // each.reportUrl = `https://app.powerbi.com/reports/${each.reportName}`;
-//     // each.workspaceUrl = `https://app.powerbi.com/groups/${each.workspaceName}`;
 
-//     for (const row of data) {
-//       row.reportName = await getReportNameFromPowerBI(row.reportId);
-//       row.workspaceName = await getWorkspaceNameFromPowerBI(row.workspaceId);
-//       row.reportUrl = `https://app.powerbi.com/groups/${row.workspaceId}/reports/${row.reportId}`;
-//       row.workspaceUrl = `https://app.powerbi.com/groups/${row.workspaceId}`;
-//     }
-
-//   return data;
-//   });
-
-//   async function getReportNameFromPowerBI(reportId) {
-//     // Call your Power BI API or mapping logic
-//     return 'Sample Report';
-//   }
-
-//   async function getWorkspaceNameFromPowerBI(workspaceId) {
-//     return 'Sample Workspace';
-// }
-// });

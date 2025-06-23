@@ -7,7 +7,7 @@ sap.ui.define(
     "sap/ui/core/Fragment",
     "sap/m/MessageBox",
     "sap/ui/Device",
-    "entitec/pbi/embedding/model/formatter",
+    "entitec/pbi/embedding/model/formatter"
   ],
   function (
     Controller,
@@ -81,36 +81,54 @@ sap.ui.define(
         /**
          * Navigates back to the previous page if available, else navigates to the home page
          */
-        onNavBack: function () {
-          var oHistory = History.getInstance();
-          var sPreviousHash = oHistory.getPreviousHash();
+        onNavBack: async function () {
+          const oHistory = History.getInstance();
+          const sPreviousHash = oHistory.getPreviousHash();
+          const refererPort = this.getModel("config").getProperty("/refererPort");
+          const host = window.location.hostname;
+          const protocol = window.location.protocol;
+          
 
-          if (sPreviousHash !== undefined) {
-            window.history.go(-1);
+          const userInfo = await this.getView().getModel().bindContext("/getUserInfo()").requestObject();
+          const source = userInfo?.referer;
+          const redirectUrl = `${source}#/Apps`;
+          // Check if user came from eComm (i.e., no internal nav history)
+          if (!sPreviousHash) {
+            this.middleWare
+              .callMiddleWare("/logout", "POST")
+              .then(() => {
+                window.location.href = redirectUrl;
+              })
+              .catch((oError) => {
+                window.location.href = redirectUrl;
+              });
           } else {
-            this.getRouter().navTo("Apps", {}, true);
+            // Regular back nav inside Analytics
+            window.history.go(-1);
           }
         },
-        onLogOut: function (oEvent) {
-          var that = this;
-          this.middleWare
-            .callMiddleWare("/logout", "POST")
-            .then(function (oData) {
-              window.location.href = "/";
-              sessionStorage.removeItem("LoggedInUser");
-              that.getRouter().navTo("Login");
-            })
-            .catch(function (oError) {
-              sessionStorage.removeItem("LoggedInUser");
-              that.getRouter().navTo("Login"); // Redirect to login on failure
-              window.location.href = "/";
-              var oViewModel = this.getView().getModel("appView");
-              oViewModel.setProperty("/LoginHeader", true); // Show login header
-              oViewModel.setProperty("/HomeScreen", false); // Hide home header
-              oViewModel.setProperty("/navVisible", false); // Hide back button
-              that.middleWare.errorHandler(oError, that);
-            });
-        },
+        onLogOut: async function () {
+          try {
+              // Fetch userInfo for source detection
+              const userInfo = await this.getView().getModel().bindContext("/getUserInfo()").requestObject();
+              const source = userInfo?.referer;
+      
+              // Perform analytics portal logout
+              await this.middleWare.callMiddleWare("/logout", "POST");
+      
+              // Determine redirect origin
+              if (source) {
+                  window.location.href = source;
+              } else {
+                  // Normal logout behavior
+                  this.getRouter().navTo("Login");
+              }
+      
+          } catch (err) {
+              console.error("Logout failed", err);
+              this.getRouter().navTo("Login");
+          }
+      },      
         onUserInfo: function (oEvent) {
           var oButton = oEvent.getSource(),
             oView = this.getView();

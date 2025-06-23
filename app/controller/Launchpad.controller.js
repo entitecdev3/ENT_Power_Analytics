@@ -8,19 +8,32 @@ sap.ui.define(["./BaseController"], function (BaseController) {
         .getRoute("Apps")
         .attachPatternMatched(this._matchedHandler, this);
     },
-    _matchedHandler: function () {
+    _matchedHandler: async function () {
+      var oView = this.getView();
       var oViewModel = this.getView().getModel("appView");
       oViewModel.setProperty("/navVisible", false);
       oViewModel.setProperty("/LoginHeader", false);
       oViewModel.setProperty("/HomeScreen", true);
 
       // Get role data from session storage
-      const userInfo = JSON.parse(
-        sessionStorage.getItem("LoggedInUser") || "{}"
-      );
-      const roles = userInfo.roles || {};
+      try {
+        // Fetch user info using getUserInfo() function import
+        const oBindingContext = oView.getModel().bindContext("/getUserInfo()");
+        const oUserData = await oBindingContext.requestObject();
 
-      this._setTileVisibility(roles);
+        // Optional: store in a reusable model for later (like you do in onProfilePress)
+        if (!this._userInfoModel) {
+          this._userInfoModel = new sap.ui.model.json.JSONModel(oUserData);
+        }
+
+        // Update visibility of tiles based on roles
+        const roles = oUserData.roles || {};
+        this._setTileVisibility(roles);
+
+      } catch (err) {
+        MessageToast.show("Failed to fetch user info");
+        console.error("getUserInfo() failed", err);
+      }
     },
     press: function (oEvent) {
       var id = oEvent.getSource().getId().split("--")[

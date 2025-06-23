@@ -95,7 +95,12 @@
                     "groupId": "$auto",
                     "updateGroupId": "powerBiChanges"
                 }
-            }
+            },
+            "config": {
+				"type": "sap.ui.model.json.JSONModel",
+				"uri": "utils/config.json",
+				"preload": true
+			}
         },
         "resources": {
             "css": [
