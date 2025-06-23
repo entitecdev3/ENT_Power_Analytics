@@ -2,13 +2,13 @@
   <Dialog id="idEditUsersDialog" class="sapUiResponsiveMargin">
     <VBox class="sapUiSmallMargin" >
       <Label required="true" text="{i18n>Name}" labelFor="idUserName" />
-      <Input id="idUserName" value="{username}" />
+      <Input id="idUserName" width="98%" value="{username}" />
       <Label required="true" text="{i18n>Role}" />
-      <Select id="idRolesMultiCombo" width="20vw" items="{/Roles}" forceSelection="false" selectedKey="{role_ID}">
+      <Select id="idRolesMultiCombo" width="98%" items="{/Roles}" forceSelection="false" selectedKey="{role_ID}">
         <core:Item key="{ID}" text="{name}" />
       </Select>
       <Label required="true" text="{i18n>Company_ID}" />
-      <Select width="20vw" items="{/Companies}" forceSelection="false" selectedKey="{company_ID}">
+      <Select items="{/Companies}" width="98%" forceSelection="false" selectedKey="{company_ID}">
         <core:Item key="{ID}" text="{name}" />
       </Select>
     </VBox>

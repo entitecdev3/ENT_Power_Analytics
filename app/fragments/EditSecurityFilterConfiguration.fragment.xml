@@ -13,7 +13,7 @@
             <Label text="{i18n>DISPLAY_NAME}"></Label>
             <Input value="{displaySetting_displayName}"></Input>
             <Label required="true" text="{i18n>OPERATOR}" />
-            <Select selectedKey="{operator}" width="auto" forceSelection="false" >
+            <Select selectedKey="{operator}" width="98%" forceSelection="false" >
                 <core:Item key="In" text="IN" />
                 <core:Item key="NotIn" text="NOT IN" />
                 <core:Item key="All" text="ALL" />
