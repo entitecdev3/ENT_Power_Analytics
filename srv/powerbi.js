@@ -165,8 +165,12 @@ module.exports = cds.service.impl(async function () {
       let expanded = true;
       if (deviceType === "phone") {
         layoutType = "MobilePortrait";
-        expanded = false
+        expanded = false;
       } else if (deviceType === "tablet") layoutType = "Master";
+      else if (deviceType === "phone_landscape") {
+        layoutType = "MobileLandscape";
+        expanded = false;
+      }
 
       const embedHTML = `
         <div id="reportContainer" style="height:100%;width:100%"></div>

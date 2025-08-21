@@ -26,9 +26,14 @@ sap.ui.define(
           const sReportId = oEvent.getParameter("arguments").reportId;
           const oModel = this.getView().getModel("powerBi");
           let sDeviceType = "desktop";
-          if (Device.system.phone) {
+          if (
+            sap.ui.Device.system.phone &&
+            sap.ui.Device.orientation.landscape
+          ) {
+            sDeviceType = "phone_landscape";
+          } else if (sap.ui.Device.system.phone) {
             sDeviceType = "phone";
-          } else if (Device.system.tablet) {
+          } else if (sap.ui.Device.system.tablet) {
             sDeviceType = "tablet";
           }
 
