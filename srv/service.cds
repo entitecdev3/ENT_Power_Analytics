@@ -2,7 +2,6 @@
 
 using portal.Power.Analytics.PowerBiPortal from '../db/schema';
 using auth from './auth';
-// using auth.AuthService as Auth;
 
 @requires: 'authenticated-user'
 service MyService @(path: 'MyService') {

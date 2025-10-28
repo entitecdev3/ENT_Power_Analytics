@@ -10,6 +10,7 @@ module.exports = cds.service.impl(async function () {
     ReportsExposed,
     SecurityFilters,
     ReportsToSecurityFilters,
+    Companies,
     Users,
   } = db.entities("portal.Power.Analytics.PowerBiPortal");
   const tokenCache = new Map();
@@ -74,21 +75,28 @@ module.exports = cds.service.impl(async function () {
     const db = cds.db;
     const reportExposedId = req.params[0];
     const deviceType = req.data.deviceType || "desktop";
-
+    const userInfo = req.user;
+  
+    const username = userInfo.username;
+    const portalType = userInfo.portalType;
+    const email = userInfo.email;
+    const company = userInfo.company_ID;
+  
     try {
+      // --- Fetch Report Details ---
       const reportDetails = await db.run(
         SELECT.one.from(ReportsExposed).where({ ID: reportExposedId })
       );
       if (!reportDetails)
         return req.error(500, "Power BI report details not found!");
-
+  
+      // --- Fetch Power BI Configuration ---
       const config = await db.run(
-        SELECT.one
-          .from(PowerBi)
-          .where({ ID: reportDetails.servicePrincipal_ID })
+        SELECT.one.from(PowerBi).where({ ID: reportDetails.servicePrincipal_ID })
       );
       if (!config) return req.error(500, "Power BI configuration not found.");
-
+  
+      // --- Get Azure Token ---
       const tokenResponse = await axios.post(
         `${config.authorityUrl}${config.tenantId}/oauth2/v2.0/token`,
         qs.stringify({
@@ -101,20 +109,20 @@ module.exports = cds.service.impl(async function () {
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
         }
       );
-
+  
       const azureToken = tokenResponse.data.access_token;
-
+  
+      // --- Get Embed URL and Dataset ---
       const embedUrlResponse = await axios.get(
         `${config.biApiUrl}v1.0/myorg/groups/${reportDetails.workspaceId}/reports/${reportDetails.reportId}`,
         {
-          headers: {
-            Authorization: `Bearer ${azureToken}`,
-          },
+          headers: { Authorization: `Bearer ${azureToken}` },
         }
       );
-
+  
       const embedInfo = embedUrlResponse.data;
-
+  
+      // --- Generate Embed Token ---
       const embedTokenResponse = await axios.post(
         `${config.biApiUrl}v1.0/myorg/groups/${reportDetails.workspaceId}/reports/${reportDetails.reportId}/GenerateToken`,
         {
@@ -128,9 +136,10 @@ module.exports = cds.service.impl(async function () {
           },
         }
       );
-
+  
       const embedToken = embedTokenResponse.data.token;
-
+  
+      // --- Fetch all Security Filters for this Report ---
       const reportFilters = await db.run(
         SELECT.from(SecurityFilters)
           .columns(
@@ -138,8 +147,12 @@ module.exports = cds.service.impl(async function () {
             "table",
             "column",
             "operator",
-            "values",
-            "requireSingleSelection"
+            "valueSource",
+            "customValues",
+            "requireSingleSelection",
+            "displaySetting_isLockedInViewMode",
+            "displaySetting_isHiddenInViewMode",
+            "displaySetting_displayName"
           )
           .where({
             ID: {
@@ -149,29 +162,63 @@ module.exports = cds.service.impl(async function () {
             },
           })
       );
-      const powerBIFilters = reportFilters.map((f) => ({
-        $schema: f.schema,
-        target: {
-          table: f.table,
-          column: f.column,
-        },
-        operator: f.operator,
-        values: f?.values ? f.values.split(",").map((v) => v.trim()) : [],
-        filterType: 1,
-        requireSingleSelection: f.requireSingleSelection,
-      }));
-
+  
+      // --- Prepare Power BI Filters ---
+      const powerBIFilters = [];
+      for (const f of reportFilters) {
+        let finalValues = [];
+  
+        // Apply conditional logic for each filter’s valueSource
+        if (f.valueSource === "username") {
+          finalValues = [username];
+        } else if (f.valueSource === "email") {
+          finalValues = [email];
+        } else if (f.valueSource === "company") {
+          const companyData = await db.run(
+            SELECT.one.from(Companies).where({ ID: company })
+          );
+          finalValues = companyData ? [companyData.name || companyData.ID] : [];
+        }else if (f.customValues) {
+          finalValues = f.customValues
+            .split(",")
+            .map((v) => v.trim())
+            .map((v) => (f.column?.includes("code") ? Number(v) : v));
+        }
+        
+  
+        powerBIFilters.push({
+          $schema: f.schema,
+          target: {
+            table: f.table,
+            column: f.column,
+          },
+          operator: f.operator,
+          values: finalValues,
+          filterType: 1,
+          requireSingleSelection: f.requireSingleSelection,
+          displaySettings: {
+            isLockedInViewMode: f.displaySetting_isLockedInViewMode,
+            isHiddenInViewMode: f.displaySetting_isHiddenInViewMode,
+            displayName: f.displaySetting_displayName,
+          },
+        });
+      }
+  
+      // --- Device Layout Handling ---
       let layoutType = "Custom";
       let expanded = true;
+  
       if (deviceType === "phone") {
         layoutType = "MobilePortrait";
         expanded = false;
-      } else if (deviceType === "tablet") layoutType = "Master";
-      else if (deviceType === "phone_landscape") {
+      } else if (deviceType === "tablet") {
+        layoutType = "Master";
+      } else if (deviceType === "phone_landscape") {
         layoutType = "MobileLandscape";
         expanded = false;
       }
-
+  
+      // --- Embed HTML with Filter Application ---
       const embedHTML = `
         <div id="reportContainer" style="height:100%;width:100%"></div>
         <script src="https://cdn.jsdelivr.net/npm/powerbi-client@2.19.1/dist/powerbi.js"></script>
@@ -191,16 +238,23 @@ module.exports = cds.service.impl(async function () {
           };
           var reportContainer = document.getElementById('reportContainer');
           var report = powerbi.embed(reportContainer, embedConfiguration);
-
+  
+          // Apply Filters
+          var filters = ${JSON.stringify(powerBIFilters)};
+          report.on('loaded', function() {
+            report.updateFilters(models.FiltersOperations.Replace, filters)
+                  .catch(function(errors){ console.error(errors); });
+          });
         </script>
       `;
-
+  
       return { html: embedHTML };
     } catch (error) {
       console.error("Power BI error:", error?.response?.data || error.message);
       req.error(500, "Failed to get Power BI embed details.");
     }
   });
+  
 
   this.on("checkReportAccess", async (req) => {
     const { url } = req.data;

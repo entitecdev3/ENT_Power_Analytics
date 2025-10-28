@@ -51,6 +51,24 @@ sap.ui.define(
         showToast: function (sMessage) {
           MessageToast.show(sMessage);
         },
+        _userInfoModel: null,
+        setUserInfo: async function () {
+          const oView = this.getView();
+          try {
+            const oBindingContext = oView.getModel().bindContext("/getUserInfo(...)");
+            await oBindingContext.execute();
+            const oContext = await oBindingContext.getBoundContext();
+            const oUserData = oContext.getObject();
+
+            this._userInfoModel = new sap.ui.model.json.JSONModel(oUserData);
+            this.setModel(this._userInfoModel, "userInfo");
+            this.getModel("userInfo").updateBindings();
+          }
+          catch (err) {
+            console.error("Failed to load user info");
+            return;
+          }
+        },
 
         /**
          * Retrieves the model by name
@@ -87,9 +105,13 @@ sap.ui.define(
           const refererPort = this.getModel("config").getProperty("/refererPort");
           const host = window.location.hostname;
           const protocol = window.location.protocol;
-          
 
-          const userInfo = await this.getView().getModel().bindContext("/getUserInfo()").requestObject();
+          const oView = this.getView();
+          const oBindingContext = oView.getModel().bindContext("/getUserInfo(...)");
+          await oBindingContext.execute();
+          const oContext = await oBindingContext.getBoundContext();
+          const userInfo = oContext.getObject();
+          // const userInfo = await this.getView().getModel().bindContext("/getUserInfo(...)").requestObject();
           const source = userInfo?.referer;
           const redirectUrl = `${source}#/Apps`;
           // Check if user came from eComm (i.e., no internal nav history)
@@ -97,10 +119,12 @@ sap.ui.define(
             this.middleWare
               .callMiddleWare("/logout", "POST")
               .then(() => {
-                window.location.href = redirectUrl;
+                if (source) window.location.href = redirectUrl;
+                else window.location.href = '/';
               })
               .catch((oError) => {
-                window.location.href = redirectUrl;
+                if (source) window.location.href = redirectUrl;
+                else window.location.href = '/';
               });
           } else {
             // Regular back nav inside Analytics
@@ -109,26 +133,28 @@ sap.ui.define(
         },
         onLogOut: async function () {
           try {
-              // Fetch userInfo for source detection
-              const userInfo = await this.getView().getModel().bindContext("/getUserInfo()").requestObject();
-              const source = userInfo?.referer;
-      
-              // Perform analytics portal logout
-              await this.middleWare.callMiddleWare("/logout", "POST");
-      
-              // Determine redirect origin
-              if (source) {
-                  window.location.href = source;
-              } else {
-                  // Normal logout behavior
-                  this.getRouter().navTo("Login");
-              }
-      
+            const oView = this.getView();
+            const oBindingContext = oView.getModel().bindContext("/getUserInfo(...)");
+            await oBindingContext.execute();
+            const oContext = await oBindingContext.getBoundContext();
+            const userInfo = oContext.getObject();
+            // const userInfo = await this.getView().getModel().bindContext("/getUserInfo(...)").requestObject();
+            const source = userInfo?.referer;
+
+            await this.middleWare.callMiddleWare("/logout", "POST");
+
+
+            if (source) {
+              window.location.href = source;
+            } else {
+              window.location.href = '/';
+            }
+
           } catch (err) {
-              console.error("Logout failed", err);
-              this.getRouter().navTo("Login");
+            console.error("Logout failed", err);
+            window.location.href = '/';
           }
-      },      
+        },
         onUserInfo: function (oEvent) {
           var oButton = oEvent.getSource(),
             oView = this.getView();
@@ -150,24 +176,8 @@ sap.ui.define(
           var oButton = oEvent.getSource();
           var oView = this.getView();
 
-          // Check if local model already has user info
-          if (!this._userInfoModel) {
-            // Call the function import using bindContext (only once)
-            const oBindingContext = oView
-              .getModel()
-              .bindContext("/getUserInfo()");
-            try {
-              const oUserData = await oBindingContext.requestObject();
+          await this.setUserInfo();
 
-              // Save result to a local JSONModel
-              this._userInfoModel = new sap.ui.model.json.JSONModel(oUserData);
-            } catch (err) {
-              MessageToast.show("Failed to load user info");
-              return;
-            }
-          }
-
-          // Load fragment if not already loaded
           if (!this._pPopover) {
             this._pPopover = Fragment.load({
               name: "entitec.pbi.embedding.fragments.UserMenu",
@@ -175,15 +185,10 @@ sap.ui.define(
             }).then(
               function (oPopover) {
                 oView.addDependent(oPopover);
-
-                // Set model only once here
-                oPopover.setModel(this._userInfoModel, "userInfo");
                 return oPopover;
               }.bind(this)
             );
           }
-
-          // Show the fragment
           this._pPopover.then(function (oPopover) {
             oPopover.openBy(oButton);
           });
@@ -286,7 +291,6 @@ sap.ui.define(
           let oItems = oTable?.getItems() || [];
           if (oItems && oItems.length > 0) {
             oItems.forEach((item) => {
-              // Check if the item has pending changes or not
               let bChanges = item?.getBindingContext()?.hasPendingChanges();
               if (bChanges) {
                 item?.setHighlight("Information");

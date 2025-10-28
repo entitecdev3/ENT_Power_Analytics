@@ -1,31 +1,70 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
   <Dialog id="idEditReportsExposedDialog" class="sapUiResponsiveMargin">
     <VBox class="sapUiSmallMargin">
+      <Label required="true" text="{i18n>PORTAL_TYPE}"></Label>
+      <Select 
+        id="idPortalTypeSelectReport" 
+        selectedKey="{tempReport>/ReportsExposed/portalType}" 
+        width="98%" 
+        forceSelection="true"
+        change="onPortalTypeForReportChange">
+        <core:Item key="standalone" text="Standalone" />
+        <core:Item key="embed" text="Embed" />
+      </Select>
+
       <Label required="true" text="{i18n>SERVICE_PRINCIPAL}" />
-      <ComboBox id="idServicePrincipalTypeInput" width="98%" items="{path:'/PowerBi', templateShareable:false, sorter: { path: 'biUser' }}" change="onServicePrincipalChange" selectedKey="{tempReport>/ReportsExposed/servicePrincipal_ID}">
+      <ComboBox id="idServicePrincipalTypeInput" width="98%" 
+        items="{path:'/PowerBi', templateShareable:false, sorter: { path: 'biUser' }}" 
+        change="onServicePrincipalChange" 
+        selectedKey="{tempReport>/ReportsExposed/servicePrincipal_ID}">
         <core:Item key="{ID}" text="{biUser}" />
       </ComboBox>
+
       <Label required="true" text="{i18n>WORKSPACE}" />
-      <ComboBox id="workspaceSelect" width="98%" change="onWorkspaceChange" selectedKey="{tempReport>/ReportsExposed/workspaceId}" />
+      <ComboBox id="workspaceSelect" width="98%" 
+        change="onWorkspaceChange" 
+        selectedKey="{tempReport>/ReportsExposed/workspaceId}" />
+
       <Label required="true" text="{i18n>REPORT}" />
-      <ComboBox id="reportSelect" width="98%" change="onReportChange" selectedKey="{tempReport>/ReportsExposed/reportId}" />
-        
+      <ComboBox id="reportSelect" width="98%" 
+        change="onReportChange" 
+        selectedKey="{tempReport>/ReportsExposed/reportId}" />
+
       <Label text="{i18n>SECURITY_FILTERS}" />
-      <MultiComboBox items="{/SecurityFilters}" width="98%" id="idSecurityFilters" selectionFinish="onSecurityFilterSelection">
-        <core:Item key="{ID}" text="{securityUniqueId}"></core:Item>
+      <MultiComboBox 
+        id="idSecurityFilters"
+        width="98%" 
+        items="{path:'/SecurityFilters'}"
+        selectionFinish="onSecurityFilterSelection">
+        <core:Item key="{ID}" text="{securityUniqueId}" />
       </MultiComboBox>
-      <Label text="{i18n>ROLES}" />
-      <MultiComboBox items="{/AssignableRoles}" width="98%"  id="idRoles" selectionFinish="onInternalRoleSelection">
+
+      <Label visible="true" id="idRolesLabel" text="{i18n>ROLES}" />
+      <MultiComboBox 
+        id="idRoles" 
+        width="98%" 
+        items="{/AssignableRoles}" 
+        visible="true"
+        selectionFinish="onInternalRoleSelection">
         <core:Item key="{ID}" text="{name}" />
       </MultiComboBox>
-      <Label text="{i18n>EXTERNAL_ROLES}" />
-      <MultiInput id="idExtRoles" width="98%" tokens="{path: 'tempReport>/ReportsExposed/tokens'}" showValueHelp="false" tokenUpdate="onExternalRoleUpdate" submit="onFreeTextSubmitRoles">
+
+      <Label visible="false" id="idExtRolesLabel" text="{i18n>EXTERNAL_ROLES}" />
+      <MultiInput 
+        id="idExtRoles" 
+        width="98%" 
+        tokens="{path: 'tempReport>/ReportsExposed/tokens'}" 
+        showValueHelp="false" 
+        visible="false"
+        tokenUpdate="onExternalRoleUpdate" 
+        submit="onFreeTextSubmitRoles">
         <tokens>
-          <Token text="{tempReport>text}"/>
+          <Token text="{tempReport>text}" />
         </tokens>
       </MultiInput>
-      <Label required="true" text="{i18n>Description}"></Label>
-      <Input id="idReportDescription" width="98%" value="{tempReport>/ReportsExposed/description}" ></Input>
+
+      <Label required="true" text="{i18n>Description}" />
+      <Input id="idReportDescription" width="98%" value="{tempReport>/ReportsExposed/description}" />
     </VBox>
 
     <beginButton>

@@ -28,7 +28,14 @@ sap.ui.define(
           .attachPatternMatched(this._matchedHandler, this);
       },
 
-      _matchedHandler: function () {
+      _matchedHandler: async function () {
+        await this.setUserInfo();
+        const userData = this.getModel("userInfo").getData();
+        const source = userData?.referer;
+        const redirectUrl = `${source}#/Apps`;
+        if (source) {
+          window.location.href = redirectUrl;
+        }
         var oViewModel = this.getView().getModel("appView");
         oViewModel.setProperty("/navVisible", true);
         oViewModel.setProperty("/LoginHeader", false);
@@ -232,7 +239,6 @@ sap.ui.define(
         }
         this.bindingContext = oContext;
         this._oDialog.setTitle(title);
-        // this.byId("idAdd").setText(button);
         this._oDialog.setBindingContext(oContext);
         this._oDialog.open();
       },
@@ -274,7 +280,6 @@ sap.ui.define(
             that.visSaveDiscardButton('UserChanges')
             MessageToast.show("User details updated successfully.");
             that.onChangeHighlightTableRow("idTableUsers"); // Track changes in row and highlight them
-            // oModel.refresh();
           }
         }).catch(oError => {
           MessageBox.error("Batch request failed: " + oError.message);

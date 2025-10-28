@@ -23,14 +23,11 @@ sap.ui.define(
           const oModel = this.getView().getModel();
           const wsModel = this.getView().getModel("powerBi");
 
-          // Load all reports
-          // Load all reports (filtered securely by role from backend)
           const aReports = await oModel
             .bindList("/MyReports")
             .requestContexts()
             .then((ctxs) => ctxs.map((ctx) => ctx.getObject()));
 
-          // Group reports by servicePrincipal_ID
           const configToReportsMap = {};
           aReports.forEach((report) => {
             const configId = report.servicePrincipal_ID;
@@ -40,9 +37,8 @@ sap.ui.define(
             configToReportsMap[configId].push(report);
           });
 
-          const wsMap = {}; // workspaceId -> workspaceName
+          const wsMap = {}; 
 
-          // For each config, fetch workspaces
           const allWorkspaces = await Promise.all(
             Object.keys(configToReportsMap).map(async (configId) => {
               const wsList = await wsModel

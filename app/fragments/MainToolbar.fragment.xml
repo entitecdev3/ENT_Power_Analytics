@@ -10,9 +10,6 @@
       <!-- CENTER SECTION: Title (Responsive) -->
       <HBox alignItems="Center" justifyContent="Center" class="titleBox" >
         <Title text="Power Analytics Portal" level="H3" wrapping="false" class="responsiveTitle">
-          <!-- <layoutData>
-            <FlexItemData growFactor="1" />
-          </layoutData> -->
         </Title>
       </HBox>
 

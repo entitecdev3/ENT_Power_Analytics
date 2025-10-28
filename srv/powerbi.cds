@@ -18,7 +18,7 @@ service PowerBiService @(path: '/powerbi/PowerBiService') {
   entity PowerBi                  as projection on pa.PowerBi;
 
   @(requires: ['Admin'])
-  action checkReportAccess(url : String) returns AccessStatus;
+  action checkReportAccess(url : String)            returns AccessStatus;
 
   @(requires: ['Admin'])
   entity Users                    as projection on pa.Users;
@@ -42,7 +42,6 @@ service PowerBiService @(path: '/powerbi/PowerBiService') {
                                           filters : array of {
         table                  : String;
         column                 : String;
-        values                 : array of String;
       })                                                 returns EmbedDetails;
     };
 
@@ -66,6 +65,8 @@ service PowerBiService @(path: '/powerbi/PowerBiService') {
         configId    : UUID;
         workspaceId : UUID;
   }
+
+ 
 
 
 }

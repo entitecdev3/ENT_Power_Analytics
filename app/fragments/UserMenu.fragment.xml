@@ -8,7 +8,7 @@
 					<MenuItem text="{i18n>light}" icon="sap-icon://navigation-right-arrow" press="onThemeChange"/>
 				</items>
 			</MenuItem>
-            <MenuItem text="Logout" icon="sap-icon://log" press="onLogOut"/>
+            <MenuItem text="Logout" visible="{path: 'userInfo>/referer', formatter: '.formatter.formatLogoutVisibility'}" icon="sap-icon://log" press="onLogOut"/>
         </items>
     </Menu>
 </core:FragmentDefinition>

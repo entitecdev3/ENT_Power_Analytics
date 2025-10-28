@@ -7,19 +7,24 @@ using {
 
 
 context PowerBiPortal {
-        @assert.unique: {username: [username]}
+        @assert.unique: {
+                username: [username],
+                email   : [email]
+        }
         entity Users : cuid, managed {
                 username : String(150) not null                            @mandatory;
+                email    : String(255) not null                            @mandatory;
                 company  : Association to PowerBiPortal.Companies not null @mandatory;
                 password : String(255) not null                            @mandatory;
                 role     : Association to PowerBiPortal.Roles;
         }
 
         entity Roles : cuid, managed {
-                name  : String(100);
-                users : Association to many PowerBiPortal.Users
-                                on users.role = $self;
-                reports : Association to many ReportsToRoles on reports.role = $self;
+                name    : String(100);
+                users   : Association to many PowerBiPortal.Users
+                                  on users.role = $self;
+                reports : Association to many ReportsToRoles
+                                  on reports.role = $self;
         }
 
         entity Companies : cuid, managed {
@@ -45,10 +50,14 @@ context PowerBiPortal {
         }
 
         entity ReportsExposed : cuid, managed {
+                        portalType       : String enum {
+                                standalone;
+                                embed
+                        } not null;
                         reportId         : UUID not null                                 @mandatory;
                         workspaceId      : UUID not null                                 @mandatory;
                         description      : String not null                               @mandatory;
-                        externalRoles : String(500); 
+                        externalRoles    : String(500);
                         servicePrincipal : Association to PowerBiPortal.PowerBi not null @mandatory;
                         securityFilters  : Composition of many ReportsToSecurityFilters
                                                    on securityFilters.report = $self;
@@ -62,17 +71,25 @@ context PowerBiPortal {
                 virtual workspaceUrl     : String;
         }
 
+        @assert.unique: {securityUniqueId: [securityUniqueId]}
         entity SecurityFilters : cuid, managed {
                 securityUniqueId                  : String(100) not null                                                    @mandatory;
+                portalType                        : String enum {
+                        standalone;
+                        embed
+                } not null;
+                description                       : String(100) not null                                                    @mandatory;
                 schema                            : String(100) default 'https://powerbi.com/product/schema#basic' not null @mandatory;
                 operator                          : String(50) not null                                                     @mandatory;
                 requireSingleSelection            : Boolean default false;
                 table                             : String(100) not null                                                    @mandatory;
                 column                            : String(100) not null                                                    @mandatory;
-                values                            : String(500);
+                valueSource                       : String(20);
+                customValues                      : String(1000);
                 displaySetting_isLockedInViewMode : Boolean default false;
                 displaySetting_isHiddenInViewMode : Boolean default false;
                 displaySetting_displayName        : String(100);
+
                 reports                           : Association to many ReportsToSecurityFilters
                                                             on reports.filter = $self;
         }

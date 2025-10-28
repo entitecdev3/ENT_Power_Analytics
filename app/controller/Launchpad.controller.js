@@ -9,30 +9,35 @@ sap.ui.define(["./BaseController"], function (BaseController) {
         .attachPatternMatched(this._matchedHandler, this);
     },
     _matchedHandler: async function () {
-      var oView = this.getView();
+      const oView = this.getView();
+      await this.setUserInfo();
+      const userData = this.getModel("userInfo").getData();
+      const source = userData?.referer;
+      const redirectUrl = `${source}#/Apps`;
+      if (source) {
+        window.location.href = redirectUrl;
+      }
       var oViewModel = this.getView().getModel("appView");
       oViewModel.setProperty("/navVisible", false);
       oViewModel.setProperty("/LoginHeader", false);
       oViewModel.setProperty("/HomeScreen", true);
-
-      // Get role data from session storage
       try {
-        // Fetch user info using getUserInfo() function import
-        const oBindingContext = oView.getModel().bindContext("/getUserInfo()");
-        const oUserData = await oBindingContext.requestObject();
+        const oBindingContext = oView.getModel().bindContext("/getUserInfo(...)");
+        await oBindingContext.execute();
+        const oContext = await oBindingContext.getBoundContext();
+        const oUserData = oContext.getObject();
 
-        // Optional: store in a reusable model for later (like you do in onProfilePress)
         if (!this._userInfoModel) {
           this._userInfoModel = new sap.ui.model.json.JSONModel(oUserData);
         }
 
-        // Update visibility of tiles based on roles
         const roles = oUserData.roles || {};
         this._setTileVisibility(roles);
 
       } catch (err) {
         MessageToast.show("Failed to fetch user info");
-        console.error("getUserInfo() failed", err);
+        console.error("Failed to fetch user info", err);
+        window.location.href = '/';
       }
     },
     press: function (oEvent) {

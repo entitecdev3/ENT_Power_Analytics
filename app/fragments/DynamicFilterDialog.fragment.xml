@@ -1,7 +1,6 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
   <Dialog id="dynamicFilterDialog" title="Apply Security Filters" contentWidth="auto" contentHeight="auto" resizable="true" draggable="true" class="sapUiContentPadding">
 
-    <!-- <ScrollContainer vertical="true" height="auto"> -->
     <Table items="{filters>/fields}" inset="false" fixedLayout="false" width="100%">
       <columns>
         <Column>
@@ -37,7 +36,6 @@
         </ColumnListItem>
       </items>
     </Table>
-    <!-- </ScrollContainer> -->
 
     <beginButton>
       <Button text="OK" type="Emphasized" press="._onSubmitSecurityFilters" />

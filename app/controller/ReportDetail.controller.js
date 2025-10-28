@@ -1,6 +1,6 @@
 sap.ui.define(
-  ["entitec/pbi/embedding/controller/BaseController", "sap/ui/Device"],
-  function (BaseController, Device) {
+  ["entitec/pbi/embedding/controller/BaseController", "sap/ui/Device", "sap/m/MessageToast"],
+  function (BaseController, Device, MessageToast) {
     "use strict";
 
     return BaseController.extend(
@@ -22,18 +22,18 @@ sap.ui.define(
             "/subHeaderTitle",
             oViewModel.getProperty("/selectedReport/description")
           );
-          this.getView().getModel().refresh(); // optional
+          this.getView().getModel().refresh(); 
           const sReportId = oEvent.getParameter("arguments").reportId;
           const oModel = this.getView().getModel("powerBi");
           let sDeviceType = "desktop";
           if (
-            sap.ui.Device.system.phone &&
-            sap.ui.Device.orientation.landscape
+            Device.system.phone &&
+            Device.orientation.landscape
           ) {
             sDeviceType = "phone_landscape";
-          } else if (sap.ui.Device.system.phone) {
+          } else if (Device.system.phone) {
             sDeviceType = "phone";
-          } else if (sap.ui.Device.system.tablet) {
+          } else if (Device.system.tablet) {
             sDeviceType = "tablet";
           }
 
@@ -47,7 +47,10 @@ sap.ui.define(
 
             const oContext = oBinding.getBoundContext();
             const oResult = oContext.getObject();
-
+            if (oResult.error) {
+              MessageToast.show(oResult.message || "Report forbidden.");
+              return;
+            }
             if (oResult && oResult.html) {
               const iframe = this.byId("embedHTML").getDomRef();
               const doc =

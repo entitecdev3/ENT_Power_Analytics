@@ -2,7 +2,7 @@
   <VBox alignItems="Center" fitContainer="true" height="100%" class="sapUiContentPadding">
 
     <Table id="idConfigTable" autoPopinMode="true" mode="Delete" alternateRowColors="true"
-      items="{path: '/PowerBi', parameters: { $$updateGroupId: 'ServicePrincipalChanges' }}"
+      items="{templateShareable:false, path: '/PowerBi', parameters: { $$updateGroupId: 'ServicePrincipalChanges' }}"
       fixedLayout="true" delete="onDeleteConfig">
       <headerToolbar>
         <Toolbar>
@@ -16,14 +16,14 @@
       </headerToolbar>
       <columns>
         <Column>
-          <Text text="BI Account Username" />
+          <Text text="{i18n>BIACCOUNTUSER}" />
         </Column>
         <Column>
-          <Text text="Client ID" />
+          <Text text="{i18n>CLIENT_ID}" />
         </Column>
         <Column>
           <HBox alignItems="Center" justifyContent="Start">
-            <Text text="Client Secret" />
+            <Text text="{i18n>CLIENT_SECRET}" />
             <core:Icon
               width="1rem"
               src="sap-icon://message-information"
@@ -36,10 +36,8 @@
           </HBox>
         </Column>
         <Column>
-          <Text text="Tenant ID" />
+          <Text text="{i18n>TENANT_ID}" />
         </Column>
-        <!-- <Column><Text text="Reports Exposed ID" /></Column> -->
-        <!-- <Column><Text text="" /></Column> -->
       </columns>
       <items>
         <ColumnListItem type="Active" press="onConfigSelect">
@@ -48,9 +46,6 @@
             <Text text="{clientId}" />
             <Text text="{clientSecret}" />
             <Text text="{tenantId}" />
-            <!-- <Text text="{reportsExposedId}" /> -->
-            <!-- <Button text="Make Default" tooltip="Make this Service Principal as Default Service
-            Principal"></Button> -->
           </cells>
         </ColumnListItem>
       </items>

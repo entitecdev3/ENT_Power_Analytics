@@ -39,27 +39,33 @@ sap.ui.define(
 
       onMessageBindingChange: function (oEvent) {
         const aContexts = oEvent.getSource().getContexts();
-        var bMessageOpen = false;
         if (!aContexts.length) {
           return;
         }
-        this.bError = false;
-        // Collect technical messages
-        const aMessages = aContexts.map(function (oContext) {
-          return oContext.getObject();
-        });
-
-        const bUnauthorized = aMessages.some(
-          (msg) => msg.technicalDetails?.httpStatus === 401
-        );
-
+      
+        const aMessages = aContexts.map((oContext) => oContext.getObject());
+      
         sap.ui.getCore().getMessageManager().removeMessages(aMessages);
-
-        if (aMessages.length) this.bError = true;
-
-        // Build a full message text with technical details
+      
+        const bUnauthorized = aMessages.some(
+          (msg) =>
+            msg.technicalDetails?.httpStatus === 401 ||
+            (msg.message && msg.message.includes("Unauthorized"))
+        );
+      
+        if (bUnauthorized) {
+          MessageBox.error("Your session has expired. Please login again.", {
+            onClose: function () {
+              sap.ui.getCore().getMessageManager().removeAllMessages();
+              this.bError = false;
+                window.location.href = '/';
+            }.bind(this),
+          });
+          return;
+        }
+      
         const sMessageText = aMessages
-          .map((msg, idx) => {
+          .map((msg) => {
             const mainMessage =
               msg.message ||
               msg.technicalDetails?.originalMessage ||
@@ -67,27 +73,16 @@ sap.ui.define(
             const httpStatus = msg.technicalDetails?.httpStatus
               ? `\nStatus: ${msg.technicalDetails.httpStatus}`
               : "";
-            const originalMessage = msg.technicalDetails?.originalMessage
-              ? `\n${msg.technicalDetails.originalMessage}`
-              : "";
-            // return `${idx + 1}. ${mainMessage}${httpStatus}${originalMessage}`;
             return `${mainMessage}${httpStatus}`;
           })
           .join("\n");
-
+      
         MessageBox.error(sMessageText, {
           onClose: function () {
-            bMessageOpen = false;
             sap.ui.getCore().getMessageManager().removeAllMessages();
             this.bError = false;
-            if (bUnauthorized) {
-              const oRouter = this.getRouter();
-              oRouter.navTo("Login"); // Ensure route name matches your manifest
-              window.location.href = "/";
-            }
           }.bind(this),
         });
-        bMessageOpen = true;
       },
     });
   }

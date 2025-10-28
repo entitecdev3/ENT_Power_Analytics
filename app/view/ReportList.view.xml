@@ -6,7 +6,6 @@
     <content>
       <VBox class="sapUiTinyMargin sapUiResponsiveMargin">
         <VBox justifyContent="Start" items="{local>/tiles}" class="sapUiSmallMarginTop">
-          <!-- <core:Fragment fragmentName="entitec.pbi.embedding.fragments.TileItem" type="XML" /> -->
           <VBox>
             <MessageStrip visible="{= ${local>isHeader} === true }" text="{local>name}" type="Information" class="sapUiSmallMarginTop sapUiTinyMarginBottom" />
             <HBox direction="Row" wrap="Wrap" class="sapUiSmallMargin tileContainer" renderType="Div" items="{local>tiles}">
@@ -15,15 +14,12 @@
                   <core:CustomData key="reportId" value="{local>ID}" />
                 </customData>
                 <TileContent>
-                  <!-- <ImageContent src="sap-icon://business-objects-experience" /> -->
                   <NumericContent value=" " icon="sap-icon://business-objects-experience" withMargin="false"></NumericContent>
                 </TileContent>
               </GenericTile>
             </HBox>
           </VBox>
         </VBox>
-        <!-- </HBox> -->
-        <!-- </ScrollContainer> -->
       </VBox>
     </content>
   </Page>

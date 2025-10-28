@@ -8,7 +8,6 @@
 
         <headerToolbar>
           <Toolbar id="lineItemsToolbar">
-            <!-- <Title id="lineItemsHeader" text="{i18n>Users}" /> -->
             <ToolbarSpacer />
             <Button icon="sap-icon://refresh" text="{i18n>Refresh}" tooltip="{i18n>Refresh}" press="onRefreshUsers" />
             <Button text="{i18n>Add}" icon="sap-icon://add" press="onAddUser" />
@@ -17,6 +16,7 @@
 
         <columns>
           <Column><Label text="{i18n>Name}" /></Column>
+          <Column><Label text="{i18n>Email}" /></Column>
           <Column><Label text="{i18n>Company}" /></Column>
           <Column><Label text="{i18n>Role}" /></Column>
           <Column><Label text="{i18n>ResetPassword}" /></Column>
@@ -26,6 +26,7 @@
           <ColumnListItem id="idColumnlist2" type="Active" press="onUserSelect" highlight="{= ${appView>/hasChanged} ? 'Information' : 'None' }">
             <cells>
               <Text text="{username}" />
+              <Text text="{email}" />
               <Text text="{parts: [{path: 'company_ID'}, {path: 'appView>/Companies'}] , formatter: '.formatter.formatCompanyDisplay'}" />
               <Text text="{parts: [{path: 'role_ID'}, {path: 'appView>/Roles'}], formatter: '.formatter.formatRoleDisplay'}" />
               <Button id="idReset" icon="sap-icon://reset" type="Attention" text="Password" press="onResetPassword" />

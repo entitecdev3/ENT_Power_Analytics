@@ -1,7 +1,6 @@
 <mvc:View controllerName="entitec.pbi.embedding.controller.Launchpad" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:mvc="sap.ui.core.mvc" xmlns:core="sap.ui.core" xmlns="sap.m">
   <Page id="idLaunchpad" showHeader="false">
-
-    <!-- First Message Strip and Tile Section -->
+    
     <MessageStrip text="Apps" type="Information" class="sapUiTinyMarginBegin sapUiTinyMarginEnd sapUiMediumMarginTop" />
 
     <FlexBox direction="Row" wrap="Wrap" justifyContent="Start" class="sapUiSmallMargin tileContainer">
@@ -12,7 +11,7 @@
       </GenericTile>
     </FlexBox>
 
-    <!-- Second Message Strip and Tile Section -->
+
     <MessageStrip id="configMsgStrip" text="Configuration" type="Information" class="sapUiTinyMarginBegin sapUiTinyMarginEnd sapUiMediumMarginTop" />
 
     <FlexBox direction="Row" wrap="Wrap" justifyContent="Start" class="sapUiSmallMargin tileContainer">

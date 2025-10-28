@@ -44,13 +44,14 @@ module.exports = cds.service.impl(async function () {
 
   this.on("READ", MyReports, async (req) => {
     const userInfo = req.user || cds.context.user;
-  
+    const portalType = req.user.portalType;
     if (!userInfo || !userInfo.id) {
       req.reject(401, "Unauthorized: Missing user info");
       return;
     }
   
     const userId = userInfo.id;
+
     const db = cds.db;
   
     // Utility: Normalize any structure to lowercase array of strings
@@ -98,7 +99,7 @@ module.exports = cds.service.impl(async function () {
   
       return await SELECT
         .from(ReportsExposed)
-        .where({ ID: { in: subQuery } })
+        .where({ ID: { in: subQuery }, portalType: portalType })
         .columns('ID', 'workspaceId', 'servicePrincipal_ID', 'externalRoles', 'description');
     }
   
@@ -106,7 +107,7 @@ module.exports = cds.service.impl(async function () {
     const userRoles = normalizeRoles(userInfo.roles);          
     const userExternalRoles = normalizeRoles(userInfo.externalRoles); 
   
-    const allReports = await SELECT.from(ReportsExposed)
+    const allReports = await SELECT.from(ReportsExposed).where({portalType: portalType})
       .columns('ID', 'workspaceId', 'servicePrincipal_ID', 'externalRoles', 'description');
   
     const matched = [];
@@ -136,7 +137,7 @@ module.exports = cds.service.impl(async function () {
         .some(name => userRoles.includes(name));
   
       if (matchesInternal) {
-        matched.push(report); // ✅ Only if both external & internal matched
+        matched.push(report); //Only if both external & internal matched
       }
     }
   

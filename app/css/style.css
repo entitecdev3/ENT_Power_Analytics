@@ -25,7 +25,6 @@ html {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  /* animation: glow 0.5s infinite alternate; */
 }
 
 /* Mobile-specific title handling */
@@ -61,7 +60,6 @@ html {
 .dark-theme .tileLayout {
   background-color: #1f1f1f;
   color: white;
-  /* border: 1px solid #333; */
 }
 
 .dark-theme .sapMText,

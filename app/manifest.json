@@ -4,6 +4,10 @@
         "id": "entitec.pbi.embedding",
         "type": "application",
         "i18n": "i18n/i18n.properties",
+        "supportedLocales": [
+            "en"
+        ],
+        "fallbackLocale": "en",
         "applicationVersion": {
             "version": "0.0.1"
         },
@@ -97,10 +101,10 @@
                 }
             },
             "config": {
-				"type": "sap.ui.model.json.JSONModel",
-				"uri": "utils/config.json",
-				"preload": true
-			}
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "utils/config.json",
+                "preload": true
+            }
         },
         "resources": {
             "css": [

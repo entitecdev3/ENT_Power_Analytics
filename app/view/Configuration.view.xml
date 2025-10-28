@@ -4,7 +4,6 @@
       <core:Fragment fragmentName="entitec.pbi.embedding.fragments.SubHeaderToolbar" type="XML" />
     </subHeader>
     <content>
-    <!-- <Title class="sapUiSmallMargin"></Title> -->
       <IconTabBar id="idConfigurationMenu" tabDensityMode="Compact" class="sapUiTinyMargin" backgroundDesign="Transparent" headerBackgroundDesign="Solid" select="onIconTabBarChange">
         <items>
           <IconTabFilter id="idServicePrincipalConfig" text="Service Principal " icon="sap-icon://key" design="Horizontal">

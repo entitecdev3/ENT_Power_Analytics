@@ -13,8 +13,3 @@ type UserInfo {
 
 }
 
-// service AuthService {
-//   function getCustomAttrbute() returns CustomAttributes;
-//   function getUserInfo() returns UserInfo;
-// }
-
