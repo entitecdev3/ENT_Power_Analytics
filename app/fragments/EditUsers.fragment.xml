@@ -3,6 +3,8 @@
     <VBox class="sapUiSmallMargin" >
       <Label required="true" text="{i18n>Name}" labelFor="idUserName" />
       <Input id="idUserName" width="98%" value="{username}" />
+      <Label required="true" text="{i18n>Email}" labelFor="idEmail" />
+      <Input id="idEmail" width="98%" value="{email}" />
       <Label required="true" text="{i18n>Role}" />
       <Select id="idRolesMultiCombo" width="98%" items="{/Roles}" forceSelection="false" selectedKey="{role_ID}">
         <core:Item key="{ID}" text="{name}" />

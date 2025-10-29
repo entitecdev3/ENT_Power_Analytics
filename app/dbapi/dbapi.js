@@ -165,6 +165,10 @@ sap.ui.define(
                     });
                   }
                   var text = JSON.parse(jqr).error;
+                } else if(jqr.includes('Invalid username or password')) {
+                  var oMessage = JSON.parse(jqr).message;
+                  MessageBox.error(oMessage);
+                  return;
                 } else if (
                   JSON.parse(jqr).response.text &&
                   JSON.parse(JSON.parse(jqr).response.text).error.message
