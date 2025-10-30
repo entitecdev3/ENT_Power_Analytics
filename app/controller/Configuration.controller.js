@@ -192,6 +192,9 @@ sap.ui.define(
           let oSelectedContext = oEvent.getSource().getBindingContext();
           this._oSelectedReportContext = oSelectedContext; // store globally
 
+          if(this._oSelectedReportContext.getObject()['@$ui5.context.isTransient'] === true){
+            this.addReport = true;
+          }
           const oNewReport = { ReportsExposed: oSelectedContext.getObject() };
 
           const oTempModel = new sap.ui.model.json.JSONModel(oNewReport);
@@ -312,6 +315,9 @@ sap.ui.define(
             delete reportObject.tokens;
           }
           if (this.addReport) {
+            if(this._oSelectedReportContext?.getObject()['@$ui5.context.isTransient'] === true){
+              this._oSelectedReportContext.delete();
+            }
             this.aReportCreateContext = oTable.create(reportObject);
           } else if (this._oSelectedReportContext) {
             let oModel = this.getView().getModel();
@@ -520,7 +526,7 @@ sap.ui.define(
             table: f.table,
             column: f.column,
             valueSource: f.valueSource,
-            customValues: customValues
+            customValues: f.customValues
             // values: Array.isArray(f.value)
             //   ? f.value
             //   : typeof f.value === "string"
@@ -668,7 +674,7 @@ sap.ui.define(
 
           // Apply filter dynamically based on selected portalType
           const oFilter = new sap.ui.model.Filter("portalType", "EQ", sSelectedKey);
-          debugger
+          oSecurityFilterBox.setSelectedKeys([]);
           const oBinding = oSecurityFilterBox.getBinding("items");
           if (oBinding) {
             oBinding.filter([oFilter]);
@@ -854,9 +860,10 @@ sap.ui.define(
           const oWorkSpaceSelect = this.byId("reportSelect");
           oWorkSpaceSelect.unbindItems();
 
-          if (!this.addReport) {
-            this.byId("workspaceSelect").fireChange(); // Trigger workspace change to update reports
-          }
+          this.byId("workspaceSelect").fireChange();
+          // if (!this.addReport) {
+          //   this.byId("workspaceSelect").fireChange(); // Trigger workspace change to update reports
+          // }
         },
 
         onWorkspaceChange: function (oEvent) {
