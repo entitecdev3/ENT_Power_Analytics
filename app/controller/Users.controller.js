@@ -158,7 +158,7 @@ sap.ui.define(
       onPasswordChangeCancel: function () {
         this.clearPasswordFields();
         this.UserPasswordDialog.close();
-        MessageToast.show("Password change canceled.");
+        MessageToast.show(this.getModel("i18n").getProperty("passwordChangeCanceled"));
       },
       validatePassword: function (newPassword, confirmPassword) {
         var pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
@@ -222,7 +222,7 @@ sap.ui.define(
       onPasswordChangeCancel: function () {
         this.clearPasswordFields();
         this.UserPasswordDialog.close();
-        MessageToast.show("Password change canceled.");
+        MessageToast.show(this.getModel("i18n").getProperty("passwordChangeCanceled"));
       },
       onUserSelect: async function (oEvent) {
         this.addUserPress = false;
