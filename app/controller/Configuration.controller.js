@@ -192,7 +192,7 @@ sap.ui.define(
           let oSelectedContext = oEvent.getSource().getBindingContext();
           this._oSelectedReportContext = oSelectedContext; // store globally
 
-          if(this._oSelectedReportContext.getObject()['@$ui5.context.isTransient'] === true){
+          if (this._oSelectedReportContext.getObject()['@$ui5.context.isTransient'] === true) {
             this.addReport = true;
           }
           const oNewReport = { ReportsExposed: oSelectedContext.getObject() };
@@ -315,7 +315,7 @@ sap.ui.define(
             delete reportObject.tokens;
           }
           if (this.addReport) {
-            if(this._oSelectedReportContext?.getObject()['@$ui5.context.isTransient'] === true){
+            if (this._oSelectedReportContext?.getObject()['@$ui5.context.isTransient'] === true) {
               this._oSelectedReportContext.delete();
             }
             this.aReportCreateContext = oTable.create(reportObject);
@@ -525,13 +525,13 @@ sap.ui.define(
           const aFiltersPayload = aFilterFields.map((f) => ({
             table: f.table,
             column: f.column,
-            valueSource: f.valueSource,
-            customValues: f.customValues
-            // values: Array.isArray(f.value)
-            //   ? f.value
-            //   : typeof f.value === "string"
-            //     ? f.value.split(",").map((v) => v.trim())
-            //     : [],
+            // values: f.valueSource,
+            // customValues: f.customValues
+            values: Array.isArray(f.value)
+              ? f.value
+              : typeof f.value === "string"
+                ? f.value.split(",").map((v) => v.trim())
+                : [],
           }));
 
           const oModel = this.getView().getModel("powerBi");
@@ -930,7 +930,7 @@ sap.ui.define(
         onSecurityFilterSelect: async function (oEvent) {
           const oSelectedContext = oEvent.getSource().getBindingContext();
 
-          // ✅ Store the selected binding context for editing
+          //  Store the selected binding context for editing
           this._oSelectedSecurityFilterContext = oSelectedContext;
 
           // Store the selected object snapshot for rollback if needed
@@ -963,6 +963,14 @@ sap.ui.define(
 
         _updateValueSourceSelect: function (portalType) {
           const oValueSourceSelect = this.byId("idValueSourceSelect");
+
+          // Store existing selected key before destroying items
+          const sPreviousKey = oValueSourceSelect.getSelectedKey();
+
+          // Define valid keys based on portalType
+          const embedKeys = ["dynamic", "custom"];
+          const otherKeys = ["username", "email", "company", "custom"];
+
           oValueSourceSelect.destroyItems();
 
           if (portalType === "embed") {
@@ -975,7 +983,14 @@ sap.ui.define(
             oValueSourceSelect.addItem(new sap.ui.core.Item({ key: "custom", text: "Static Value(s)" }));
           }
 
-          oValueSourceSelect.setSelectedKey("");
+          // Check if previous key is valid for this portalType
+          const validKeys = portalType === "embed" ? embedKeys : otherKeys;
+
+          if (validKeys.includes(sPreviousKey)) {
+            oValueSourceSelect.setSelectedKey(sPreviousKey);
+          } else {
+            oValueSourceSelect.setSelectedKey(""); // reset only if previous key not valid
+          }
         },
 
         openSecurityFilterConfigDialog: function (title, oData) {
