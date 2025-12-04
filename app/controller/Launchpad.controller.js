@@ -57,6 +57,10 @@ sap.ui.define(["./BaseController"], function (BaseController) {
         this._oRouter.navTo("Users");
       }
 
+      if (id === "idAdministration") {
+        this._oRouter.navTo("Administration");
+      }
+
       if (id === "idReport") {
         this._oRouter.navTo("Report");
       }

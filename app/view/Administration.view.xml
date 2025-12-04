@@ -1,0 +1,36 @@
+<mvc:View controllerName="entitec.pbi.embedding.controller.Administration" xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:mvc="sap.ui.core.mvc" displayBlock="true">
+  <Page id="idAdministrationPage" backgroundDesign="Solid" showHeader="false" showFooter="true">
+    <subHeader>
+      <core:Fragment fragmentName="entitec.pbi.embedding.fragments.SubHeaderToolbar" type="XML" />
+    </subHeader>
+    <content>
+      <IconTabBar id="idAdministrationMenu" expandable="false" tabDensityMode="Compact" class="sapUiTinyMargin" backgroundDesign="Transparent" headerBackgroundDesign="Solid" select="onIconTabBarChange">
+        <!-- ========== TAB 1: USERS ========== -->
+        <items>
+          <IconTabFilter id="idTabUsers" text="Users" icon="sap-icon://account" key="users" design="Horizontal">
+            <VBox>
+              <core:Fragment fragmentName="entitec.pbi.embedding.fragments.UserAdministration" type="XML" />
+            </VBox>
+          </IconTabFilter>
+
+          <!-- ========== TAB 2: COMPANIES ========== -->
+          <IconTabFilter id="idTabCompanies" text="Companies" icon="sap-icon://building" key="companies" design="Horizontal">
+            <VBox>
+              <core:Fragment fragmentName="entitec.pbi.embedding.fragments.CompanyAdministration" type="XML" />
+            </VBox>
+          </IconTabFilter>
+        </items>
+      </IconTabBar>
+    </content>
+
+    <footer>
+      <Bar>
+        <contentRight>
+          <Button id="idSaveAdministration" text="{i18n>save}" type="Emphasized" enabled="{appView>/visSaveButton}" press="onSaveChanges" />
+          <Button id="idDiscardAdministration" text="{i18n>discard}" type="Default" enabled="{appView>/visDiscardButton}" press="onDiscardChanges" />
+        </contentRight>
+      </Bar>
+    </footer>
+
+  </Page>
+</mvc:View>

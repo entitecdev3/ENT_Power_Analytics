@@ -154,6 +154,11 @@
                     "target": "Users"
                 },
                 {
+                    "pattern": "Administration",
+                    "name": "Administration",
+                    "target": "Administration"
+                },
+                {
                     "pattern": "ServicePrincipalConfiguration",
                     "name": "ServicePrincipalConfiguration",
                     "target": "ServicePrincipalConfiguration"
@@ -210,6 +215,12 @@
                     "viewLevel": 2,
                     "layout": "OneColumn"
                 },
+                "Administration": {
+                    "viewName": "Administration",
+                    "viewId": "Administration",
+                    "viewLevel": 2,
+                    "layout": "OneColumn"
+                },
                 "ServicePrincipalConfiguration": {
                     "viewName": "ServicePrincipalConfiguration",
                     "viewId": "ServicePrincipalConfiguration",
@@ -247,6 +258,9 @@
             "id": "idApp",
             "async": true,
             "type": "XML"
+        },
+        "resourceRoots": {
+            "entitec.pbi.embedding": "./"
         },
         "handleValidation": true
     }

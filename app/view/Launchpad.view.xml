@@ -1,6 +1,6 @@
 <mvc:View controllerName="entitec.pbi.embedding.controller.Launchpad" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:mvc="sap.ui.core.mvc" xmlns:core="sap.ui.core" xmlns="sap.m">
   <Page id="idLaunchpad" showHeader="false">
-    
+
     <MessageStrip text="Apps" type="Information" class="sapUiTinyMarginBegin sapUiTinyMarginEnd sapUiMediumMarginTop" />
 
     <FlexBox direction="Row" wrap="Wrap" justifyContent="Start" class="sapUiSmallMargin tileContainer">
@@ -22,11 +22,14 @@
         </TileContent>
       </GenericTile>
 
-      <GenericTile frameType="OneByOne" class="--sapTile_Hover_Background tileLayout" header="Register Users" subheader="Manage Access" tooltip="Add or remove users" id="idUser" press="press">
+      <GenericTile frameType="OneByOne" class="--sapTile_Hover_Background tileLayout" header="Administration" subheader="Users and Companies" tooltip="Administration" id="idAdministration" press="press">
+
         <TileContent>
-          <ImageContent src="sap-icon://account" />
+          <ImageContent src="sap-icon://shield" />
         </TileContent>
       </GenericTile>
+
+
 
     </FlexBox>
   </Page>

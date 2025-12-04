@@ -1,0 +1,29 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:layout="sap.ui.layout.form">
+  <VBox alignItems="Center" fitContainer="true" height="100%" class="sapUiContentPadding">
+    <Table id="idTableCompanies" autoPopinMode="true" mode="Delete" items="{path: '/Companies', parameters: { $$updateGroupId: 'CompanyChanges' }}" fixedLayout="true" alternateRowColors="true" delete="onDeleteCompany">
+
+      <headerToolbar>
+        <Toolbar id="lineItemsToolbarCompanies">
+          <ToolbarSpacer />
+          <Button icon="sap-icon://refresh" text="{i18n>Refresh}" press="onRefreshCompanies" />
+          <Button text="{i18n>Add}" icon="sap-icon://add" press="onAddCompany" />
+        </Toolbar>
+      </headerToolbar>
+
+      <columns>
+        <Column><Label text="Company Name" /></Column>
+        <Column><Label text="Contact Details" /></Column>
+      </columns>
+
+      <items>
+        <ColumnListItem press="onCompanySelect" highlight="{= ${appView>/hasChanged} ? 'Information' : 'None' }">
+          <cells>
+            <Text text="{name}" />
+            <Text text="{contactDetails}" />
+          </cells>
+        </ColumnListItem>
+      </items>
+
+    </Table>
+  </VBox>
+</core:FragmentDefinition>

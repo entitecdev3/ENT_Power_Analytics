@@ -51,7 +51,7 @@ sap.ui.define(
       onAddUser: function () {
         this.addUserPress = true;
         this.editUserPress = false;
-        let oContext = this.byId('idTableUsers').getBinding("items").create({}, true, { groupId: "UserChanges" });
+        let oContext = this.byId('idTableRegisterUsers').getBinding("items").create({}, true, { groupId: "UserChanges" });
         this.openUserDialog("Add User", "Add", oContext);
       },
       onRefreshUsers: function () {
@@ -65,12 +65,12 @@ sap.ui.define(
                 oModel.resetChanges("UserChanges");
                 oModel.refresh();
                 that.visSaveDiscardButton('UserChanges');
-                that.onChangeHighlightTableRow("idTableUsers"); // Track changes in row and highlight them
+                that.onChangeHighlightTableRow("idTableRegisterUsers"); // Track changes in row and highlight them
               }
             }
           });
         } else {
-          that.onChangeHighlightTableRow("idTableUsers"); // Track changes in row and highlight them
+          that.onChangeHighlightTableRow("idTableRegisterUsers"); // Track changes in row and highlight them
           oModel.resetChanges("UserChanges");
           oModel.refresh();
         }
@@ -86,7 +86,7 @@ sap.ui.define(
             oContext.delete();
           }
         }
-        this.onChangeHighlightTableRow("idTableUsers"); // Track changes in row and highlight them
+        this.onChangeHighlightTableRow("idTableRegisterUsers"); // Track changes in row and highlight them
         this._oDialog.close();
       },
       onNewPasswordLiveChange: function (oEvent) {
@@ -124,7 +124,7 @@ sap.ui.define(
           this._oDialog.close();
         }
         if (this.getModel().hasPendingChanges()) {
-          this.onChangeHighlightTableRow("idTableUsers"); // Track changes in row and highlight them
+          this.onChangeHighlightTableRow("idTableRegisterUsers"); // Track changes in row and highlight them
           this.visSaveDiscardButton("UserChanges")
         }
       },
@@ -200,7 +200,7 @@ sap.ui.define(
         this.UserPasswordDialog.close();
         if (this.getView().getModel().hasPendingChanges('UserChanges')) {
           this.visSaveDiscardButton('UserChanges');
-          this.onChangeHighlightTableRow("idTableUsers"); // Track changes in row and highlight them
+          this.onChangeHighlightTableRow("idTableRegisterUsers"); // Track changes in row and highlight them
         }
       },
       clearPasswordFields: function () {
@@ -252,7 +252,7 @@ sap.ui.define(
 
         this.getModel().submitBatch("UserChanges").then(() => {
           // Retrieve all messages from the model
-          const oContext = this.byId("idTableUsers").getBinding("items");
+          const oContext = this.byId("idTableRegisterUsers").getBinding("items");
           const aMessages = this.getModel().getMessages(oContext);
 
           if (aMessages.length > 0) {
@@ -273,13 +273,13 @@ sap.ui.define(
               MessageBox.warning(sWarningMessage);
             } else {
               MessageToast.show("Batch operation completed successfully");
-              that.onChangeHighlightTableRow("idTableUsers"); // Track changes in row and highlight them
+              that.onChangeHighlightTableRow("idTableRegisterUsers"); // Track changes in row and highlight them
               that.visSaveDiscardButton('UserChanges')
             }
           } else {
             that.visSaveDiscardButton('UserChanges')
             MessageToast.show("User details updated successfully.");
-            that.onChangeHighlightTableRow("idTableUsers"); // Track changes in row and highlight them
+            that.onChangeHighlightTableRow("idTableRegisterUsers"); // Track changes in row and highlight them
           }
         }).catch(oError => {
           MessageBox.error("Batch request failed: " + oError.message);
@@ -320,7 +320,7 @@ sap.ui.define(
                 oModel.resetChanges("UserChanges");
                 oModel.refresh();
                 that.visSaveDiscardButton('UserChanges');
-                that.onChangeHighlightTableRow("idTableUsers"); // Track changes in row and highlight them
+                that.onChangeHighlightTableRow("idTableRegisterUsers"); // Track changes in row and highlight them
               }
             }
           });
