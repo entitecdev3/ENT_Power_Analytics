@@ -24,6 +24,7 @@ sap.ui.define(
           const source = userData?.referer;
           const redirectUrl = `${source}#/Apps`;
           if (source) {
+            document.activeElement.blur();
             window.location.href = redirectUrl;
           }
           let oViewModel = this.getView().getModel("appView");

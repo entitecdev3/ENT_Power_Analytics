@@ -9,6 +9,12 @@ default-*.json
 gen/
 node_modules/
 target/
+app-dist
+app_build
+electron-build
+release-builds
+service_console.txt
+db/csv/portal.Power.Analytics.PowerBiPortal-PowerBi.csv
 
 # Web IDE, App Studio
 .che/

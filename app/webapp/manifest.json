@@ -3,11 +3,15 @@
     "sap.app": {
         "id": "entitec.pbi.embedding",
         "type": "application",
-        "i18n": "i18n/i18n.properties",
-        "supportedLocales": [
-            "en"
-        ],
-        "fallbackLocale": "en",
+        "i18n": {
+            "bundleUrl": "i18n/i18n.properties",
+            "supportedLocales": [
+                "",
+                "it",
+                "en"
+            ],
+            "fallbackLocale": "en"
+        },
         "applicationVersion": {
             "version": "0.0.1"
         },
@@ -73,7 +77,13 @@
             "i18n": {
                 "type": "sap.ui.model.resource.ResourceModel",
                 "settings": {
-                    "bundleName": "entitec.pbi.embedding.i18n.i18n"
+                    "bundleName": "entitec.pbi.embedding.i18n.i18n",
+                    "supportedLocales": [
+                        "",
+                        "it",
+                        "en"
+                    ],
+                    "fallbackLocale": "en"
                 }
             },
             "": {
@@ -90,7 +100,6 @@
             "powerBi": {
                 "dataSource": "powerBiService",
                 "type": "sap.ui.model.odata.v4.ODataModel",
-                "async": "true",
                 "preload": true,
                 "settings": {
                     "synchronizationMode": "None",
@@ -258,9 +267,6 @@
             "id": "idApp",
             "async": true,
             "type": "XML"
-        },
-        "resourceRoots": {
-            "entitec.pbi.embedding": "./"
         },
         "handleValidation": true
     }

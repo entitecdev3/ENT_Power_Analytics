@@ -7,7 +7,7 @@
         $$updateGroupId: 'ReportsChanges',
         $expand: 'securityFilters($select=ID,filter_ID),roles($select=ID,role_ID)'
       },
-      templateShareable:true
+      templateShareable:false
     }" fixedLayout="true" delete="onDeleteReport">
 
       <headerToolbar>

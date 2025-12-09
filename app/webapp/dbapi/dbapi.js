@@ -160,6 +160,7 @@ sap.ui.define(
                     MessageBox.error(oMessage, {
                       actions: [MessageBox.Action.OK],
                       onClose: function () {
+                        document.activeElement.blur();
                         window.location.href = "/";
                       },
                     });
@@ -204,6 +205,7 @@ sap.ui.define(
                   MessageBox.error(oMessage, {
                     actions: [MessageBox.Action.OK],
                     onClose: function () {
+                      document.activeElement.blur();
                       window.location.href = "/";
                     },
                   });

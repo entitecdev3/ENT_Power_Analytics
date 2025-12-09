@@ -11,7 +11,8 @@
       delete="onDeleteSecurityFilterConfig"
       items="{
         path: '/SecurityFilters',
-        parameters: { $$updateGroupId: 'SecurityFilterChanges' }
+        parameters: { $$updateGroupId: 'SecurityFilterChanges' },
+        templateShareable: false
       }"
     >
       <headerToolbar>

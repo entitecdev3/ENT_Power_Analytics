@@ -1,6 +1,6 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:layout="sap.ui.layout.form">
   <VBox alignItems="Center" fitContainer="true" height="100%" class="sapUiContentPadding">
-    <Table id="idTableCompanies" autoPopinMode="true" mode="Delete" items="{path: '/Companies', parameters: { $$updateGroupId: 'CompanyChanges' }}" fixedLayout="true" alternateRowColors="true" delete="onDeleteCompany">
+    <Table id="idTableCompanies" autoPopinMode="true" mode="Delete" items="{path: '/Companies', parameters: { $$updateGroupId: 'CompanyChanges' }, templateShareable: false}" fixedLayout="true" alternateRowColors="true" delete="onDeleteCompany">
 
       <headerToolbar>
         <Toolbar id="lineItemsToolbarCompanies">

@@ -57,6 +57,7 @@ sap.ui.define(
           MessageBox.error("Your session has expired. Please login again.", {
             onClose: function () {
               sap.ui.getCore().getMessageManager().removeAllMessages();
+              document.activeElement.blur();
               this.bError = false;
                 window.location.href = '/';
             }.bind(this),

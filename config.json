@@ -1,7 +1,6 @@
 {
-    "server": {
-        "port": 4004,
-        "livereload": true
-    }
-}
+    "protocol": "http",
+    "host": "localhost",
+    "port": 4004
+  }
   

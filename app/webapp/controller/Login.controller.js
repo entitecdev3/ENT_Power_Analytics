@@ -14,8 +14,8 @@ sap.ui.define([
     },
     _matchedHandler: function () {
       this.getModel("appView").setProperty("/navVisible", false);
-      this.getModel("appView").setProperty("/LoginHeader", true); 
-      this.getModel("appView").setProperty("/HomeScreen", false); 
+      this.getModel("appView").setProperty("/LoginHeader", true);
+      this.getModel("appView").setProperty("/HomeScreen", false);
     },
     onButtonLoginPress: function (oEvent) {
       var sUsername = this.getView().byId("idUnameInput").getValue();
@@ -36,15 +36,18 @@ sap.ui.define([
         .callMiddleWare(`/Login`, "POST", payload)
         .then(function (data, status, xhr) {
           that.getView().setBusy(false);
+          sap.ui.getCore().applyChanges();   // ensure rendering is complete
+          document.activeElement.blur();      // remove focus from the active element
+
           that.getRouter().navTo("Apps");
           that.getModel().refresh();
           var oViewModel = that.getView().getModel("appView");
-          oViewModel.setProperty("/User",data.user);
+          oViewModel.setProperty("/User", data.user);
           sessionStorage.setItem("LoggedInUser", JSON.stringify(data.user));
-          oViewModel.setProperty("/LoginHeader", false);  
-          oViewModel.setProperty("/HomeScreen", true);    
-          oViewModel.setProperty("/navVisible", false);  
-          
+          oViewModel.setProperty("/LoginHeader", false);
+          oViewModel.setProperty("/HomeScreen", true);
+          oViewModel.setProperty("/navVisible", false);
+
         })
         .catch(function (jqXhr, textStatus, errorMessage) {
           that.getView().setBusy(false);

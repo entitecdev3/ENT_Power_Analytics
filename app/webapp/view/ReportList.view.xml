@@ -5,10 +5,10 @@
     </subHeader>
     <content>
       <VBox class="sapUiTinyMargin sapUiResponsiveMargin">
-        <VBox justifyContent="Start" items="{local>/tiles}" class="sapUiSmallMarginTop">
+        <VBox justifyContent="Start" items="{path: 'local>/tiles', templateShareable: false}" class="sapUiSmallMarginTop">
           <VBox>
             <MessageStrip visible="{= ${local>isHeader} === true }" text="{local>name}" type="Information" class="sapUiSmallMarginTop sapUiTinyMarginBottom" />
-            <HBox direction="Row" wrap="Wrap" class="sapUiSmallMargin tileContainer" renderType="Div" items="{local>tiles}">
+            <HBox direction="Row" wrap="Wrap" class="sapUiSmallMargin tileContainer" renderType="Div" items="{path: 'local>tiles', templateShareable: false}">
               <GenericTile sizeBehavior="Small" frameType="OneByOne" class="tileLayout" visible="{= ${local>isHeader} === false }" header="{local>description}" press="onTilePress">
                 <customData>
                   <core:CustomData key="reportId" value="{local>ID}" />

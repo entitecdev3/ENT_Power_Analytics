@@ -1,15 +1,22 @@
 {
-  "name": "ent-power-analytics",
+  "name": "entitec.pbi.embedding",
   "version": "1.0.0",
+  "main": "electron.js",
   "description": "A simple CAP project.",
   "repository": "<Add your repository here>",
   "license": "UNLICENSED",
   "private": true,
+  "build": {
+    "appId": "entitec.pbi.embedding.app",
+    "win": {
+      "target": "nsis",
+      "icon": "icon.ico"
+    }
+  },
   "dependencies": {
     "@cap-js-community/odata-v2-adapter": "^1.14.2",
     "axios": "^1.8.4",
     "bcryptjs": "^3.0.2",
-    "ent-power-analytics": "file:",
     "express": "^4",
     "express-session": "^1.18.1",
     "jsonwebtoken": "^9.0.2",
@@ -32,22 +39,44 @@
         "kind": "custom",
         "impl": "srv/custom-auth.js"
       }
+    },
+    "build": {
+      "tasks": [
+        {
+          "for": "nodejs",
+          "src": "srv",
+          "dest": "srv"
+        }
+      ]
     }
   },
   "devDependencies": {
     "@cap-js/cds-types": "^0.8.0",
     "@cap-js/sqlite": "^1",
+    "@electron/rebuild": "^3.7.2",
     "@sap/cds": "^8.9.6",
     "@sap/cds-dk": "^8.9.8",
+    "@ui5/builder": "^4.1.2",
+    "@ui5/cli": "^4.0.36",
+    "@ui5/fs": "^4.0.3",
     "connect-livereload": "^0.6.1",
+    "copyfiles": "^2.4.1",
+    "electron": "^33.4.1",
+    "electron-packager": "^17.1.2",
     "livereload": "^0.9.3",
     "nodemon": "^3.1.10"
   },
   "scripts": {
-    "build": "cds build",
-    "deploy": "cds deploy",
+    "start:dev": "concurrently \"npm run watch:cap\" \"npm run watch:ui5\" \"electron .\"",
     "start": "cds serve",
-    "watch": "nodemon custom-server.js",
-    "cds:watch": "cds watch"
+    "watch:cap": "cds watch",
+    "watch:ui5": "ui5 serve --port 4004",
+    "clean": "rimraf dist app-dist electron-build release-builds",
+    "build:cap": "cds build",
+    "build:ui5": "cd app && ui5 build --clean-dest --dest ../app-dist",
+    "copy:config": "copyfiles app/webapp/config/*.json app-dist/config",
+    "package:electron": "electron-packager . PowerAnalytics --overwrite --asar --platform=win32 --arch=x64 --out=electron-build --icon=app/icon.ico",
+    "zip:release": "powershell -Command \"if (!(Test-Path release-builds)) { New-Item -ItemType Directory -Path release-builds }; Compress-Archive electron-build\\PowerAnalytics-win32-x64 release-builds\\PowerAnalytics.zip -Force\"",
+    "build:prod": "npm run clean && npm run build:cap && npm run build:ui5 && npm run copy:config && npm run package:electron && npm run zip:release"
   }
 }

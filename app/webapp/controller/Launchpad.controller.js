@@ -1,4 +1,4 @@
-sap.ui.define(["./BaseController"], function (BaseController) {
+sap.ui.define(["./BaseController", "sap/m/MessageToast"], function (BaseController, MessageToast) {
   "use strict";
 
   return BaseController.extend("entitec.pbi.embedding.controller.Launchpad", {
@@ -15,6 +15,7 @@ sap.ui.define(["./BaseController"], function (BaseController) {
       const source = userData?.referer;
       const redirectUrl = `${source}#/Apps`;
       if (source) {
+        document.activeElement.blur();
         window.location.href = redirectUrl;
       }
       var oViewModel = this.getView().getModel("appView");
@@ -37,6 +38,7 @@ sap.ui.define(["./BaseController"], function (BaseController) {
       } catch (err) {
         MessageToast.show("Failed to fetch user info");
         console.error("Failed to fetch user info", err);
+        document.activeElement.blur();
         window.location.href = '/';
       }
     },
@@ -84,7 +86,6 @@ sap.ui.define(["./BaseController"], function (BaseController) {
       const isAdmin = roles.Admin === 1;
 
       view.byId("idConfiguration").setVisible(isAdmin);
-      view.byId("idUser").setVisible(isAdmin);
 
       const oConfigMsgStrip = view.byId("configMsgStrip");
       if (oConfigMsgStrip) {

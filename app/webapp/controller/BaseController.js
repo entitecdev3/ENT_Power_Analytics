@@ -119,10 +119,12 @@ sap.ui.define(
             this.middleWare
               .callMiddleWare("/logout", "POST")
               .then(() => {
+                document.activeElement.blur();
                 if (source) window.location.href = redirectUrl;
                 else window.location.href = '/';
               })
               .catch((oError) => {
+                document.activeElement.blur();
                 if (source) window.location.href = redirectUrl;
                 else window.location.href = '/';
               });
@@ -143,7 +145,7 @@ sap.ui.define(
 
             await this.middleWare.callMiddleWare("/logout", "POST");
 
-
+            document.activeElement.blur();
             if (source) {
               window.location.href = source;
             } else {
@@ -152,6 +154,7 @@ sap.ui.define(
 
           } catch (err) {
             console.error("Logout failed", err);
+            document.activeElement.blur();
             window.location.href = '/';
           }
         },
