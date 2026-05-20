@@ -81,7 +81,13 @@ sap.ui.define([], function () {
           return 'Standalone';
         }
       }
-    }
+    },
+    formatLanguageVisible: function (sLang, aLanguageList) {
+      if (!Array.isArray(aLanguageList)) {
+          return false;
+      }
+      return aLanguageList.includes(sLang);
+    },
 
 
   };

@@ -124,21 +124,21 @@ module.exports = cds.service.impl(async function () {
       if (!matchesExternal) continue; // Must match external roles
   
       // Match linked Roles
-      const reportRoleLinks = await SELECT.from(ReportsToRoles)
-        .where({ report_ID: report.ID })
-        .columns('role_ID');
+      // const reportRoleLinks = await SELECT.from(ReportsToRoles)
+      //   .where({ report_ID: report.ID })
+      //   // .columns('role_ID');
   
-      const linkedRoleNames = await SELECT.from(Roles)
-        .where({ ID: { in: reportRoleLinks.map(r => r.role_ID) } })
-        .columns('name');
+      // const linkedRoleNames = await SELECT.from(Roles)
+      //   .where({ ID: { in: reportRoleLinks.map(r => r.role_ID) } })
+      //   .columns('name');
   
-      const matchesInternal = linkedRoleNames
-        .map(r => r.name.toLowerCase())
-        .some(name => userRoles.includes(name));
+      // const matchesInternal = linkedRoleNames
+      //   .map(r => r.name.toLowerCase())
+      //   .some(name => userRoles.includes(name));
   
-      if (matchesInternal) {
+      // if (matchesInternal) {
         matched.push(report); //Only if both external & internal matched
-      }
+      // }
     }
   
     return matched;

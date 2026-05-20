@@ -99,6 +99,10 @@ sap.ui.define(
         /**
          * Navigates back to the previous page if available, else navigates to the home page
          */
+        onLanguageChange: function (oEvent) {
+          var oLangugae = oEvent.getSource().getKey();
+          sap.ui.getCore().getConfiguration().setLanguage(oLangugae);
+        },
         onNavBack: async function () {
           const oHistory = History.getInstance();
           const sPreviousHash = oHistory.getPreviousHash();

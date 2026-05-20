@@ -42,6 +42,7 @@ cds.on("bootstrap", (app) => {
     if (url.startsWith("/odata") ||
       url.startsWith("/powerbi") ||
       url.startsWith("/auth") ||
+      url.startsWith("/api") || 
       url.startsWith("/$batch")) return next();
     res.sendFile(path.join(uiRoot, "index.html"));
   });

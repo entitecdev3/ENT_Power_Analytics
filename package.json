@@ -33,7 +33,8 @@
         "credentials": {
           "url": "db.poweranalytics.sqlite",
           "key": "my_passphrase"
-        }
+        },
+        "schema_evolution": "false"
       },
       "auth": {
         "kind": "custom",

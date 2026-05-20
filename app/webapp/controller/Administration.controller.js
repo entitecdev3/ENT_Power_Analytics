@@ -365,7 +365,7 @@ sap.ui.define(
                 }
               } else {
                 MessageToast.show(
-                  "Service Principal details updated successfully."
+                  "User details updated successfully."
                 );
                 that.visSaveDiscardButton('UserChanges')
                 that.onChangeHighlightTableRow("idTableRegisterUsers"); // Changing the status of the table row
@@ -420,7 +420,7 @@ sap.ui.define(
                   that.visSaveDiscardButton('CompanyChanges')
                 }
               } else {
-                MessageToast.show("Report details updated successfully.");
+                MessageToast.show("Company details updated successfully.");
                 if (!that.addReport) {
                   oModel.refresh();
                 }
