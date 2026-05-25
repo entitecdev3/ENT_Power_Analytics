@@ -3,6 +3,8 @@ _out
 *.db
 *.sqlite*
 *.http
+*.env
+.vscode
 connection.properties
 default-*.json
 .cdsrc-private.json

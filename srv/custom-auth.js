@@ -24,7 +24,8 @@ module.exports = function () {
     passport.use(new LocalStrategy(async (username, password, done) => {
         try {
             const db = cds.db;
-            const user = await db.run(SELECT.one.from('portal_Power_Analytics_PowerBIPortal_Users')
+            const { Users, Roles } = cds.entities('portal.Power.Analytics.PowerBiPortal')
+            const user = await db.run(SELECT.one.from(Users)
                 .where({ username })
                 .columns(['ID', 'username', 'email', 'password', 'role_ID', 'company_ID']));
             if (!user) return done(null, false, { message: 'Invalid username or password' });
@@ -32,7 +33,7 @@ module.exports = function () {
             const validPassword = await bcrypt.compare(password, user.password);
             if (!validPassword) return done(null, false, { message: 'Invalid username or password' });
 
-            const roles = (await db.run(SELECT.from('portal_Power_Analytics_PowerBIPortal_Roles')
+            const roles = (await db.run(SELECT.from(Roles)
                 .where({ ID: user.role_ID })
                 .columns(['name']))).map(r => r.name);
 

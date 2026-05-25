@@ -6,15 +6,24 @@
   "repository": "<Add your repository here>",
   "license": "UNLICENSED",
   "private": true,
-  "build": {
-    "appId": "entitec.pbi.embedding.app",
-    "win": {
-      "target": "nsis",
-      "icon": "icon.ico"
+  "cds": {
+    "requires": {
+      "db": {
+        "kind": "postgres"
+      },
+      "hana": {
+        "kind": "hana"
+      },
+      "auth": {
+        "kind": "custom",
+        "impl": "srv/custom-auth.js"
+      }
     }
   },
   "dependencies": {
     "@cap-js-community/odata-v2-adapter": "^1.14.2",
+    "@cap-js/postgres": "^1.14.2",
+    "@sap/cds": "^8.9.6",
     "axios": "^1.8.4",
     "bcryptjs": "^3.0.2",
     "express": "^4",
@@ -25,31 +34,6 @@
     "powerbi-client": "^2.23.1",
     "sqlite3": "^5.1.7",
     "uuid": "^11.1.0"
-  },
-  "cds": {
-    "requires": {
-      "db": {
-        "kind": "sqlite",
-        "credentials": {
-          "url": "db.poweranalytics.sqlite",
-          "key": "my_passphrase"
-        },
-        "schema_evolution": "false"
-      },
-      "auth": {
-        "kind": "custom",
-        "impl": "srv/custom-auth.js"
-      }
-    },
-    "build": {
-      "tasks": [
-        {
-          "for": "nodejs",
-          "src": "srv",
-          "dest": "srv"
-        }
-      ]
-    }
   },
   "devDependencies": {
     "@cap-js/cds-types": "^0.8.0",
@@ -70,6 +54,7 @@
   "scripts": {
     "start:dev": "concurrently \"npm run watch:cap\" \"npm run watch:ui5\" \"electron .\"",
     "start": "cds serve",
+    "deploy": "cds deploy",
     "watch:cap": "cds watch",
     "watch:ui5": "ui5 serve --port 4004",
     "clean": "rimraf dist app-dist electron-build release-builds",
