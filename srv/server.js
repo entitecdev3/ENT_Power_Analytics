@@ -22,15 +22,19 @@ process.env.PORT = PORT;
 if (PROTOCOL === "https") {
   const sslKeyPath  = path.resolve(process.cwd(), process.env.SSL_KEY_PATH);
   const sslCertPath = path.resolve(process.cwd(), process.env.SSL_CERT_PATH);
+  const sslPassPhrase = process.env.SSL_PASS_PHRASE;
+
   if (!fs.existsSync(sslKeyPath) || !fs.existsSync(sslCertPath)) {
-    console.error("❌ SSL files not found at:")
-    console.error("   key :", sslKeyPath)
-    console.error("   cert:", sslCertPath)
-    process.exit(1)
+    console.log("❌ SSL files not found");
+    process.exit(1);
   }
-  const sslOptions = {
+
+  let sslOptions = {
     key  : fs.readFileSync(sslKeyPath),
-    cert : fs.readFileSync(sslCertPath)
+    cert : fs.readFileSync(sslCertPath),
+  }
+  if(sslPassPhrase){
+    sslOptions['passphrase'] = sslPassPhrase;
   }
   const _originalCreateServer = http.createServer.bind(http)
   http.createServer = function (...args) {

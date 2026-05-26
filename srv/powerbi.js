@@ -2,6 +2,11 @@ const cds = require("@sap/cds");
 const axios = require("axios");
 const qs = require("qs");
 
+function maskSecret(secret) {
+  if (!secret || secret.length <= 3) return "***";
+  return secret.slice(0, 3) + "*".repeat(secret.length - 3);
+}
+
 module.exports = cds.service.impl(async function () {
   // const { PowerBi, ReportsExposed, SecurityFilters, ReportsToSecurityFilters } = this.entities;
   const db = await cds.connect.to("db"); // explicitly connect to the DB
