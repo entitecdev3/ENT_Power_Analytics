@@ -12,7 +12,7 @@ module.exports = cds.service.impl(async function () {
     ReportsToSecurityFilters,
     Companies,
     Users,
-  } = db.entities("portal.Power.Analytics.PowerBiPortal");
+  } = this.entities;
   const tokenCache = new Map();
 
   async function getAccessToken(config) {

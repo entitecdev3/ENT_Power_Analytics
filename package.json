@@ -1,7 +1,7 @@
 {
   "name": "entitec.pbi.embedding",
   "version": "1.0.0",
-  "main": "electron.js",
+  "main": "server.js",
   "description": "A simple CAP project.",
   "repository": "<Add your repository here>",
   "license": "UNLICENSED",
@@ -28,6 +28,7 @@
     "bcryptjs": "^3.0.2",
     "express": "^4",
     "express-session": "^1.18.1",
+    "https": "^1.0.0",
     "jsonwebtoken": "^9.0.2",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
@@ -38,17 +39,9 @@
   "devDependencies": {
     "@cap-js/cds-types": "^0.8.0",
     "@cap-js/sqlite": "^1",
-    "@electron/rebuild": "^3.7.2",
-    "@sap/cds": "^8.9.6",
     "@sap/cds-dk": "^8.9.8",
-    "@ui5/builder": "^4.1.2",
     "@ui5/cli": "^4.0.36",
     "@ui5/fs": "^4.0.3",
-    "connect-livereload": "^0.6.1",
-    "copyfiles": "^2.4.1",
-    "electron": "^33.4.1",
-    "electron-packager": "^17.1.2",
-    "livereload": "^0.9.3",
     "nodemon": "^3.1.10"
   },
   "scripts": {
