@@ -120,18 +120,19 @@ sap.ui.define(
           const redirectUrl = `${source}#/Apps`;
           // Check if user came from eComm (i.e., no internal nav history)
           if (!sPreviousHash) {
-            this.middleWare
-              .callMiddleWare("/logout", "POST")
-              .then(() => {
-                document.activeElement.blur();
-                if (source) window.location.href = redirectUrl;
-                else window.location.href = '/';
-              })
-              .catch((oError) => {
-                document.activeElement.blur();
-                if (source) window.location.href = redirectUrl;
-                else window.location.href = '/';
-              });
+            this.getRouter().navTo("Apps")
+            // this.middleWare
+            //   .callMiddleWare("/logout", "POST")
+            //   .then(() => {
+            //     document.activeElement.blur();
+            //     if (source) window.location.href = redirectUrl;
+            //     else window.location.href = '/';
+            //   })
+            //   .catch((oError) => {
+            //     document.activeElement.blur();
+            //     if (source) window.location.href = redirectUrl;
+            //     else window.location.href = '/';
+            //   });
           } else {
             // Regular back nav inside Analytics
             window.history.go(-1);
