@@ -23,6 +23,12 @@
 
                     <Label text="{i18n>PASSWORD_LABEL}" design="Bold" />
                     <Input id="idPasswordInput" type="Password" placeholder="{i18n>PASSWORD_PLACEHOLDER}" submit="onButtonLoginPress" showValueHelp="true" valueHelpIconSrc="sap-icon://show" valueHelpRequest="onSeePasswordClick" maxLength="15" />
+                    
+                    <Label text="{i18n>Language}" design="Bold" />
+                    <ComboBox placeholder="{i18n>chooseLanguage}" width="auto" id="languageSelect" selectedKey="{path: 'appView>/selectLang'}" change="onLanguageChange">
+                      <core:Item key="en" text="{i18n>English}" />
+                      <core:Item key="it" text="{i18n>Italian}" />
+                    </ComboBox>
 
                     <Button text="{i18n>LOGIN_BUTTON}" type="Emphasized" press="onButtonLoginPress" />
                   </form:content>

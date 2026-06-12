@@ -6,18 +6,18 @@
     <content>
       <IconTabBar id="idConfigurationMenu" expandable="false" tabDensityMode="Compact" class="sapUiTinyMargin" backgroundDesign="Transparent" headerBackgroundDesign="Solid" select="onIconTabBarChange">
         <items>
-          <IconTabFilter id="idServicePrincipalConfig" text="Service Principal " icon="sap-icon://key" design="Horizontal">
+          <IconTabFilter id="idServicePrincipalConfig" text="{i18n>SERVICE_PRINCIPAL}" icon="sap-icon://key" design="Horizontal">
             <VBox>
               <core:Fragment fragmentName="entitec.pbi.embedding.fragments.ServicePrincipalConfiguration" type="XML" />
             </VBox>
           </IconTabFilter>
 
-          <IconTabFilter id="idReportConfig" design="Horizontal" text="Reports" icon="sap-icon://business-objects-experience">
+          <IconTabFilter id="idReportConfig" design="Horizontal" text="{i18n>REPORT}" icon="sap-icon://business-objects-experience">
             <VBox>
               <core:Fragment fragmentName="entitec.pbi.embedding.fragments.ReportsConfiguration" type="XML" />
             </VBox>
           </IconTabFilter>
-          <IconTabFilter id="idSecurityFilterConfig" design="Horizontal" text="Security Filters" icon="sap-icon://shield">
+          <IconTabFilter id="idSecurityFilterConfig" design="Horizontal" text="{i18n>SECURITY_FILTERS}" icon="sap-icon://shield">
             <VBox>
               <core:Fragment fragmentName="entitec.pbi.embedding.fragments.SecurityFilterConfiguration" type="XML" />
             </VBox>

@@ -15,9 +15,9 @@ module.exports = cds.service.impl(async function () {
     ReportsExposed,
     SecurityFilters,
     ReportsToSecurityFilters,
-    Companies,
-    Users,
+    Users
   } = this.entities;
+  const Companies = cds.entities['PowerBiPortal.Companies'];
   const tokenCache = new Map();
 
   async function getAccessToken(config) {
@@ -86,6 +86,10 @@ module.exports = cds.service.impl(async function () {
     const portalType = userInfo.portalType;
     const email = userInfo.email;
     const company = userInfo.company_ID;
+    let filters = {}
+    if(portalType == 'embed'){
+      filters = req.user.filters;
+    }
   
     try {
       // --- Fetch Report Details ---
@@ -148,6 +152,7 @@ module.exports = cds.service.impl(async function () {
       const reportFilters = await db.run(
         SELECT.from(SecurityFilters)
           .columns(
+            "portalType",
             "schema",
             "table",
             "column",
@@ -172,41 +177,57 @@ module.exports = cds.service.impl(async function () {
       const powerBIFilters = [];
       for (const f of reportFilters) {
         let finalValues = [];
-  
         // Apply conditional logic for each filter’s valueSource
-        if (f.valueSource === "username") {
-          finalValues = [username];
-        } else if (f.valueSource === "email") {
-          finalValues = [email];
-        } else if (f.valueSource === "company") {
-          const companyData = await db.run(
-            SELECT.one.from(Companies).where({ ID: company })
-          );
-          finalValues = companyData ? [companyData.name || companyData.ID] : [];
-        }else if (f.customValues) {
-          finalValues = f.customValues
-            .split(",")
-            .map((v) => v.trim())
-            .map((v) => (f.column?.includes("code") ? Number(v) : v));
+        if(portalType == 'embed'){
+          //Assign value into the filter according to table name
+          if(f.valueSource == 'dynamic' && Object.keys(filters).includes(f.table)){
+            if(Array.isArray(filters[f.table])){
+              finalValues = filters[f.table];
+            } else {
+              finalValues = [filters[f.table]];
+            }
+          } else if (f.customValues) {
+            finalValues = f.customValues
+              .split(",")
+              .map((v) => v.trim())
+              .map((v) => (f.column?.includes("code") ? Number(v) : v));
+          }
+        } else {
+          if (f.valueSource === "username") {
+            finalValues = [username];
+          } else if (f.valueSource === "email") {
+            finalValues = [email];
+          } else if (f.valueSource === "company") {
+            const companyData = await db.run(
+              SELECT.one.from(Companies).where({ID: company})
+            );
+            finalValues = companyData ? [companyData.name || companyData.ID] : [];
+          }else if (f.customValues) {
+            finalValues = f.customValues
+              .split(",")
+              .map((v) => v.trim())
+              .map((v) => (f.column?.includes("code") ? Number(v) : v));
+          }
         }
         
-  
-        powerBIFilters.push({
-          $schema: f.schema,
-          target: {
-            table: f.table,
-            column: f.column,
-          },
-          operator: f.operator,
-          values: finalValues,
-          filterType: 1,
-          requireSingleSelection: f.requireSingleSelection,
-          displaySettings: {
-            isLockedInViewMode: f.displaySetting_isLockedInViewMode,
-            isHiddenInViewMode: f.displaySetting_isHiddenInViewMode,
-            displayName: f.displaySetting_displayName,
-          },
-        });
+        if(!!finalValues.length){
+          powerBIFilters.push({
+            $schema: f.schema,
+            target: {
+              table: f.table,
+              column: f.column,
+            },
+            operator: f.operator,
+            values: finalValues,
+            filterType: 1,
+            requireSingleSelection: f.requireSingleSelection,
+            displaySettings: {
+              isLockedInViewMode: f.displaySetting_isLockedInViewMode,
+              isHiddenInViewMode: f.displaySetting_isHiddenInViewMode,
+              displayName: f.displaySetting_displayName,
+            },
+          });
+        }
       }
   
       // --- Device Layout Handling ---

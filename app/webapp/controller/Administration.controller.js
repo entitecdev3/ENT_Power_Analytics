@@ -27,8 +27,10 @@ sap.ui.define(
       },
 
       _matchedHandler: async function () {
-        await this.setUserInfo();
-        const userData = this.getModel("userInfo").getData();
+        if ( ! this.getOwnerComponent().getModel("userInfo")?.getProperty("/username")) {
+          await this.setUserInfo();
+        }  
+        const userData = this.getOwnerComponent().getModel("userInfo")?.getData();
         const source = userData?.referer;
         const redirectUrl = `${source}#/Apps`;
         if (source) {
@@ -41,7 +43,8 @@ sap.ui.define(
         oViewModel.setProperty("/HomeScreen", true);
         oViewModel.setProperty("/visSaveButton", false);
         oViewModel.setProperty("/visDiscardButton", false);
-        oViewModel.setProperty('/subHeaderTitle', 'Administration');
+        this.updateToolbarTitle();
+        // oViewModel.setProperty('/subHeaderTitle', this.getModel('i18n').getProperty('Administration'));
         this.getCallData(oViewModel, this.getView().getModel(), "/Companies", "/Companies");
         this.getCallData(oViewModel, this.getView().getModel(), "/Roles", "/Roles");
 
@@ -51,13 +54,13 @@ sap.ui.define(
         this.addUserPress = true;
         this.editUserPress = false;
         let oContext = this.byId('idTableRegisterUsers').getBinding("items").create({}, true, { groupId: "UserChanges" });
-        this.openUserDialog("Add User", "Add", oContext);
+        this.openUserDialog(this.getModel('i18n').getProperty("AddUser"), this.getModel('i18n').getProperty("Add"), oContext);
       },
       onAddCompany: function () {
         this.addCompanyPress = true;
         this.editCompanyPress = false;
         let oContext = this.byId('idTableCompanies').getBinding("items").create({}, true, { groupId: "CompanyChanges" });
-        this.openCompanyDialog("Add Company", "Add", oContext);
+        this.openCompanyDialog(this.getModel('i18n').getProperty("AddCompany"), this.getModel('i18n').getProperty("Add"), oContext);
       },
       onRefreshUsers: function () {
         var that = this;
@@ -84,7 +87,7 @@ sap.ui.define(
         var that = this;
         let oModel = this.getView().getModel();
         if (oModel.hasPendingChanges('CompanyChanges')) {
-          MessageBox.warning("Are you sure you want to reload. Your changes will be lost?", {
+          MessageBox.warning(this.getModel('i18n').getProperty('DiscardMsg'), {
             actions: [MessageBox.Action.OK, MessageBox.Action.CANCEL],
             onClose: function (sAction) {
               if (sAction === MessageBox.Action.OK) {
@@ -157,7 +160,7 @@ sap.ui.define(
         let oContext = this.bindingContext || this._oDialog.getBindingContext();
         if (this.addUserPress) {
           this.clearPasswordFields();
-          await this._handlePasswordPopup("Create Password", "OK", oContext);
+          await this._handlePasswordPopup(this.getModel('i18n').getProperty("createPassword"), this.getModel('i18n').getProperty("ok"), oContext);
           this._oDialog.close();
         }
         else {
@@ -270,7 +273,7 @@ sap.ui.define(
       onResetPassword: function (oEvent) {
         this.editUserPress = true;
         this.bindingContext = oEvent.getSource().getBindingContext();
-        this._handlePasswordPopup("Reset Password", "Update", this.bindingContext);
+        this._handlePasswordPopup(this.getModel('i18n').getProperty("ResetPassword"), this.getModel('i18n').getProperty("update"), this.bindingContext);
       },
       onPasswordChangeCancel: function () {
         this.clearPasswordFields();
@@ -281,14 +284,14 @@ sap.ui.define(
         this.addUserPress = false;
         this.editUserPress = true;
         this.bindingContext = oEvent.getSource().getBindingContext();
-        this.openUserDialog("Edit User", "Update", this.bindingContext);
+        this.openUserDialog(this.getModel('i18n').getProperty("EditUser"), this.getModel('i18n').getProperty("update"), this.bindingContext);
         this._oSelectedUserObject = JSON.parse(JSON.stringify(this.bindingContext.getObject()));
       },
       onCompanySelect: async function (oEvent) {
         this.addCompanyPress = false;
         this.editCompanyPress = true;
         this.bindingContext = oEvent.getSource().getBindingContext();
-        this.openCompanyDialog("Edit Company", "Update", this.bindingContext);
+        this.openCompanyDialog(this.getModel('i18n').getProperty("EditCompany"), this.getModel('i18n').getProperty("update"), this.bindingContext);
         this._oSelectedCompanyObject = JSON.parse(JSON.stringify(this.bindingContext.getObject()));
       },
       openUserDialog: function (title, button, oContext) {
@@ -322,7 +325,7 @@ sap.ui.define(
         if (sSelectedKey.includes("users")) {
           // Service Principal batch
           if (!oModel.hasPendingChanges("UserChanges")) {
-            MessageToast.show("No changes detected.");
+            MessageToast.show(this.getModel('i18n').getProperty('noChangesDetected'));
             return;
           }
           this.getModel()
@@ -358,14 +361,14 @@ sap.ui.define(
                     .join("\n");
                   MessageBox.warning(sWarningMessage);
                 } else {
-                  MessageToast.show("Batch operation completed successfully");
+                  MessageToast.show(this.getModel('i18n').getProperty('batchOperationSuccess'));
                   that.visSaveDiscardButton('UserChanges');
                   that.onChangeHighlightTableRow("idTableRegisterUsers"); // Changing the status of the table row
                   that.getCallData(that.getView().getModel('appView'), that.getView().getModel(), "/Users", "/UserData");
                 }
               } else {
                 MessageToast.show(
-                  "User details updated successfully."
+                  this.getModel('i18n').getProperty('userUpdateSuccess')
                 );
                 that.visSaveDiscardButton('UserChanges')
                 that.onChangeHighlightTableRow("idTableRegisterUsers"); // Changing the status of the table row
@@ -373,12 +376,12 @@ sap.ui.define(
               }
             })
             .catch((oError) => {
-              MessageBox.error("Batch request failed: " + oError.message);
+              MessageBox.error(this.getModel('i18n').getProperty('batchRequestFailed') + oError.message);
             });
         } else if (sSelectedKey.includes("companies")) {
           // Report batch
           if (!oModel.hasPendingChanges("CompanyChanges")) {
-            MessageToast.show("No changes detected.");
+            MessageToast.show(this.getModel('i18n').getProperty('noChangesDetected'));
             return;
           }
           this.getModel()
@@ -415,12 +418,12 @@ sap.ui.define(
                     .join("\n");
                   MessageBox.warning(sWarningMessage);
                 } else {
-                  MessageToast.show("Batch operation completed successfully");
+                  MessageToast.show(this.getModel('i18n').getProperty('batchOperationSuccess'));
                   that.onChangeHighlightTableRow('idTableCompanies');
                   that.visSaveDiscardButton('CompanyChanges')
                 }
               } else {
-                MessageToast.show("Company details updated successfully.");
+                MessageToast.show(this.getModel('i18n').getProperty('companyUpdateSuccess'));
                 if (!that.addReport) {
                   oModel.refresh();
                 }
@@ -429,7 +432,7 @@ sap.ui.define(
               }
             })
             .catch((oError) => {
-              MessageBox.error("Batch request failed: " + oError.message);
+              MessageBox.error(this.getModel('i18n').getProperty('batchRequestFailed') + oError.message);
             });
         } 
 
@@ -441,11 +444,11 @@ sap.ui.define(
         var oContext = oItem.getBindingContext(); // Get binding context of the item
 
         if (!oContext) {
-          MessageToast.show("No user selected for deletion.");
+          MessageToast.show(this.getModel('i18n').getProperty('noUserSelectedForDeletion'));
           return;
         }
 
-        MessageBox.confirm("Are you sure you want to delete this user?", {
+        MessageBox.confirm(this.getModel('i18n').getProperty('confirmDeleteUser'), {
           actions: [MessageBox.Action.OK, MessageBox.Action.CANCEL],
           onClose: function (sAction) {
             if (sAction === MessageBox.Action.OK) {
@@ -463,11 +466,11 @@ sap.ui.define(
         var oContext = oItem.getBindingContext(); // Get binding context of the item
 
         if (!oContext) {
-          MessageToast.show("No company selected for deletion.");
+          MessageToast.show(this.getModel('i18n').getProperty('noCompanySelectedForDeletion'));
           return;
         }
 
-        MessageBox.confirm("Are you sure you want to delete this company?", {
+        MessageBox.confirm(this.getModel('i18n').getProperty('confirmDeleteCompany'), {
           actions: [MessageBox.Action.OK, MessageBox.Action.CANCEL],
           onClose: function (sAction) {
             if (sAction === MessageBox.Action.OK) {
@@ -486,7 +489,7 @@ sap.ui.define(
 
         if (sSelectedKey.includes("users")) {
           this.showDiscardChangesWarning(
-            "Are you sure you want to discard your changes?",
+            this.getModel('i18n').getProperty('confirmDiscardChanges'),
             null,
             oModel,
             "UserChanges",
@@ -496,7 +499,7 @@ sap.ui.define(
           );
         } else if (sSelectedKey.includes("companies")) {
           this.showDiscardChangesWarning(
-            "Are you sure you want to discard your changes?",
+            this.getModel('i18n').getProperty('confirmDiscardChanges'),
             null,
             oModel,
             "CompanyChanges",
@@ -560,7 +563,7 @@ sap.ui.define(
           if (bChange) {
             // 3. if Ok then discard all the changes and navigate to the selected tab
             this.showDiscardChangesWarning(
-              "You have unsaved changes. Press OK to discard them and proceed, or Cancel to go back and save your changes.",
+              this.getModel('i18n').getProperty('unsavedChangesWarning'),
               null,
               oModel,
               "UserChanges",
@@ -577,7 +580,7 @@ sap.ui.define(
           if (bChange) {
             // 3. if Ok then discard all the changes and navigate to the selected tab
             this.showDiscardChangesWarning(
-              "You have unsaved changes. Press OK to discard them and proceed, or Cancel to go back and save your changes.",
+              this.getModel('i18n').getProperty('unsavedChangesWarning'),
               null,
               oModel,
               "CompanyChanges",

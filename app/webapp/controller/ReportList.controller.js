@@ -12,13 +12,22 @@ sap.ui.define(
             .getRoute("Report")
             .attachPatternMatched(this._onMatched, this);
         },
-
-        _onMatched: async function () {
+        _onMatched: async function (oEvent) {
+          let oArgs = oEvent.getParameter("arguments"), 
+          oQuery = oArgs["?query"];
+          if (oQuery) {
+            if(oQuery.lang) sap.ui.getCore().getConfiguration().setLanguage(oQuery.lang);
+            if(oQuery.theme){
+              sap.ui.getCore().applyTheme(oQuery.theme);
+              sessionStorage.setItem('theme', oQuery.theme);
+            } 
+          }
           const appModel = this.getView().getModel("appView");
           appModel.setProperty("/navVisible", true);
           appModel.setProperty("/LoginHeader", false);
           appModel.setProperty("/HomeScreen", true);
-          appModel.setProperty('/subHeaderTitle', 'Reports');
+          this.updateToolbarTitle();
+          // appModel.setProperty('/subHeaderTitle', this.getModel('i18n').getProperty('REPORT'));
 
           const oModel = this.getView().getModel();
           const wsModel = this.getView().getModel("powerBi");

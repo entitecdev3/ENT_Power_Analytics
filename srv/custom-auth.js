@@ -61,7 +61,8 @@ module.exports = function () {
             company_ID: user.company_ID,
             portalType: user.portalType || 'standalone',
             referer: user.referer,
-            externalRoles: user.externalRoles
+            externalRoles: user.externalRoles,
+            filters: user.filters
         });
     });
 
@@ -107,6 +108,7 @@ module.exports = function () {
             cdsUser.portalType = userSession.portalType || 'standalone';
             cdsUser.referer = userSession.referer ;
             cdsUser.externalRoles = userSession.externalRoles || [];
+            cdsUser.filters = userSession.filters;
             done(null, cdsUser);
         } catch (err) {
             done(err);
@@ -162,14 +164,16 @@ module.exports = function () {
                 externalRoles: payload.externalRoles || [],
                 database: payload.database,
                 portalType: 'embed',
-                referer: referer
+                referer: referer,
+                filters: payload.filters
             };
+            const sLanguage = payload.language, sTheme = payload.theme;
 
             req.logIn(user, (err) => {
                 if (err) return res.status(401).send('Login failed');
                 req.session.user = user;
                 req.session.portalType = 'embed';
-                return res.redirect('/#/Report');
+                return res.redirect(`/#/Report?lang=${sLanguage}&theme=${sTheme}`);
             });
         } catch (err) {
             console.error('JWT Verification Failed:', err);

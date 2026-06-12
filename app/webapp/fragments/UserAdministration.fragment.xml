@@ -14,7 +14,7 @@
       <columns>
         <Column><Label text="{i18n>Name}" /></Column>
         <Column><Label text="{i18n>Email}" /></Column>
-        <Column><Label text="{i18n>Company}" /></Column>
+        <Column><Label text="{i18n>Company_ID}" /></Column>
         <Column><Label text="{i18n>Role}" /></Column>
         <Column><Label text="{i18n>ResetPassword}" /></Column>
       </columns>

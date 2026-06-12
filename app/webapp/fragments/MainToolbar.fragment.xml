@@ -9,7 +9,7 @@
 
       <!-- CENTER SECTION: Title (Responsive) -->
       <HBox alignItems="Center" justifyContent="Center" class="titleBox" >
-        <Title text="Power Analytics Portal" level="H3" wrapping="false" class="responsiveTitle">
+        <Title text="{i18n>title}" level="H3" wrapping="false" class="responsiveTitle">
         </Title>
       </HBox>
 

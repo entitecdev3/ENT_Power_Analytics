@@ -16,6 +16,10 @@ sap.ui.define([
       this.getModel("appView").setProperty("/navVisible", false);
       this.getModel("appView").setProperty("/LoginHeader", true);
       this.getModel("appView").setProperty("/HomeScreen", false);
+      this.getModel("appView").setProperty("/selectLang", 'en');
+      if (this.getOwnerComponent().getModel("userInfo")?.getProperty("/username")) {
+        this.getRouter().navTo('Apps');
+      }  
     },
     onButtonLoginPress: function (oEvent) {
       var sUsername = this.getView().byId("idUnameInput").getValue();
@@ -23,7 +27,7 @@ sap.ui.define([
 
       // Validate Inputs
       if (!sUsername || !sPassword) {
-        sap.m.MessageToast.show("Please enter username and password");
+        sap.m.MessageToast.show(this.getModel("i18n").getProperty("enterUsernamePassword"));
         return;
       }
       var payload = {

@@ -12,12 +12,12 @@
 
       <headerToolbar>
         <Toolbar>
-          <Title text="Manage Reports" level="H3" />
+          <Title text="{i18n>ManageReports}" level="H3" />
           <ToolbarSpacer />
 
-          <Button icon="sap-icon://inspection" text="Test Report URL" type="Emphasized" press=".onTestReportURL" tooltip="Open and test a report URL in a popup" class="sapUiTinyMarginBegin" />
+          <Button icon="sap-icon://inspection" text="{i18n>TestReportURL}" type="Emphasized" press=".onTestReportURL" tooltip="{i18n>testReportTooltip}" class="sapUiTinyMarginBegin" />
           <Button icon="sap-icon://refresh" text="{i18n>Refresh}" tooltip="{i18n>Refresh}" press="onRefreshReports" />
-          <Button id="idRCAddButton" icon="sap-icon://add" tooltip="Add Report" text="{i18n>Add}" press="onAddReportsConfiguration" />
+          <Button id="idRCAddButton" icon="sap-icon://add" tooltip="{i18n>AddReport}" text="{i18n>Add}" press="onAddReportsConfiguration" />
         </Toolbar>
       </headerToolbar>
 
@@ -68,7 +68,7 @@
               </items>
             </VBox>
             <Text text="{path: 'externalRoles'}" />
-            <Button text="Preview Report" type="Emphasized" press=".onLoadReport" />
+            <Button text="{i18n>PreviewReport}" type="Emphasized" press=".onLoadReport" />
           </cells>
         </ColumnListItem>
       </items>

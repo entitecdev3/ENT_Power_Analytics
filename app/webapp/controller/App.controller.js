@@ -6,8 +6,8 @@ sap.ui.define([
   "use strict";
 
   return BaseController.extend("entitec.pbi.embedding.controller.App", {
-    onInit() {
-      var oViewModel,
+    onInit : async function() {
+      let oViewModel,
         fnSetAppNotBusy,
         iOriginalBusyDelay = this.getView().getBusyIndicatorDelay();
       oViewModel = new JSONModel({
@@ -31,21 +31,23 @@ sap.ui.define([
         BusyIndicator.hide();
       });
 
-      var oViewModel = this.getModel("appView");
+      let oViewModel = this.getModel("appView");
 
-      var sUser = sessionStorage.getItem("LoggedInUser");
+      let sUser = sessionStorage.getItem("LoggedInUser");
       if (sUser) {
         oViewModel.setProperty("/User", JSON.parse(sUser));
       }
 
+      let userInfoModel = this.getModel("userInfo");
+      if( this.getRouter().getHashChanger().getHash() && !userInfoModel?.getProperty('/username')){
+        await this.setUserInfo();
+      }
+
       let selectedTheme = sessionStorage.theme
           ? sessionStorage.theme
-          : "sap_horizon_dark";
+          : "sap_horizon";
         sap.ui.getCore().applyTheme(selectedTheme);
 
     },
-
-
-
   });
 });

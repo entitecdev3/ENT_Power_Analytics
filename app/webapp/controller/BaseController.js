@@ -55,7 +55,7 @@ sap.ui.define(
         setUserInfo: async function () {
           const oView = this.getView();
           try {
-            const oBindingContext = oView.getModel().bindContext("/getUserInfo(...)");
+            const oBindingContext = this.getModel().bindContext("/getUserInfo(...)");
             await oBindingContext.execute();
             const oContext = await oBindingContext.getBoundContext();
             const oUserData = oContext.getObject();
@@ -99,9 +99,20 @@ sap.ui.define(
         /**
          * Navigates back to the previous page if available, else navigates to the home page
          */
+
+        changeAppLanguage: function(sLanguage) {
+          sap.ui.getCore().getConfiguration().setLanguage(sLanguage);
+          const oOwnerComponent = this.getOwnerComponent();
+          const oI18nSettings = oOwnerComponent.getManifestEntry("/sap.ui5/models/i18n/settings");
+          const oNewI18nModel = new sap.ui.model.resource.ResourceModel(oI18nSettings);
+          oOwnerComponent.setModel(oNewI18nModel, "i18n");
+        },
         onLanguageChange: function (oEvent) {
-          var oLangugae = oEvent.getSource().getKey();
-          sap.ui.getCore().getConfiguration().setLanguage(oLangugae);
+          var oLangugae = oEvent.getSource()?.getKey?.() || oEvent.getSource()?.getSelectedKey?.();
+          // sap.ui.getCore().getConfiguration().setLanguage(oLangugae);
+          this.changeAppLanguage(oLangugae);
+          this.getModel('appView').setProperty('/selectLang', oLangugae)
+          this.updateToolbarTitle();
         },
         onNavBack: async function () {
           const oHistory = History.getInstance();
@@ -109,59 +120,53 @@ sap.ui.define(
           const refererPort = this.getModel("config").getProperty("/refererPort");
           const host = window.location.hostname;
           const protocol = window.location.protocol;
-
           const oView = this.getView();
-          const oBindingContext = oView.getModel().bindContext("/getUserInfo(...)");
-          await oBindingContext.execute();
-          const oContext = await oBindingContext.getBoundContext();
-          const userInfo = oContext.getObject();
-          // const userInfo = await this.getView().getModel().bindContext("/getUserInfo(...)").requestObject();
+          const userInfo = this.getModel('userInfo')?.getData();
           const source = userInfo?.referer;
           const redirectUrl = `${source}#/Apps`;
-          // Check if user came from eComm (i.e., no internal nav history)
           if (!sPreviousHash) {
             this.getRouter().navTo("Apps")
-            // this.middleWare
-            //   .callMiddleWare("/logout", "POST")
-            //   .then(() => {
-            //     document.activeElement.blur();
-            //     if (source) window.location.href = redirectUrl;
-            //     else window.location.href = '/';
-            //   })
-            //   .catch((oError) => {
-            //     document.activeElement.blur();
-            //     if (source) window.location.href = redirectUrl;
-            //     else window.location.href = '/';
-            //   });
           } else {
-            // Regular back nav inside Analytics
             window.history.go(-1);
           }
         },
         onLogOut: async function () {
           try {
             const oView = this.getView();
-            const oBindingContext = oView.getModel().bindContext("/getUserInfo(...)");
-            await oBindingContext.execute();
-            const oContext = await oBindingContext.getBoundContext();
-            const userInfo = oContext.getObject();
-            // const userInfo = await this.getView().getModel().bindContext("/getUserInfo(...)").requestObject();
+            let oUserInfo = this.getOwnerComponent().getModel("userInfo"),
+            userInfo = oUserInfo?.getData();
             const source = userInfo?.referer;
-
+            oUserInfo.destroy();
             await this.middleWare.callMiddleWare("/logout", "POST");
-
+            sessionStorage.clear();
             document.activeElement.blur();
             if (source) {
               window.location.href = source;
             } else {
-              window.location.href = '/';
+              this.getRouter().navTo("Login")
             }
-
           } catch (err) {
             console.error("Logout failed", err);
             document.activeElement.blur();
             window.location.href = '/';
           }
+        },
+        updateToolbarTitle: function () {
+          let sCurrentRoute = this.getRouter().getHashChanger().getHash().split('?')[0];
+          let sTitle;
+          let aRouteParts = sCurrentRoute.split('/');
+          let sRelevantPart = aRouteParts[0];
+          if (sCurrentRoute === 'Report') {
+            sTitle = this.getModel("i18n").getProperty("REPORT");
+          } else if (sCurrentRoute.includes('Configuration')) {
+            sTitle = this.getModel("i18n").getProperty("Configuration");
+          } else if (sCurrentRoute.includes('Administration')) {
+            sTitle = this.getModel("i18n").getProperty("Administration");
+          } 
+          // if(!sCurrentRoute){
+          //   sTitle = this.getModel('i18n').getProperty("")
+          // }
+          this.getModel("appView").setProperty("/subHeaderTitle", sTitle);
         },
         onUserInfo: function (oEvent) {
           var oButton = oEvent.getSource(),
@@ -181,10 +186,11 @@ sap.ui.define(
           });
         },
         onProfilePress: async function (oEvent) {
-          var oButton = oEvent.getSource();
-          var oView = this.getView();
-
-          await this.setUserInfo();
+          let oButton = oEvent.getSource();
+          let oView = this.getView();
+          if ( ! this.getOwnerComponent().getModel("userInfo")?.getProperty("/username")) {
+            await this.setUserInfo();
+          } 
 
           if (!this._pPopover) {
             this._pPopover = Fragment.load({

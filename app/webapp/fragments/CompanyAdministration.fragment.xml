@@ -11,8 +11,8 @@
       </headerToolbar>
 
       <columns>
-        <Column><Label text="Company Name" /></Column>
-        <Column><Label text="Contact Details" /></Column>
+        <Column><Label text="{i18n>CompanyName}" /></Column>
+        <Column><Label text="{i18n>ContactDetails}" /></Column>
       </columns>
 
       <items>

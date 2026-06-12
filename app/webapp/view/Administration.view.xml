@@ -7,14 +7,14 @@
       <IconTabBar id="idAdministrationMenu" expandable="false" tabDensityMode="Compact" class="sapUiTinyMargin" backgroundDesign="Transparent" headerBackgroundDesign="Solid" select="onIconTabBarChange">
         <!-- ========== TAB 1: USERS ========== -->
         <items>
-          <IconTabFilter id="idTabUsers" text="Users" icon="sap-icon://account" key="users" design="Horizontal">
+          <IconTabFilter id="idTabUsers" text="{i18n>Users}" icon="sap-icon://account" key="users" design="Horizontal">
             <VBox>
               <core:Fragment fragmentName="entitec.pbi.embedding.fragments.UserAdministration" type="XML" />
             </VBox>
           </IconTabFilter>
 
           <!-- ========== TAB 2: COMPANIES ========== -->
-          <IconTabFilter id="idTabCompanies" text="Companies" icon="sap-icon://building" key="companies" design="Horizontal">
+          <IconTabFilter id="idTabCompanies" text="{i18n>Companies}" icon="sap-icon://building" key="companies" design="Horizontal">
             <VBox>
               <core:Fragment fragmentName="entitec.pbi.embedding.fragments.CompanyAdministration" type="XML" />
             </VBox>

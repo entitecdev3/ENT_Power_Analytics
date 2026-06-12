@@ -17,14 +17,14 @@
     >
       <headerToolbar>
         <Toolbar>
-          <Title text="Manage Security Filters" level="H3" />
+          <Title text="{i18n>ManageSecurityFilters}" level="H3" />
           <ToolbarSpacer />
-          <Button icon="sap-icon://refresh" text="{i18n>Refresh}" press="onRefreshSecurityFilters" />
+          <Button icon="sap-icon://refresh" tooltip="{i18n>Refresh}" text="{i18n>Refresh}" press="onRefreshSecurityFilters" />
           <Button
             id="idAddSFButton"
             icon="sap-icon://add"
             text="{i18n>Add}"
-            tooltip="Add Security Filter"
+            tooltip="{i18n>AddSecurityFilter}"
             press="onAddSecurityFilterConfiguration"
           />
         </Toolbar>

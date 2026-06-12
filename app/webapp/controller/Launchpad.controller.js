@@ -10,40 +10,27 @@ sap.ui.define(["./BaseController", "sap/m/MessageToast"], function (BaseControll
     },
     _matchedHandler: async function () {
       const oView = this.getView();
-      await this.setUserInfo();
-      const userData = this.getModel("userInfo").getData();
+      if ( ! this.getOwnerComponent().getModel("userInfo")?.getProperty("/username")) {
+        await this.setUserInfo();
+      }  
+      const userData = this.getOwnerComponent().getModel("userInfo")?.getData();
       const source = userData?.referer;
       const redirectUrl = `${source}#/Apps`;
       if (source) {
         document.activeElement.blur();
         window.location.href = redirectUrl;
       }
-      var oViewModel = this.getView().getModel("appView");
+      let oViewModel = this.getView().getModel("appView");
       oViewModel.setProperty("/navVisible", false);
       oViewModel.setProperty("/LoginHeader", false);
       oViewModel.setProperty("/HomeScreen", true);
-      try {
-        const oBindingContext = oView.getModel().bindContext("/getUserInfo(...)");
-        await oBindingContext.execute();
-        const oContext = await oBindingContext.getBoundContext();
-        const oUserData = oContext.getObject();
-
-        if (!this._userInfoModel) {
-          this._userInfoModel = new sap.ui.model.json.JSONModel(oUserData);
-        }
-
-        const roles = oUserData.roles || {};
+      const roles = userData?.roles || {};
+      if(roles){
         this._setTileVisibility(roles);
-
-      } catch (err) {
-        MessageToast.show("Failed to fetch user info");
-        console.error("Failed to fetch user info", err);
-        document.activeElement.blur();
-        window.location.href = '/';
       }
     },
     press: function (oEvent) {
-      var id = oEvent.getSource().getId().split("--")[
+      let id = oEvent.getSource().getId().split("--")[
         oEvent.getSource().getId().split("--").length - 1
       ];
 
@@ -86,6 +73,7 @@ sap.ui.define(["./BaseController", "sap/m/MessageToast"], function (BaseControll
       const isAdmin = roles.Admin === 1;
 
       view.byId("idConfiguration").setVisible(isAdmin);
+      view.byId("idAdministration").setVisible(isAdmin);
 
       const oConfigMsgStrip = view.byId("configMsgStrip");
       if (oConfigMsgStrip) {

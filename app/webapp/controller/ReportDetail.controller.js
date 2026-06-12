@@ -48,7 +48,7 @@ sap.ui.define(
             const oContext = oBinding.getBoundContext();
             const oResult = oContext.getObject();
             if (oResult.error) {
-              MessageToast.show(oResult.message || "Report forbidden.");
+              MessageToast.show(oResult.message || this.getModel("i18n").getProperty("reportForbidden"));
               return;
             }
             if (oResult && oResult.html) {
@@ -59,10 +59,10 @@ sap.ui.define(
               doc.write(oResult.html);
               doc.close();
             } else {
-              MessageToast.show("No HTML returned from Power BI service.");
+              MessageToast.show(this.getModel("i18n").getProperty("noHtmlReturned"));
             }
           } catch (err) {
-            MessageToast.show("Failed to load Power BI report.");
+            MessageToast.show(this.getModel("i18n").getProperty("powerBiLoadFailed"));
             console.error("Error in _onPatternMatched:", err);
           }
         },

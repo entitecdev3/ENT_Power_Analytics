@@ -1,10 +1,10 @@
 <mvc:View controllerName="entitec.pbi.embedding.controller.Launchpad" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:mvc="sap.ui.core.mvc" xmlns:core="sap.ui.core" xmlns="sap.m">
   <Page id="idLaunchpad" showHeader="false">
 
-    <MessageStrip text="Apps" type="Information" class="sapUiTinyMarginBegin sapUiTinyMarginEnd sapUiMediumMarginTop" />
+    <MessageStrip text="{i18n>Apps}" type="Information" class="sapUiTinyMarginBegin sapUiTinyMarginEnd sapUiMediumMarginTop" />
 
     <FlexBox direction="Row" wrap="Wrap" justifyContent="Start" class="sapUiSmallMargin tileContainer">
-      <GenericTile frameType="OneByOne" class="--sapTile_Hover_Background tileLayout" header="Report" subheader="Power BI Embedded" tooltip="Open Report" id="idReport" press="press">
+      <GenericTile frameType="OneByOne" class="--sapTile_Hover_Background tileLayout" header="{i18n>REPORT}" subheader="{i18n>PowerBIEmbedded}" tooltip="{i18n>OpenReport}" id="idReport" press="press">
         <TileContent>
           <ImageContent src="sap-icon://filter-analytics" />
         </TileContent>
@@ -12,17 +12,17 @@
     </FlexBox>
 
 
-    <MessageStrip id="configMsgStrip" text="Configuration" type="Information" class="sapUiTinyMarginBegin sapUiTinyMarginEnd sapUiMediumMarginTop" />
+    <MessageStrip id="configMsgStrip" text="{i18n>Configuration}" type="Information" class="sapUiTinyMarginBegin sapUiTinyMarginEnd sapUiMediumMarginTop" />
 
     <FlexBox direction="Row" wrap="Wrap" justifyContent="Start" class="sapUiSmallMargin tileContainer">
 
-      <GenericTile frameType="OneByOne" class="--sapTile_Hover_Background tileLayout" header="Configuration" subheader="Settings Overview" tooltip="View Configuration" id="idConfiguration" press="press">
+      <GenericTile frameType="OneByOne" class="--sapTile_Hover_Background tileLayout" header="{i18n>Configuration}" subheader="{i18n>SettingsOverview}" tooltip="{i18n>ViewConfiguration}" id="idConfiguration" press="press">
         <TileContent>
           <ImageContent src="sap-icon://action-settings" />
         </TileContent>
       </GenericTile>
 
-      <GenericTile frameType="OneByOne" class="--sapTile_Hover_Background tileLayout" header="Administration" subheader="Users and Companies" tooltip="Administration" id="idAdministration" press="press">
+      <GenericTile frameType="OneByOne" class="--sapTile_Hover_Background tileLayout" header="{i18n>Administration}" subheader="{i18n>UsersAndCompanies}" tooltip="{i18n>Administration}" id="idAdministration" press="press">
 
         <TileContent>
           <ImageContent src="sap-icon://shield" />

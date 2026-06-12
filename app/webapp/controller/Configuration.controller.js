@@ -19,8 +19,10 @@ sap.ui.define(
             .attachPatternMatched(this._matchedHandler, this);
         },
         _matchedHandler: async function () {
-          await this.setUserInfo();
-          const userData = this.getModel("userInfo").getData();
+          if ( ! this.getOwnerComponent().getModel("userInfo")?.getProperty("/username")) {
+            await this.setUserInfo();
+          }  
+          const userData = this.getOwnerComponent().getModel("userInfo")?.getData();
           const source = userData?.referer;
           const redirectUrl = `${source}#/Apps`;
           if (source) {
@@ -33,7 +35,8 @@ sap.ui.define(
           oViewModel.setProperty("/HomeScreen", true);
           oViewModel.setProperty('/visSaveButton', false);
           oViewModel.setProperty('/visDiscardButton', false);
-          oViewModel.setProperty('/subHeaderTitle', 'Configuration');
+          this.updateToolbarTitle();
+          // oViewModel.setProperty('/subHeaderTitle', this.getModel('i18n').getProperty('Configuration'));
           this.getModel().refresh();
 
           this.getCallData(oViewModel, this.getView().getModel("powerBi"), "/PowerBi", "/ServicePrincipalData");
@@ -48,7 +51,7 @@ sap.ui.define(
           let oContext = this.byId("idConfigTable")
             .getBinding("items")
             .create({}, true, { groupId: "ServicePrincipalChanges" });
-          this.openConfigDialog("Add Service Principal", "Add", oContext);
+          this.openConfigDialog(this.getModel('i18n').getProperty('addServicePrincipal'), this.getModel('i18n').getProperty('Add'), oContext);
         },
         onConfigSelect: async function (oEvent) {
           this.addServicePrincipal = false;
@@ -58,8 +61,8 @@ sap.ui.define(
             JSON.stringify(oContext.getObject())
           );
           this.openConfigDialog(
-            "Edit Service Principal",
-            "Update",
+            this.getModel('i18n').getProperty("editServicePrincipal"),
+            this.getModel('i18n').getProperty("update"),
             oSource.getBindingContext()
           );
         },
@@ -83,12 +86,12 @@ sap.ui.define(
           var oContext = oItem.getBindingContext();
 
           if (!oContext) {
-            MessageToast.show("No Service Principal selected for deletion.");
+            MessageToast.show(this.getModel('i18n').getProperty('noServicePrincipalSelected'));
             return;
           }
 
           MessageBox.confirm(
-            "Are you sure you want to delete this Service Principal?",
+            this.getModel('i18n').getProperty('confirmDeleteServicePrincipal'),
             {
               actions: [MessageBox.Action.OK, MessageBox.Action.CANCEL],
               onClose: function (sAction) {
@@ -105,7 +108,7 @@ sap.ui.define(
           let oModel = this.getView().getModel();
           if (oModel.hasPendingChanges()) {
             this.showDiscardChangesWarning(
-              "Are you sure you want to reload. Your changes will be lost?",
+              this.getModel('i18n').getProperty('DiscardMsg'),
               null,
               oModel,
               "ServicePrincipalChanges",
@@ -185,7 +188,7 @@ sap.ui.define(
           oView.setModel(oTempModel, "tempReport");
 
           let oNewContext = new Context(oTempModel, "/ReportsExposed");
-          this.openReportsConfigDialog("Add Report", "Add", oNewContext);
+          this.openReportsConfigDialog(this.getModel('i18n').getProperty('AddReport'), this.getModel('i18n').getProperty('Add'), oNewContext);
         },
         onReportSelect: async function (oEvent) {
           this.addReport = false;
@@ -202,7 +205,7 @@ sap.ui.define(
           oView.setModel(oTempModel, "tempReport");
 
           let oNewContext = new Context(oTempModel, "/ReportsExposed");
-          this.openReportsConfigDialog("Edit Report", "Update", oNewContext);
+          this.openReportsConfigDialog(this.getModel('i18n').getProperty("EditReport"), this.getModel('i18n').getProperty("update"), oNewContext);
 
           this.byId("idServicePrincipalTypeInput").fireChange();
           // checked the security filter combo box on select
@@ -381,11 +384,11 @@ sap.ui.define(
           var oContext = oItem.getBindingContext();
 
           if (!oContext) {
-            MessageToast.show("No Report selected for deletion.");
+            MessageToast.show(this.getModel('i18n').getProperty('noReportSelected'));
             return;
           }
 
-          MessageBox.confirm("Are you sure you want to delete this Report?", {
+          MessageBox.confirm(this.getModel('i18n').getProperty('deleteWarningReport'), {
             actions: [MessageBox.Action.OK, MessageBox.Action.CANCEL],
             onClose: function (sAction) {
               if (sAction === MessageBox.Action.OK) {
@@ -399,7 +402,7 @@ sap.ui.define(
           let oModel = this.getView().getModel(), that = this;
           if (oModel.hasPendingChanges('ReportsChanges')) {
             MessageBox.warning(
-              "Are you sure you want to reload. Your changes will be lost?",
+              this.getModel('i18n').getProperty('DiscardMsg'),
               {
                 actions: [MessageBox.Action.OK, MessageBox.Action.CANCEL],
                 onClose: function (sAction) {
@@ -437,10 +440,10 @@ sap.ui.define(
             if (Array.isArray(oData.value) && oData.value.length > 0) {
               this._openDynamicFilterDialog(oData.value); // Pass the filter fields to dialog
             } else {
-              MessageToast.show("No security filters defined for this report.");
+              MessageToast.show(this.getModel('i18n').getProperty('noSecurityFiltersDefined'));
             }
           } catch (err) {
-            MessageBox.error("Failed to fetch filter fields: " + err.message);
+            MessageBox.error(this.getModel('i18n').getProperty('failedToFetchFilterFields')+ err.message);
           }
         },
         _openDynamicFilterDialog: function (aFilterFields) {
@@ -578,10 +581,10 @@ sap.ui.define(
               iframeDoc.write(oResult.html);
               iframeDoc.close();
             } else {
-              MessageBox.warning("No filtered report returned from backend.");
+              MessageBox.warning(this.getModel('i18n').getProperty('noFilteredReportReturned'));
             }
           } catch (err) {
-            MessageBox.error("Error embedding filtered report: " + err.message);
+            MessageBox.error(this.getModel('i18n').getProperty('embedReportError')+ err.message);
           }
         },
         onCancelUserSelection: function () {
@@ -639,10 +642,10 @@ sap.ui.define(
               iframeDoc.close();
               this._oSelectedUser = null;
             } else {
-              MessageToast.show("No embed HTML received.");
+              MessageToast.show(this.getModel('i18n').getProperty('noEmbedHtmlReceived'));
             }
           } catch (error) {
-            MessageBox.error("Failed to load report: " + error.message);
+            MessageBox.error(this.getModel('i18n').getProperty('failedToLoadReport') + error.message);
           }
         },
 
@@ -750,10 +753,10 @@ sap.ui.define(
             this.byId("idInputWorkspaceId").setValue(workspaceId);
 
             MessageToast.show(
-              "Report added locally. Don’t forget to save changes."
+              this.getModel('i18n').getProperty('reportAddedLocally')
             );
           } else {
-            MessageBox.error("Enter a valid Power BI URL!");
+            MessageBox.error(this.getModel('i18n').getProperty('enterValidPowerBiUrl'));
           }
           var oInput = this.byId("fetchURLInput");
           if (oInput) {
@@ -768,13 +771,12 @@ sap.ui.define(
             if (text) {
               this.byId("fetchURLInput").setValue(text);
             } else {
-              MessageBox.warning("Clipboard is empty or inaccessible.");
+              MessageBox.warning(this.getModel('i18n').getProperty('clipboardEmpty'));
             }
           } catch (err) {
             MessageBox.error(
-              "Failed to access clipboard. Please allow clipboard permissions."
+              this.getModel('i18n').getProperty('clipboardPermissionFailed')
             );
-            console.error("Clipboard error:", err);
           }
         },
 
@@ -784,13 +786,12 @@ sap.ui.define(
             if (text) {
               this.byId("idTestUrlInput").setValue(text);
             } else {
-              MessageBox.warning("Clipboard is empty or inaccessible.");
+              MessageBox.warning(this.getModel('i18n').getProperty('clipboardEmpty'));
             }
           } catch (err) {
             MessageBox.error(
-              "Failed to access clipboard. Please allow clipboard permissions."
+              this.getModel('i18n').getProperty('clipboardPermissionFailed')
             );
-            console.error("Clipboard error:", err);
           }
         },
 
@@ -800,7 +801,7 @@ sap.ui.define(
             const sUrl = oInput.getValue().trim();
 
             if (!sUrl) {
-              MessageBox.warning("Please enter a valid Power BI Report URL.");
+              MessageBox.warning(this.getModel('i18n').getProperty('pleaseEnterValidPowerBiReportUrl'));
               return;
             }
 
@@ -815,17 +816,16 @@ sap.ui.define(
             const oResult = oContextBinding.getBoundContext().getObject();
             if (oResult.statusCode === 200) {
               MessageBox.success(
-                "Report is accessible to the Service Principal."
+                this.getModel('i18n').getProperty('servicePrincipalReportAccessible')
               );
             } else {
               MessageBox.error(`${oResult.message}`);
             }
           } catch (err) {
             MessageBox.error(
-              "Unexpected error occurred while testing the report URL.\n" +
+              this.getModel('i18n').getProperty('unexpectedReportUrlError') + "\n" +
               err.message
             );
-            console.error("onTestURLLoad Error:", err);
           }
         },
 
@@ -924,7 +924,7 @@ sap.ui.define(
           };
 
           // Open the dialog directly with the JSON model
-          this.openSecurityFilterConfigDialog("Add Security Filter", oNewFilter);
+          this.openSecurityFilterConfigDialog(this.getModel('i18n').getProperty("AddSecurityFilter"), oNewFilter);
         },
 
 
@@ -940,7 +940,7 @@ sap.ui.define(
           );
 
           // Open dialog with a copy of the data to avoid two-way binding during edit
-          this.openSecurityFilterConfigDialog("Edit Security Filter", {
+          this.openSecurityFilterConfigDialog(this.getModel('i18n').getProperty("EDIT_SECURITY_FILTER"), {
             ...oSelectedContext.getObject()
           });
         },
@@ -1115,12 +1115,12 @@ sap.ui.define(
           var oContext = oItem.getBindingContext();
 
           if (!oContext) {
-            MessageToast.show("No Security Filter selected for deletion.");
+            MessageToast.show(this.getModel('i18n').getProperty('noSecurityFilterSelected'));
             return;
           }
 
           MessageBox.confirm(
-            "Are you sure you want to delete this Security Filter?",
+            this.getModel('i18n').getProperty('deleteWarningFilter'),
             {
               actions: [MessageBox.Action.OK, MessageBox.Action.CANCEL],
               onClose: function (sAction) {
@@ -1137,7 +1137,7 @@ sap.ui.define(
           let oModel = this.getView().getModel();
           if (oModel.hasPendingChanges()) {
             this.showDiscardChangesWarning(
-              "Are you sure you want to reload. Your changes will be lost?",
+              this.getModel('i18n').getProperty('DiscardMsg'),
               null,
               oModel,
               "SecurityFilterChanges",
@@ -1163,7 +1163,7 @@ sap.ui.define(
           if (sSelectedKey.includes("idServicePrincipalConfig")) {
             // Service Principal batch
             if (!oModel.hasPendingChanges("ServicePrincipalChanges")) {
-              MessageToast.show("No changes detected.");
+              MessageToast.show(this.getModel('i18n').getProperty('noChangesDetected'));
               return;
             }
             this.getModel()
@@ -1199,14 +1199,14 @@ sap.ui.define(
                       .join("\n");
                     MessageBox.warning(sWarningMessage);
                   } else {
-                    MessageToast.show("Batch operation completed successfully");
+                    MessageToast.show(this.getModel('i18n').getProperty('batchOperationSuccess'));
                     that.visSaveDiscardButton('ServicePrincipalChanges');
                     that.onChangeHighlightTableRow("idConfigTable"); // Changing the status of the table row
                     that.getCallData(that.getView().getModel('appView'), that.getView().getModel("powerBi"), "/PowerBi", "/ServicePrincipalData");
                   }
                 } else {
                   MessageToast.show(
-                    "Service Principal details updated successfully."
+                    this.getModel('i18n').getProperty('servicePrincipalUpdateSuccess')
                   );
                   that.visSaveDiscardButton('ServicePrincipalChanges')
                   that.onChangeHighlightTableRow("idConfigTable"); // Changing the status of the table row
@@ -1214,12 +1214,12 @@ sap.ui.define(
                 }
               })
               .catch((oError) => {
-                MessageBox.error("Batch request failed: " + oError.message);
+                MessageBox.error(this.getModel('i18n').getProperty('batchRequestFailed') + oError.message);
               });
           } else if (sSelectedKey.includes("idReportConfig")) {
             // Report batch
             if (!oModel.hasPendingChanges("ReportsChanges")) {
-              MessageToast.show("No changes detected.");
+              MessageToast.show(this.getModel('i18n').getProperty('noChangesDetected'));
               return;
             }
             this.getModel()
@@ -1256,12 +1256,12 @@ sap.ui.define(
                       .join("\n");
                     MessageBox.warning(sWarningMessage);
                   } else {
-                    MessageToast.show("Batch operation completed successfully");
+                    MessageToast.show(this.getModel('i18n').getProperty('batchOperationSuccess'));
                     that.onChangeHighlightTableRow('idRCConfigTable');
                     that.visSaveDiscardButton('ReportsChanges')
                   }
                 } else {
-                  MessageToast.show("Report details updated successfully.");
+                  MessageToast.show(this.getModel('i18n').getProperty('reportUpdateSuccess'));
                   if (!that.addReport) {
                     oModel.refresh();
                   }
@@ -1270,7 +1270,7 @@ sap.ui.define(
                 }
               })
               .catch((oError) => {
-                MessageBox.error("Batch request failed: " + oError.message);
+                MessageBox.error(this.getModel('i18n').getProperty('batchRequestFailed') + oError.message);
               });
           } else if (sSelectedKey.includes("idSecurityFilterConfig")) {
             const oTable = this.byId("idConfigSecurityFilterTable");
@@ -1329,12 +1329,12 @@ sap.ui.define(
                   }
                 }
 
-                MessageToast.show("Security Filter details updated successfully.");
+                MessageToast.show(this.getModel('i18n').getProperty('securityFilterUpdateSuccess'));
                 this.visSaveDiscardButton('SecurityFilterChanges');
                 this.onChangeHighlightTableRow("idConfigSecurityFilterTable");
                 oODataModel.refresh();
               })
-              .catch(oError => MessageBox.error("Batch request failed: " + oError.message));
+              .catch(oError => MessageBox.error(this.getModel("i18n").getProperty('batchRequestFailed') + oError.message));
           }
 
 
@@ -1346,7 +1346,7 @@ sap.ui.define(
 
           if (sSelectedKey.includes("idServicePrincipalConfig")) {
             this.showDiscardChangesWarning(
-              "Are you sure you want to discard your changes?",
+              this.getModel('i18n').getProperty('confirmDiscardChanges'),
               null,
               oModel,
               "ServicePrincipalChanges",
@@ -1356,7 +1356,7 @@ sap.ui.define(
             );
           } else if (sSelectedKey.includes("idReportConfig")) {
             this.showDiscardChangesWarning(
-              "Are you sure you want to discard your changes?",
+              this.getModel('i18n').getProperty('confirmDiscardChanges'),
               null,
               oModel,
               "ReportsChanges",
@@ -1366,7 +1366,7 @@ sap.ui.define(
             );
           } else if (sSelectedKey.includes("idSecurityFilterConfig")) {
             this.showDiscardChangesWarning(
-              "Are you sure you want to discard your changes?",
+              this.getModel('i18n').getProperty('confirmDiscardChanges'),
               null,
               oModel,
               "SecurityFilterChanges",
@@ -1433,7 +1433,7 @@ sap.ui.define(
             if (bChange) {
               // 3. if Ok then discard all the changes and navigate to the selected tab
               this.showDiscardChangesWarning(
-                "You have unsaved changes. Press OK to discard them and proceed, or Cancel to go back and save your changes.",
+                this.getModel('i18n').getProperty('unsavedChangesWarning'),
                 null,
                 oModel,
                 "ServicePrincipalChanges",
@@ -1450,7 +1450,7 @@ sap.ui.define(
             if (bChange) {
               // 3. if Ok then discard all the changes and navigate to the selected tab
               this.showDiscardChangesWarning(
-                "You have unsaved changes. Press OK to discard them and proceed, or Cancel to go back and save your changes.",
+                this.getModel('i18n').getProperty('unsavedChangesWarning'),
                 null,
                 oModel,
                 "ReportsChanges",
@@ -1467,7 +1467,7 @@ sap.ui.define(
             if (bChange) {
               // 3. if Ok then discard all the changes and navigate to the selected tab
               this.showDiscardChangesWarning(
-                "You have unsaved changes. Press OK to discard them and proceed, or Cancel to go back and save your changes.",
+                this.getModel('i18n').getProperty('unsavedChangesWarning'),
                 null,
                 oModel,
                 "SecurityFilterChanges",

@@ -4,13 +4,13 @@
     <Table items="{path: 'filters>/fields', templateShareable: false}" inset="false" fixedLayout="false" width="100%">
       <columns>
         <Column>
-          <Text text="Table" />
+          <Text text="{i18n>TABLE}" />
         </Column>
         <Column>
-          <Text text="Column" />
+          <Text text="{i18n>COLUMN}" />
         </Column>
         <Column>
-          <Text text="Value" />
+          <Text text="{i18n>VALUE}" />
         </Column>
       </columns>
 
@@ -22,9 +22,9 @@
 
             <!-- Conditional Inputs -->
             <VBox>
-              <Input visible="{=${filters>requireSingleSelection}}" placeholder="Enter value..." width="100%" value="{filters>value}" />
+              <Input visible="{=${filters>requireSingleSelection}}" placeholder="{i18n>EnterValue}" width="100%" value="{filters>value}" />
 
-              <MultiInput visible="{=${filters>requireSingleSelection}===false}" width="100%" placeholder="Enter values..." showValueHelp="false" tokens="{filters>tokens}" tokenUpdate=".onTokenUpdate" submit=".onFreeTextSubmit">
+              <MultiInput visible="{=${filters>requireSingleSelection}===false}" width="100%" placeholder="{i18n>EnterValue}." showValueHelp="false" tokens="{filters>tokens}" tokenUpdate=".onTokenUpdate" submit=".onFreeTextSubmit">
                 <tokens>
                   <Token text="{filters>text}" />
                 </tokens>
@@ -38,10 +38,10 @@
     </Table>
 
     <beginButton>
-      <Button text="OK" type="Emphasized" press="._onSubmitSecurityFilters" />
+      <Button text="{i18n>ok}" type="Emphasized" press="._onSubmitSecurityFilters" />
     </beginButton>
     <endButton>
-      <Button text="Cancel" press=".onCloseFilterDialog" />
+      <Button text="{i18n>cancel}" press=".onCloseFilterDialog" />
     </endButton>
   </Dialog>
 </core:FragmentDefinition>

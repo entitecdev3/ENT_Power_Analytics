@@ -6,7 +6,7 @@
       fixedLayout="true" delete="onDeleteConfig">
       <headerToolbar>
         <Toolbar>
-          <Title text="Manage Service Principal" level="H3" />
+          <Title text="{i18n>ManageServicePrincipal}" level="H3" />
           <ToolbarSpacer />
           <Button icon="sap-icon://refresh" text="{i18n>Refresh}" visible="true"
             tooltip="{i18n>Refresh}" press="onRefreshServicePrincipal" />

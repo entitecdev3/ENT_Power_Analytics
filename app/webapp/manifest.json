@@ -183,7 +183,7 @@
                     "target": "Report"
                 },
                 {
-                    "pattern": "Report",
+                    "pattern": "Report/:?query:",
                     "name": "Report",
                     "target": [
                         "ReportList"
