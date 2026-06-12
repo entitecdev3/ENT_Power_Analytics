@@ -30,12 +30,9 @@ sap.ui.define([
       $(document).ajaxStop(function (x, y, z) {
         BusyIndicator.hide();
       });
-
-      let oViewModel = this.getModel("appView");
-
       let sUser = sessionStorage.getItem("LoggedInUser");
       if (sUser) {
-        oViewModel.setProperty("/User", JSON.parse(sUser));
+        this.getModel("appView").setProperty("/User", JSON.parse(sUser));
       }
 
       let userInfoModel = this.getModel("userInfo");
