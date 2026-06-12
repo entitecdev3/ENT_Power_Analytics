@@ -16,7 +16,6 @@ sap.ui.define([
       this.getModel("appView").setProperty("/navVisible", false);
       this.getModel("appView").setProperty("/LoginHeader", true);
       this.getModel("appView").setProperty("/HomeScreen", false);
-      this.getModel("appView").setProperty("/selectLang", 'en');
       if (this.getOwnerComponent().getModel("userInfo")?.getProperty("/username")) {
         this.getRouter().navTo('Apps');
       }  

@@ -30,6 +30,21 @@ sap.ui.define([
       $(document).ajaxStop(function (x, y, z) {
         BusyIndicator.hide();
       });
+      if (!window.location.href.includes("language")) {
+				const oLang = navigator.language.split("-")[0].toLowerCase();
+				if (oLang.includes('en')) {
+					sap.ui.getCore().getConfiguration().setLanguage('en');
+          sessionStorage.setItem('language', 'en');
+				}
+				else {
+          sap.ui.getCore().getConfiguration().setLanguage('it');
+          sessionStorage.setItem('language', 'it');
+				}
+			}
+      if(sessionStorage.language){
+				this.getModel("appView").setProperty("/selectLang", sessionStorage.language);
+				this.changeAppLanguage(sessionStorage.language)
+			}
       let sUser = sessionStorage.getItem("LoggedInUser");
       if (sUser) {
         this.getModel("appView").setProperty("/User", JSON.parse(sUser));
