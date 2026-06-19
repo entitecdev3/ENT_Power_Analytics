@@ -45,3 +45,9 @@ mta_archives/
 @cds-models
 ssl/*
 Certificates/*
+
+app/webapp/config.json
+nssm.exe
+launch_analytics.bat 
+install_service_with_nssm.bat
+
