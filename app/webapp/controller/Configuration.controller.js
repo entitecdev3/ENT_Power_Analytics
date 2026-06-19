@@ -250,6 +250,17 @@ sap.ui.define(
             const oFilter = new sap.ui.model.Filter("portalType", "EQ", sPortalType);
             oBinding.filter([oFilter]);
           }
+          if (sPortalType.toLowerCase() == 'embed') {
+            this.byId("idRoles").setVisible(false);
+            this.byId("idExtRoles").setVisible(true);
+            this.byId("idRolesLabel").setVisible(false);
+            this.byId("idExtRolesLabel").setVisible(true);
+          } else {
+            this.byId("idRoles").setVisible(true);
+            this.byId("idExtRoles").setVisible(false);
+            this.byId("idRolesLabel").setVisible(true);
+            this.byId("idExtRolesLabel").setVisible(false);
+          }
         },
         onSecurityFilterSelection: function (oEvent) {
           let aSelectedKeys = oEvent.getSource().getSelectedKeys(), filterArray = [];
@@ -275,13 +286,14 @@ sap.ui.define(
           const sEnteredValue = oEvent.getParameter("value")?.trim();
           if (!sEnteredValue) return;
           const oModel = oMultiInput.getModel("tempReport");
-          let aTokens = oModel.getProperty("/ReportsExposed/tokens") || [];
-
-          if (!aTokens.find((token) => token.text === sEnteredValue) && sEnteredValue !== '') {
+          const sPath = "/ReportsExposed/tokens";
+          let aTokens = oModel.getProperty(sPath) || [];
+          aTokens = [...aTokens]; 
+          if (!aTokens.find((token) => token.text === sEnteredValue)) {
             aTokens.push({ text: sEnteredValue });
-            oModel.setProperty("/ReportsExposed/tokens", aTokens);
+            oModel.setProperty(sPath, aTokens);
           }
-          oMultiInput.setValue(""); // Clear input after submit
+          oMultiInput.setValue(""); 
         },
         onExternalRoleUpdate: function (oEvent) {
           const oMultiInput = oEvent.getSource();
@@ -290,13 +302,13 @@ sap.ui.define(
           let aTokens = oMultiInput
             .getTokens()
             .map((t) => ({ text: t.getText() }));
-          // check type
-          let type = oEvent.getParameter('type')
-          if (type === 'removed') {
-            let tok = oEvent.getParameter('removedTokens'), removeText = tok[0].getText();
-            aTokens = aTokens.filter(obj => obj.text !== removeText);
+
+          const sType = oEvent.getParameter('type');
+          if (sType === 'removed') {
+            const aRemovedTokens = oEvent.getParameter('removedTokens') || [];
+            const aRemovedTexts = aRemovedTokens.map((t) => t.getText());
+            aTokens = aTokens.filter(obj => !aRemovedTexts.includes(obj.text));
           }
-          // Keep only remaining tokens
           oModel.setProperty(sPath, aTokens);
         },
 
@@ -479,26 +491,7 @@ sap.ui.define(
           oDialog.close();
           this._applyFiltersAndEmbedReport();
         },
-        onTokenUpdate: function (oEvent) {
-          const oMultiInput = oEvent.getSource();
-          const oContext = oMultiInput.getBindingContext("filters");
-          const oModel = oMultiInput.getModel("filters");
-          const sPath = oContext.getPath() + "/tokens";
-
-          // Keep only remaining tokens
-          let aTokens = oMultiInput
-            .getTokens()
-            .map((t) => ({ text: t.getText() }));
-
-          let type = oEvent.getParameter('type')
-          if (type === 'removed') {
-            let token = oEvent.getParameter('removedTokens'), removeText = token[0].getText();
-            aTokens = aTokens.filter(obj => obj.text !== removeText);
-          }
-          oModel.setProperty(sPath, aTokens);
-        },
-
-        onFreeTextSubmit: function (oEvent) {
+        onFreeTextChange: function (oEvent) {
           const oMultiInput = oEvent.getSource();
           const sEnteredValue = oEvent.getParameter("value")?.trim();
           if (!sEnteredValue) return;
@@ -506,21 +499,35 @@ sap.ui.define(
           const oContext = oMultiInput.getBindingContext("filters");
           const oModel = oMultiInput.getModel("filters");
           const sBasePath = oContext.getPath();
-
           let aTokens = oModel.getProperty(sBasePath + "/tokens") || [];
-
           if (!aTokens.find((token) => token.text === sEnteredValue)) {
-            aTokens.push({ text: sEnteredValue });
-            oModel.setProperty(sBasePath + "/tokens", aTokens);
-
-            // Also update the value field as array of texts
-            const aTokenTexts = aTokens.map((t) => t.text);
-            oModel.setProperty(sBasePath + "/value", aTokenTexts);
+              aTokens.push({ text: sEnteredValue });
+              oModel.setProperty(sBasePath + "/tokens", aTokens);
+              const aTokenTexts = aTokens.map((t) => t.text);
+              oModel.setProperty(sBasePath + "/value", aTokenTexts);
           }
-
-          oMultiInput.setValue(""); // Clear input after submit
+          oMultiInput.setValue(""); 
         },
+        onTokenUpdate: function (oEvent) {
+          const oMultiInput = oEvent.getSource();
+          const oContext = oMultiInput.getBindingContext("filters");
+          const oModel = oMultiInput.getModel("filters");
+          const sBasePath = oContext.getPath();
 
+          let aTokens = oMultiInput
+              .getTokens()
+              .map((t) => ({ text: t.getText() }));
+
+          const sType = oEvent.getParameter('type');
+          if (sType === 'removed') {
+              const aRemovedTokens = oEvent.getParameter('removedTokens');
+              const sRemoveText = aRemovedTokens[0].getText();
+              aTokens = aTokens.filter(obj => obj.text !== sRemoveText);
+          }
+          oModel.setProperty(sBasePath + "/tokens", aTokens);
+          const aTokenTexts = aTokens.map((t) => t.text);
+          oModel.setProperty(sBasePath + "/value", aTokenTexts);
+        },
         _applyFiltersAndEmbedReport: async function () {
           const oFiltersModel = this.getView().getModel("filters");
           const aFilterFields = oFiltersModel.getProperty("/fields");

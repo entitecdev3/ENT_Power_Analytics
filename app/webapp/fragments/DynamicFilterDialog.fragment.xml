@@ -24,7 +24,7 @@
             <VBox>
               <Input visible="{=${filters>requireSingleSelection}}" placeholder="{i18n>EnterValue}" width="100%" value="{filters>value}" />
 
-              <MultiInput visible="{=${filters>requireSingleSelection}===false}" width="100%" placeholder="{i18n>EnterValue}." showValueHelp="false" tokens="{filters>tokens}" tokenUpdate=".onTokenUpdate" submit=".onFreeTextSubmit">
+              <MultiInput visible="{=${filters>requireSingleSelection}===false}" width="100%" placeholder="{i18n>EnterValue}." showValueHelp="false" tokens="{filters>tokens}" tokenUpdate=".onTokenUpdate" change=".onFreeTextChange">
                 <tokens>
                   <Token text="{filters>text}" />
                 </tokens>

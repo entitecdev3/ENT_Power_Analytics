@@ -7,6 +7,17 @@ function maskSecret(secret) {
   return secret.slice(0, 3) + "*".repeat(secret.length - 3);
 }
 
+const castValueType = (val) => {
+  if (typeof val !== 'string') return val;
+  const trimmed = val.trim();
+  if (trimmed.toLowerCase() === 'true') return true;
+  if (trimmed.toLowerCase() === 'false') return false;
+  if (trimmed !== '' && !isNaN(trimmed)) {
+    return Number(trimmed);
+  }
+  return trimmed;
+};
+
 module.exports = cds.service.impl(async function () {
   // const { PowerBi, ReportsExposed, SecurityFilters, ReportsToSecurityFilters } = this.entities;
   const db = await cds.connect.to("db"); // explicitly connect to the DB
@@ -211,6 +222,7 @@ module.exports = cds.service.impl(async function () {
         }
         
         if(!!finalValues.length){
+          finalValues = finalValues.map(castValueType);
           powerBIFilters.push({
             $schema: f.schema,
             target: {
@@ -510,21 +522,27 @@ module.exports = cds.service.impl(async function () {
       }
 
       const finalFilters = filters.map((userFilter) => {
-        const key = `${userFilter.table}.${userFilter.column}`;
+        const tableKey = userFilter.table?.trim();
+        const columnKey = userFilter.column?.trim();
+        const key = `${tableKey}.${columnKey}`;
+        
         const def = filtersMap.get(key);
-
         if (!def) {
           throw new Error(`No filter definition found for ${key}`);
         }
+        const valuesArray = Array.isArray(userFilter.values) 
+          ? userFilter.values 
+          : [userFilter.values];
+        const castedValues = valuesArray.map(castValueType);
 
         return {
           $schema: def.schema,
           target: {
-            table: userFilter.table,
-            column: userFilter.column,
+            table: tableKey,
+            column: columnKey,
           },
           operator: def.operator,
-          values: userFilter.values,
+          values: castedValues,
           filterType: 1,
           requireSingleSelection: def.requireSingleSelection,
           displaySettings: {

@@ -57,7 +57,7 @@
         showValueHelp="false" 
         visible="false"
         tokenUpdate="onExternalRoleUpdate" 
-        submit="onFreeTextSubmitRoles">
+        change="onFreeTextSubmitRoles">
         <tokens>
           <Token text="{tempReport>text}" />
         </tokens>
