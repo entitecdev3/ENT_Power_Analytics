@@ -163,6 +163,7 @@ module.exports = cds.service.impl(async function () {
       const reportFilters = await db.run(
         SELECT.from(SecurityFilters)
           .columns(
+            "ID",
             "portalType",
             "schema",
             "table",
@@ -188,14 +189,12 @@ module.exports = cds.service.impl(async function () {
       const powerBIFilters = [];
       for (const f of reportFilters) {
         let finalValues = [];
-        // Apply conditional logic for each filter’s valueSource
-        if(portalType == 'embed'){
-          //Assign value into the filter according to table name
-          if(f.valueSource == 'dynamic' && Object.keys(filters).includes(f.table)){
-            if(Array.isArray(filters[f.table])){
-              finalValues = filters[f.table];
+        if(portalType == 'embed' && f.portalType == 'embed'){
+          if(f.valueSource == 'dynamic' && Object.keys(filters).includes(f.ID)){
+            if(Array.isArray(filters[f.ID])){
+              finalValues = filters[f.ID];
             } else {
-              finalValues = [filters[f.table]];
+              finalValues = [filters[f.ID]];
             }
           } else if (f.customValues) {
             finalValues = f.customValues

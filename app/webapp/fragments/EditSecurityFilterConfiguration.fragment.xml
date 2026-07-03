@@ -2,6 +2,9 @@
   <Dialog id="idEditSecurityFilterDialog" class="sapUiResponsiveMargin" title="{i18n>EDIT_SECURITY_FILTER}">
     <VBox class="sapUiSmallMargin">
 
+      <Label text="{i18n>ID}" />
+      <Input editable="false" value="{editSecurityFilterModel>/ID}" />
+
       <Label required="true" text="{i18n>PORTAL_TYPE}" />
       <Select id="idPortalTypeSelect"
               selectedKey="{editSecurityFilterModel>/portalType}"
