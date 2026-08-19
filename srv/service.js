@@ -89,7 +89,7 @@ module.exports = cds.service.impl(async function () {
       if (isAdmin) {
         return await SELECT
           .from(ReportsExposed)
-          .columns('ID', 'workspaceId', 'servicePrincipal_ID', 'externalRoles', 'description');
+          .columns('ID', 'workspaceId', 'externalRoles', 'description', { ref: ['servicePrincipals'], expand: [{ref: ['powerbi']}]});
       }
   
       const subQuery = SELECT
@@ -100,7 +100,7 @@ module.exports = cds.service.impl(async function () {
       return await SELECT
         .from(ReportsExposed)
         .where({ ID: { in: subQuery }, portalType: portalType })
-        .columns('ID', 'workspaceId', 'servicePrincipal_ID', 'externalRoles', 'description');
+        .columns('ID', 'workspaceId', 'externalRoles', 'description', { ref: ['servicePrincipals'], expand: [{ref: ['powerbi']}]});
     }
   
     // Case 2: SSO login (non-UUID)
@@ -108,7 +108,7 @@ module.exports = cds.service.impl(async function () {
     const userExternalRoles = normalizeRoles(userInfo.externalRoles); 
   
     const allReports = await SELECT.from(ReportsExposed).where({portalType: portalType})
-      .columns('ID', 'workspaceId', 'servicePrincipal_ID', 'externalRoles', 'description');
+      .columns('ID', 'workspaceId', 'externalRoles', 'description', { ref: ['servicePrincipals'], expand: [{ref: ['powerbi']}]});
   
     const matched = [];
   
@@ -213,7 +213,7 @@ module.exports = cds.service.impl(async function () {
   //         let config = await SELECT.one
   //           .from(PowerBi)
   //           .where({
-  //             ID: report.servicePrincipal?.ID || report.servicePrincipal_ID,
+  //             ID: report.servicePrincipal?.ID || report.servicePrincipals_ID,
   //           });
   //         if (!config) return report;
 
@@ -260,10 +260,100 @@ module.exports = cds.service.impl(async function () {
 
   //   return enrichedData;
   // });
-  this.on("READ", ReportsExposed, async (req, next) => {
-    // Ensure $select contains the required fields
+  // this.on("READ", ReportsExposed, async (req, next) => {
+  //   // Ensure $select contains the required fields
+  //   const cols = req.query?.SELECT?.columns || [];
+  //   const requiredFields = ["reportId", "workspaceId"];
+
+  //   for (const field of requiredFields) {
+  //     const exists = cols.some((col) => col.ref?.[0] === field);
+  //     if (!exists) {
+  //       cols.push({ ref: [field] });
+  //     }
+  //   }
+
+  //   const data = await next(); // Let CAP handle the DB fetch first
+  //   console.log("READ Triggered");
+
+  //   // Normalize to array for consistent handling
+  //   const reports = Array.isArray(data) ? data : [data];
+
+  //   // Check if all reports have required IDs to fetch Power BI data
+  //   const allComplete = reports.every(
+  //     (r) =>
+  //       r.reportId &&
+  //       r.workspaceId 
+  //       // &&
+  //       // (r.servicePrincipal?.ID || r.servicePrincipals_ID)
+  //   );
+
+  //   if (!allComplete) {
+  //     console.log(
+  //       "Skipping enrichment — missing reportId/workspaceId or servicePrincipal"
+  //     );
+  //     return data; // Return raw data without enrichment
+  //   }
+
+  //   const enrichedData = await Promise.all(
+  //     reports.map(async (report) => {
+  //       try {
+  //         const servicePrincipalId = '';
+  //           // report.servicePrincipals?.ID || report.servicePrincipals_ID;
+
+  //         const config = await SELECT.one
+  //           .from(PowerBi)
+  //           // .where({ ID: servicePrincipalId });
+  //         if (!config) return report;
+
+  //         const token = await getAccessToken(config);
+
+  //         const [wsResp, repResp] = await Promise.all([
+  //           axios.get(`${config.biApiUrl}v1.0/myorg/groups`, {
+  //             headers: { Authorization: `Bearer ${token}` },
+  //           }),
+  //           axios.get(
+  //             `${config.biApiUrl}v1.0/myorg/groups/${report.workspaceId}/reports`,
+  //             {
+  //               headers: { Authorization: `Bearer ${token}` },
+  //             }
+  //           ),
+  //         ]);
+
+  //         const workspaces = wsResp.data.value;
+  //         const reportsList = repResp.data.value;
+
+  //         const workspace = workspaces.find(
+  //           (ws) => ws.id === report.workspaceId
+  //         );
+  //         const matchedReport = reportsList.find(
+  //           (r) => r.id === report.reportId
+  //         );
+
+  //         report.workspaceName = workspace?.name || "Unknown Workspace";
+  //         report.workspaceUrl = `${config.tenantUrl || "https://app.powerbi.com"
+  //           }/groups/${report.workspaceId}`;
+  //         report.reportName = matchedReport?.name || "Unknown Report";
+  //         report.reportUrl = `${report.workspaceUrl}/reports/${report.reportId}`;
+  //       } catch (err) {
+  //         console.error(
+  //           `Power BI fetch failed for report ${report.ID}:`,
+  //           err.message
+  //         );
+  //         report.workspaceName = "Error loading workspace";
+  //         report.reportName = "Error loading report";
+  //       }
+
+  //       return report;
+  //     })
+  //   );
+
+  //   // If the request was for a single record, return a single object
+  //   return Array.isArray(data) ? enrichedData : enrichedData[0];
+  // });
+
+  this.on("READ", "ReportsExposed", async (req, next) => {
     const cols = req.query?.SELECT?.columns || [];
-    const requiredFields = ["reportId", "workspaceId", "servicePrincipal_ID"];
+    const requiredFields = ["reportId", "workspaceId"];
 
     for (const field of requiredFields) {
       const exists = cols.some((col) => col.ref?.[0] === field);
@@ -271,82 +361,57 @@ module.exports = cds.service.impl(async function () {
         cols.push({ ref: [field] });
       }
     }
-
-    const data = await next(); // Let CAP handle the DB fetch first
-    console.log("READ Triggered");
-
-    // Normalize to array for consistent handling
+    const data = await next();
     const reports = Array.isArray(data) ? data : [data];
-
-    // Check if all reports have required IDs to fetch Power BI data
-    const allComplete = reports.every(
-      (r) =>
-        r.reportId &&
-        r.workspaceId &&
-        (r.servicePrincipal?.ID || r.servicePrincipal_ID)
-    );
-
-    if (!allComplete) {
-      console.log(
-        "Skipping enrichment — missing reportId/workspaceId or servicePrincipal"
-      );
-      return data; // Return raw data without enrichment
+    const reportIds = reports.map(r => r.ID);
+    const allLinks = await SELECT.from("PowerBiPortal.ReportsToPowerBi").where({ report_ID: { in: reportIds } }).orderBy('createdAt asc'); 
+    const linksByReport = {};
+    for (const link of allLinks) {
+        if (!linksByReport[link.report_ID]) linksByReport[link.report_ID] = [];
+        linksByReport[link.report_ID].push(link);
     }
-
+    const allConfigIds = [...new Set(allLinks.map(l => l.powerbi_ID))];
+    const allConfigs = await SELECT.from("PowerBiPortal.PowerBi").where({ ID: { in: allConfigIds } });
+    const configMap = new Map(allConfigs.map(c => [c.ID, c]));
     const enrichedData = await Promise.all(
-      reports.map(async (report) => {
-        try {
-          const servicePrincipalId =
-            report.servicePrincipal?.ID || report.servicePrincipal_ID;
+        reports.map(async (report) => {
+            const reportLinks = linksByReport[report.ID] || [];
+            let success = false;
+            let lastError = null;
+            for (const link of reportLinks) {
+                const config = configMap.get(link.powerbi_ID);
+                if (!config) continue;
+                try {
+                    const token = await getAccessToken(config);
+                    const [wsResp, repResp] = await Promise.all([
+                        axios.get(`${config.biApiUrl}v1.0/myorg/groups`, {
+                            headers: { Authorization: `Bearer ${token}` },
+                        }),
+                        axios.get(`${config.biApiUrl}v1.0/myorg/groups/${report.workspaceId}/reports`, {
+                            headers: { Authorization: `Bearer ${token}` },
+                        }),
+                    ]);
 
-          const config = await SELECT.one
-            .from(PowerBi)
-            .where({ ID: servicePrincipalId });
-          if (!config) return report;
+                    report.workspaceName = wsResp.data.value.find(ws => ws.id === report.workspaceId)?.name || "Unknown";
+                    report.reportName = repResp.data.value.find(r => r.id === report.reportId)?.name || "Unknown";
+                    report.workspaceUrl = `${config.tenantUrl || "https://app.powerbi.com"}/groups/${report.workspaceId}`;
+                    report.reportUrl = `${report.workspaceUrl}/reports/${report.reportId}`;
 
-          const token = await getAccessToken(config);
-
-          const [wsResp, repResp] = await Promise.all([
-            axios.get(`${config.biApiUrl}v1.0/myorg/groups`, {
-              headers: { Authorization: `Bearer ${token}` },
-            }),
-            axios.get(
-              `${config.biApiUrl}v1.0/myorg/groups/${report.workspaceId}/reports`,
-              {
-                headers: { Authorization: `Bearer ${token}` },
-              }
-            ),
-          ]);
-
-          const workspaces = wsResp.data.value;
-          const reportsList = repResp.data.value;
-
-          const workspace = workspaces.find(
-            (ws) => ws.id === report.workspaceId
-          );
-          const matchedReport = reportsList.find(
-            (r) => r.id === report.reportId
-          );
-
-          report.workspaceName = workspace?.name || "Unknown Workspace";
-          report.workspaceUrl = `${config.tenantUrl || "https://app.powerbi.com"
-            }/groups/${report.workspaceId}`;
-          report.reportName = matchedReport?.name || "Unknown Report";
-          report.reportUrl = `${report.workspaceUrl}/reports/${report.reportId}`;
-        } catch (err) {
-          console.error(
-            `Power BI fetch failed for report ${report.ID}:`,
-            err.message
-          );
-          report.workspaceName = "Error loading workspace";
-          report.reportName = "Error loading report";
-        }
-
-        return report;
-      })
+                    success = true;
+                    break; 
+                } catch (err) {
+                    lastError = err.message;
+                    console.warn(`Principal ${config.biUser} failed: ${err.message}. Trying next in pool...`);
+                }
+            }
+            if (!success) {
+                report.workspaceName = "Error loading";
+                report.reportName = "Error loading";
+            }
+            return report;
+        })
     );
 
-    // If the request was for a single record, return a single object
     return Array.isArray(data) ? enrichedData : enrichedData[0];
   });
 

@@ -13,12 +13,18 @@
       </Select>
 
       <Label required="true" text="{i18n>SERVICE_PRINCIPAL}" />
-      <ComboBox id="idServicePrincipalTypeInput" width="98%" 
+      <!-- <ComboBox id="idServicePrincipalTypeInput" width="98%" 
         items="{path:'/PowerBi', templateShareable:false, sorter: { path: 'biUser' }}" 
         change="onServicePrincipalChange" 
         selectedKey="{tempReport>/ReportsExposed/servicePrincipal_ID}">
         <core:Item key="{ID}" text="{biUser}" />
-      </ComboBox>
+      </ComboBox> -->
+      <MultiComboBox 
+        id="idServicePrincipalTypeInput" width="98%" 
+        items="{path:'/PowerBi', templateShareable:false, sorter: { path: 'biUser' }}"
+        selectionFinish="onServicePrincipalFinish" selectionChange="onServicePrincipalChange">
+        <core:Item key="{ID}" text="{biUser}" />
+      </MultiComboBox>
 
       <Label required="true" text="{i18n>WORKSPACE}" />
       <ComboBox id="workspaceSelect" width="98%" 

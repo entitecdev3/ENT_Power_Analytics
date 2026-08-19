@@ -39,7 +39,7 @@ sap.ui.define(
 
           const configToReportsMap = {};
           aReports.forEach((report) => {
-            const configId = report.servicePrincipal_ID;
+            const configId = report.servicePrincipals[0].powerbi_ID;
             if (!configToReportsMap[configId]) {
               configToReportsMap[configId] = [];
             }

@@ -5,7 +5,7 @@
       path : '/ReportsExposed', 
       parameters: {
         $$updateGroupId: 'ReportsChanges',
-        $expand: 'securityFilters($select=ID,filter_ID),roles($select=ID,role_ID)'
+        $expand: 'securityFilters($select=ID,filter_ID),roles($select=ID,role_ID),servicePrincipals($select=ID,powerbi_ID)'
       },
       templateShareable:false
     }" fixedLayout="true" delete="onDeleteReport">
@@ -53,7 +53,12 @@
         <ColumnListItem type="Active" press="onReportSelect">
           <cells>
             <Text text="{path: 'portalType', formatter: '.formatter.formatPortalType'}" />
-            <Text text="{parts: [{path : 'servicePrincipal_ID'},{path : 'appView>/ServicePrincipalData'}] , formatter: '.formatter.formatServicePrincipal' }" />
+            <!-- <Text text="{parts: [{path : 'servicePrincipals_ID'},{path : 'appView>/ServicePrincipalData'}] , formatter: '.formatter.formatServicePrincipal' }" /> -->
+            <VBox items="{servicePrincipals}">
+              <items>
+                <Text text="{parts : [{path: 'powerbi_ID'}, {path : 'appView>/ServicePrincipalData'}], formatter: '.formatter.formatServicePrincipal', targetType: 'any'}" />
+              </items>
+            </VBox>
             <Link text="{reportName}" href="{reportUrl}" target="_blank" />
             <Link text="{workspaceName}" href="{workspaceUrl}" target="_blank" />
             <Text text="{description}"></Text>

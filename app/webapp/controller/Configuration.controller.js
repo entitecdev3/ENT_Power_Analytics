@@ -178,8 +178,7 @@ sap.ui.define(
               portalType: "standalone",
               reportId: "",
               workspaceId: "",
-              description: "",
-              servicePrincipal_ID: "",
+              description: ""
             },
           };
 
@@ -207,7 +206,9 @@ sap.ui.define(
           let oNewContext = new Context(oTempModel, "/ReportsExposed");
           this.openReportsConfigDialog(this.getModel('i18n').getProperty("EditReport"), this.getModel('i18n').getProperty("update"), oNewContext);
 
-          this.byId("idServicePrincipalTypeInput").fireChange();
+          let oServicePrincipalMultiBox = oSelectedContext.getObject().servicePrincipals?.map((srvPir)=> srvPir.powerbi_ID) || []
+          this.byId("idServicePrincipalTypeInput").setSelectedKeys(oServicePrincipalMultiBox);
+          this.byId("idServicePrincipalTypeInput").fireSelectionFinish();
           // checked the security filter combo box on select
           let oSecurityFilterCombo = oSelectedContext.getObject().securityFilters?.map((filter) => filter.filter_ID) || []
           this.byId("idSecurityFilters").setSelectedKeys(oSecurityFilterCombo);
@@ -260,6 +261,20 @@ sap.ui.define(
             this.byId("idExtRoles").setVisible(false);
             this.byId("idRolesLabel").setVisible(true);
             this.byId("idExtRolesLabel").setVisible(false);
+          }
+
+          let oMultiComboBox = this.byId("idServicePrincipalTypeInput");
+          let oBindingMulti = oMultiComboBox.getBinding("items");
+          if (oBindingMulti) {
+              let oFilter = new sap.ui.model.Filter("isExpire", sap.ui.model.FilterOperator.EQ, false);
+              oBindingMulti.filter([oFilter]);
+          } else {
+              // Fallback if binding initializes slightly after onInit
+              oMultiComboBox.attachEventOnce("updateFinished", function () {
+                  oMultiComboBox.getBinding("items")?.filter([
+                      new sap.ui.model.Filter("isExpire", sap.ui.model.FilterOperator.EQ, false)
+                  ]);
+              });
           }
         },
         onSecurityFilterSelection: function (oEvent) {
@@ -317,7 +332,7 @@ sap.ui.define(
           let reportObject = this._oReportDialog
             .getModel("tempReport")
             .getProperty("/ReportsExposed");
-          let validated = await this._validateReportFields(reportObject, ['roles', 'externalRoles']);
+          let validated = await this._validateReportFields(reportObject, ['roles', 'externalRoles', 'servicePrincipals']);
           if (!validated) return;
 
           const oTable = this.byId("idRCConfigTable").getBinding("items");
@@ -361,9 +376,10 @@ sap.ui.define(
             }
             await nonPrimitiveValueEdit('securityFilters', reportObject.securityFilters)
             await nonPrimitiveValueEdit('roles', reportObject.roles)
+            await nonPrimitiveValueEdit('servicePrincipals', reportObject.servicePrincipals)
             // Roles Edit Part
             Object.keys(reportObject).forEach((key) => {
-              if (key === "securityFilters" || key === 'roles' || key === '@$ui5.context.isTransient' || key === '@odata.context') return;
+              if ( key === "servicePrincipals" || key === "securityFilters" || key === 'roles' || key === '@$ui5.context.isTransient' || key === '@odata.context') return;
               this._oSelectedReportContext.setProperty(key, reportObject[key]);
             });
           }
@@ -835,9 +851,18 @@ sap.ui.define(
             );
           }
         },
-
-        onServicePrincipalChange: function (oEvent) {
-          const selectedId = oEvent.getSource().getSelectedKey();
+        onServicePrincipalChange: function(oEvent) {
+          let aSelectedKeys = oEvent.getSource().getSelectedKeys(), filterArray = [];
+          if (aSelectedKeys.length !== 0) {
+            aSelectedKeys.forEach((key) => {
+              filterArray.push({ "powerbi_ID": key })
+            })
+          }
+          oEvent.getSource().getModel("tempReport").setProperty("/ReportsExposed/servicePrincipals", filterArray);
+        },
+        onServicePrincipalFinish: function (oEvent) {
+          const selectedId = oEvent.getSource().getSelectedKeys()[0];
+          if(!selectedId) return;
           this.configId = selectedId;
 
           const oWorkspaceSelect = this.byId("workspaceSelect");
@@ -878,7 +903,7 @@ sap.ui.define(
           const selectedWorkspaceId = oEvent.getSource().getSelectedKey();
           const selectedConfigId = this.byId(
             "idServicePrincipalTypeInput"
-          ).getSelectedKey();
+          ).getSelectedKeys()[0];
 
           const oReportSelect = this.byId("reportSelect");
           // add the name of the workspace to the table binding context 
@@ -907,7 +932,6 @@ sap.ui.define(
             this._oReportDialog.getModel("tempReport").setProperty("/ReportsExposed/reportName", oEvent.getParameter('value'));
           }
         },
-
         //------------- Security Filters Configuration ------------------
 
         onAddSecurityFilterConfiguration: function () {

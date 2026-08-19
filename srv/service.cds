@@ -35,7 +35,7 @@ service MyService @(path: 'MyService') {
         workspaceId      as workspaceId,
         description      as description,
         externalRoles    as externalRoles,
-        servicePrincipal as servicePrincipal,
+        servicePrincipals as servicePrincipals,
         securityFilters  as securityFilters,
         roles            as roles,
         reportName       as reportName,
@@ -78,6 +78,7 @@ service MyService @(path: 'MyService') {
         clientId     as clientId,
         clientSecret as clientSecret,
         tenantId     as tenantId,
+        isExpire     as isExpire,
         createdAt    as createdAt,
         createdBy    as createdBy,
         modifiedAt   as modifiedAt,
@@ -152,6 +153,17 @@ service MyService @(path: 'MyService') {
     };
 
     @(requires: ['Admin'])
+    entity ReportsToPowerBi as projection on PowerBiPortal.ReportsToPowerBi {
+        ID         as ID,
+        report     as report,
+        powerbi    as powerbi,
+        createdAt  as createdAt,
+        createdBy  as createdBy,
+        modifiedAt as modifiedAt,
+        modifiedBy as modifiedBy
+    };
+
+    @(requires: ['Admin'])
     entity ReportsExposed @cds.redirection.target as projection on PowerBiPortal.ReportsExposed {
         ID               as ID,
         portalType       as portalType,
@@ -159,7 +171,7 @@ service MyService @(path: 'MyService') {
         workspaceId      as workspaceId,
         description      as description,
         externalRoles    as externalRoles,
-        servicePrincipal as servicePrincipal,
+        servicePrincipals as servicePrincipals,
         securityFilters  as securityFilters,
         roles            as roles,
         reportName       as reportName,

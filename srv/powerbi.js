@@ -92,7 +92,7 @@ module.exports = cds.service.impl(async function () {
     const reportExposedId = req.params[0];
     const deviceType = req.data.deviceType || "desktop";
     const userInfo = req.user;
-  
+ 
     const username = userInfo.username;
     const portalType = userInfo.portalType;
     const email = userInfo.email;
@@ -101,64 +101,94 @@ module.exports = cds.service.impl(async function () {
     if(portalType == 'embed'){
       filters = req.user.filters;
     }
-  
+
     try {
-      // --- Fetch Report Details ---
+      // --- Fetch Report Details with Service Principals pool ---
       const reportDetails = await db.run(
-        SELECT.one.from(ReportsExposed).where({ ID: reportExposedId })
+        SELECT.one.from(ReportsExposed).where({ ID: reportExposedId }).columns('*',{ref: ['servicePrincipals'],expand: [
+          { ref: ['powerbi'], expand: ['*'] }
+        ]})
       );
+
       if (!reportDetails)
         return req.error(500, "Power BI report details not found!");
-  
-      // --- Fetch Power BI Configuration ---
-      const config = await db.run(
-        SELECT.one.from(PowerBi).where({ ID: reportDetails.servicePrincipal_ID })
-      );
-      if (!config) return req.error(500, "Power BI configuration not found.");
-  
-      // --- Get Azure Token ---
-      const tokenResponse = await axios.post(
-        `${config.authorityUrl}${config.tenantId}/oauth2/v2.0/token`,
-        qs.stringify({
-          grant_type: "client_credentials",
-          client_id: config.clientId,
-          client_secret: config.clientSecret,
-          scope: config.scopeBase,
-        }),
-        {
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+
+      // Extract all active Power BI configurations into a pool
+      const activeConfigs = reportDetails.servicePrincipals
+        ?.map(sp => sp.powerbi)
+        ?.filter(pb => pb && !pb.isExpire);
+ 
+      if (!activeConfigs || activeConfigs.length === 0) {
+        return req.error(500, "No active Power BI configuration found for this report.");
+      }
+
+      let embedToken = null, embedInfo = null, config = null, lastError = null;
+
+      for (const candidateConfig of activeConfigs) {
+        config = candidateConfig;
+        try {
+          // --- Get Azure Token ---
+          const tokenResponse = await axios.post(
+            `${config.authorityUrl}${config.tenantId}/oauth2/v2.0/token`,
+            qs.stringify({
+              grant_type: "client_credentials",
+              client_id: config.clientId,
+              client_secret: config.clientSecret,
+              scope: config.scopeBase,
+            }),
+            {
+              headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            }
+          );
+ 
+          const azureToken = tokenResponse.data.access_token;
+ 
+          // --- Get Embed URL and Dataset ---
+          const embedUrlResponse = await axios.get(
+            `${config.biApiUrl}v1.0/myorg/groups/${reportDetails.workspaceId}/reports/${reportDetails.reportId}`,
+            {
+              headers: { Authorization: `Bearer ${azureToken}` },
+            }
+          );
+ 
+          embedInfo = embedUrlResponse.data;
+
+          const generateTokenPayload = {
+            accessLevel: "view",
+            datasetId: embedInfo.datasetId
+          };
+
+          const embedTokenResponse = await axios.post(
+            `${config.biApiUrl}v1.0/myorg/groups/${reportDetails.workspaceId}/reports/${reportDetails.reportId}/GenerateToken`,
+            generateTokenPayload,
+            {
+              headers: {
+                Authorization: `Bearer ${azureToken}`,
+                "Content-Type": "application/json"
+              }
+            }
+          );
+          embedToken = embedTokenResponse.data.token;
+          
+          break;
+        } catch (err) {
+          lastError = err;
+          const errMessage = err?.response?.data?.error?.message || err.message || "",
+          errCode = err?.response?.data?.error?.code || "";
+          if (errCode.includes('Limit') || errMessage.toLowerCase().includes('limit') || errMessage.toLowerCase().includes('exceeded')) {
+            try {
+              await db.run(
+                UPDATE(PowerBi).set({ isExpire: true }).where({ ID: config.ID })
+              );
+            } catch (updateErr) {}
+          }
         }
-      );
-  
-      const azureToken = tokenResponse.data.access_token;
-  
-      // --- Get Embed URL and Dataset ---
-      const embedUrlResponse = await axios.get(
-        `${config.biApiUrl}v1.0/myorg/groups/${reportDetails.workspaceId}/reports/${reportDetails.reportId}`,
-        {
-          headers: { Authorization: `Bearer ${azureToken}` },
-        }
-      );
-  
-      const embedInfo = embedUrlResponse.data;
-  
-      // --- Generate Embed Token ---
-      const embedTokenResponse = await axios.post(
-        `${config.biApiUrl}v1.0/myorg/groups/${reportDetails.workspaceId}/reports/${reportDetails.reportId}/GenerateToken`,
-        {
-          accessLevel: "view",
-          datasetId: embedInfo.datasetId,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${azureToken}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-  
-      const embedToken = embedTokenResponse.data.token;
-  
+      }
+ 
+      if (!embedToken) {
+        return req.error(500, "Failed to generate Power BI embed token using any available service principal.");
+      }
+ 
       // --- Fetch all Security Filters for this Report ---
       const reportFilters = await db.run(
         SELECT.from(SecurityFilters)
@@ -184,8 +214,7 @@ module.exports = cds.service.impl(async function () {
             },
           })
       );
-  
-      // --- Prepare Power BI Filters ---
+ 
       const powerBIFilters = [];
       for (const f of reportFilters) {
         let finalValues = [];
@@ -240,11 +269,10 @@ module.exports = cds.service.impl(async function () {
           });
         }
       }
-  
-      // --- Device Layout Handling ---
+
       let layoutType = "Custom";
       let expanded = true;
-  
+
       if (deviceType === "phone") {
         layoutType = "MobilePortrait";
         expanded = false;
@@ -254,8 +282,7 @@ module.exports = cds.service.impl(async function () {
         layoutType = "MobileLandscape";
         expanded = false;
       }
-  
-      // --- Embed HTML with Filter Application ---
+ 
       const embedHTML = `
         <div id="reportContainer" style="height:100%;width:100%"></div>
         <script src="https://cdn.jsdelivr.net/npm/powerbi-client@2.19.1/dist/powerbi.js"></script>
@@ -275,7 +302,6 @@ module.exports = cds.service.impl(async function () {
           };
           var reportContainer = document.getElementById('reportContainer');
           var report = powerbi.embed(reportContainer, embedConfiguration);
-  
           // Apply Filters
           var filters = ${JSON.stringify(powerBIFilters)};
           report.on('loaded', function() {
@@ -284,7 +310,7 @@ module.exports = cds.service.impl(async function () {
           });
         </script>
       `;
-  
+ 
       return { html: embedHTML };
     } catch (error) {
       console.error("Power BI error:", error?.response?.data || error.message);
@@ -440,58 +466,98 @@ module.exports = cds.service.impl(async function () {
   this.on("embedReportWithFiltersAuto", async (req) => {
     const reportExposedId = req.params[0];
     const filters = req.data.filters;
-    // const { reportExposedId, filters } = req.data;
     const db = cds.db;
 
     try {
+      // --- Fetch Report Details with Service Principals pool ---
       const reportDetails = await db.run(
-        SELECT.one.from(ReportsExposed).where({ ID: reportExposedId })
+        SELECT.one.from(ReportsExposed).where({ ID: reportExposedId }).columns('*',{ref: ['servicePrincipals'],expand: [
+          { ref: ['powerbi'], expand: ['*'] }
+        ]})
       );
+
       if (!reportDetails)
         return req.error(500, "Power BI report details not found!");
 
-      const config = await db.run(
-        SELECT.one
-          .from(PowerBi)
-          .where({ ID: reportDetails.servicePrincipal_ID })
-      );
-      if (!config) return req.error(500, "Power BI configuration not found.");
+      // Extract all active Power BI configurations into a pool
+      const activeConfigs = reportDetails.servicePrincipals
+        ?.map(sp => sp.powerbi)
+        ?.filter(pb => pb && !pb.isExpire);
+ 
+      if (!activeConfigs || activeConfigs.length === 0) {
+        return req.error(500, "No active Power BI configuration found for this report.");
+      }
 
-      const tokenResponse = await axios.post(
-        `${config.authorityUrl}${config.tenantId}/oauth2/v2.0/token`,
-        qs.stringify({
-          grant_type: "client_credentials",
-          client_id: config.clientId,
-          client_secret: config.clientSecret,
-          scope: config.scopeBase,
-        }),
-        { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
-      );
+      let embedToken = null;
+      let embedInfo = null;
+      let config = null;
+      let lastError = null;
 
-      const azureToken = tokenResponse.data.access_token;
+      // --- Failover Pool Loop ---
+      for (const candidateConfig of activeConfigs) {
+        config = candidateConfig;
+        try {
+          const tokenResponse = await axios.post(
+            `${config.authorityUrl}${config.tenantId}/oauth2/v2.0/token`,
+            qs.stringify({
+              grant_type: "client_credentials",
+              client_id: config.clientId,
+              client_secret: config.clientSecret,
+              scope: config.scopeBase,
+            }),
+            { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
+          );
 
-      const embedUrlResponse = await axios.get(
-        `${config.biApiUrl}v1.0/myorg/groups/${reportDetails.workspaceId}/reports/${reportDetails.reportId}`,
-        {
-          headers: { Authorization: `Bearer ${azureToken}` },
+          const azureToken = tokenResponse.data.access_token;
+
+          const embedUrlResponse = await axios.get(
+            `${config.biApiUrl}v1.0/myorg/groups/${reportDetails.workspaceId}/reports/${reportDetails.reportId}`,
+            {
+              headers: { Authorization: `Bearer ${azureToken}` },
+            }
+          );
+          embedInfo = embedUrlResponse.data;
+
+          const embedTokenResponse = await axios.post(
+            `${config.biApiUrl}v1.0/myorg/groups/${reportDetails.workspaceId}/reports/${reportDetails.reportId}/GenerateToken`,
+            {
+              accessLevel: "view",
+              datasetId: embedInfo.datasetId,
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${azureToken}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+          embedToken = embedTokenResponse.data.token;
+          break; // Successfully obtained token, break out of loop
+        } catch (err) {
+          lastError = err;
+          const errMessage = err?.response?.data?.error?.message || err.message || "";
+          const errCode = err?.response?.data?.error?.code || "";
+
+          console.warn(`Service Principal ${config.biUser || config.clientId} failed (${errMessage}). Trying next in pool...`);
+
+          // Check if the error indicates a limit/quota exceeded issue
+          if (errCode.includes('Limit') || errMessage.toLowerCase().includes('limit') || errMessage.toLowerCase().includes('exceeded')) {
+            try {
+              await db.run(
+                UPDATE(PowerBi).set({ isExpire: true }).where({ ID: config.ID })
+              );
+              console.log(`Updated Service Principal ${config.ID} to expired due to limit exceeded.`);
+            } catch (updateErr) {
+              console.error("Failed to update service principal expiration status:", updateErr.message);
+            }
+          }
         }
-      );
-      const embedInfo = embedUrlResponse.data;
+      }
 
-      const embedTokenResponse = await axios.post(
-        `${config.biApiUrl}v1.0/myorg/groups/${reportDetails.workspaceId}/reports/${reportDetails.reportId}/GenerateToken`,
-        {
-          accessLevel: "view",
-          datasetId: embedInfo.datasetId,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${azureToken}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      const embedToken = embedTokenResponse.data.token;
+      if (!embedToken) {
+        console.error("All service principals in the pool failed.", lastError?.response?.data || lastError?.message);
+        return req.error(500, "Failed to generate Power BI embed token using any available service principal.");
+      }
 
       // STEP: Fetch actual filter definitions (operator, schema, etc.)
       const definedFilters = await db.run(
@@ -562,7 +628,7 @@ module.exports = cds.service.impl(async function () {
           tokenType: models.TokenType.Embed,
           accessToken: '${embedToken}',
           embedUrl: '${embedInfo.embedUrl}',
-          settings: {          
+          settings: {         
             layoutType: models.LayoutType.MobilePortrait,
             panes: {
               filters: { visible: true, expanded: true }

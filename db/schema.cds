@@ -42,6 +42,9 @@ context PowerBiPortal {
                 clientId     : UUID not null        @mandatory;
                 clientSecret : String(255) not null @mandatory;
                 tenantId     : UUID not null        @mandatory;
+                isExpire     : Boolean default false;
+                reports      : Association to many ReportsToPowerBi
+                                  on reports.powerbi = $self;
         }
 
         entity Identity : cuid, managed {
@@ -58,7 +61,8 @@ context PowerBiPortal {
                         workspaceId      : UUID not null                                 @mandatory;
                         description      : String not null                               @mandatory;
                         externalRoles    : String(500);
-                        servicePrincipal : Association to PowerBiPortal.PowerBi not null @mandatory;
+                        servicePrincipals : Composition of many ReportsToPowerBi 
+                                                   on servicePrincipals.report = $self;
                         securityFilters  : Composition of many ReportsToSecurityFilters
                                                    on securityFilters.report = $self;
                         roles            : Composition of many ReportsToRoles
@@ -89,9 +93,13 @@ context PowerBiPortal {
                 displaySetting_isLockedInViewMode : Boolean default false;
                 displaySetting_isHiddenInViewMode : Boolean default false;
                 displaySetting_displayName        : String(100);
-
                 reports                           : Association to many ReportsToSecurityFilters
                                                             on reports.filter = $self;
+        }
+
+        entity ReportsToPowerBi : cuid, managed {
+                report  : Association to ReportsExposed @key @mandatory;
+                powerbi : Association to PowerBi @key @mandatory;
         }
 
         entity ReportsToSecurityFilters : cuid, managed {
@@ -105,7 +113,6 @@ context PowerBiPortal {
                 role   : Association to Roles not null
                          @assert.notNull;
         }
-
 
         entity Configuration : cuid, managed {
                 key configKey : String(100);
