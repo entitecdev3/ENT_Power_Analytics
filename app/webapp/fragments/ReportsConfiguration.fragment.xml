@@ -54,7 +54,7 @@
           <cells>
             <Text text="{path: 'portalType', formatter: '.formatter.formatPortalType'}" />
             <!-- <Text text="{parts: [{path : 'servicePrincipals_ID'},{path : 'appView>/ServicePrincipalData'}] , formatter: '.formatter.formatServicePrincipal' }" /> -->
-            <VBox items="{servicePrincipals}">
+            <VBox items="{path: 'servicePrincipals', templateShareable:false}">
               <items>
                 <Text text="{parts : [{path: 'powerbi_ID'}, {path : 'appView>/ServicePrincipalData'}], formatter: '.formatter.formatServicePrincipal', targetType: 'any'}" />
               </items>
@@ -62,12 +62,12 @@
             <Link text="{reportName}" href="{reportUrl}" target="_blank" />
             <Link text="{workspaceName}" href="{workspaceUrl}" target="_blank" />
             <Text text="{description}"></Text>
-            <VBox items="{securityFilters}">
+            <VBox items="{path :'securityFilters', templateShareable:false}">
               <items>
                 <Text text="{parts : [{path: 'filter_ID'}, {path : 'appView>/SecurityFilters'}], formatter: '.formatter.formatSecurityFilters', targetType: 'any'}" />
               </items>
             </VBox>
-            <VBox items="{roles}">
+            <VBox items="{path: 'roles', templateShareable:false}">
               <items>
                 <Text text="{parts : [{path: 'role_ID'}, {path: 'appView>/AssignableRoles'}], formatter: '.formatter.formatRoleDisplay'}" />
               </items>

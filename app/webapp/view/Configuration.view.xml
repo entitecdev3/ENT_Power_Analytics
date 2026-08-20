@@ -22,6 +22,11 @@
               <core:Fragment fragmentName="entitec.pbi.embedding.fragments.SecurityFilterConfiguration" type="XML" />
             </VBox>
           </IconTabFilter>
+          <IconTabFilter id="idIdentityConfig" design="Horizontal" text="{i18n>IDENTITY}" icon="sap-icon://badge">
+            <VBox>
+              <core:Fragment fragmentName="entitec.pbi.embedding.fragments.IdentityConfiguration" type="XML" />
+            </VBox>
+          </IconTabFilter>
         </items>
       </IconTabBar>
     </content>

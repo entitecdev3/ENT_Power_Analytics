@@ -1,0 +1,35 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:layout="sap.ui.layout.form">
+  <VBox alignItems="Center" fitContainer="true" height="100%" class="sapUiContentPadding">
+
+    <Table id="idIdentityConfigTable" autoPopinMode="true" mode="Delete" alternateRowColors="true"
+      items="{templateShareable:false, path: '/Identity', parameters: { $$updateGroupId: 'IdentityChanges' }}"
+      fixedLayout="true" delete="onDeleteIdentityConfig">
+      <headerToolbar>
+        <Toolbar>
+          <Title text="{i18n>ManageIdentity}" level="H3" />
+          <ToolbarSpacer />
+          <Button icon="sap-icon://refresh" text="{i18n>Refresh}" visible="true"
+            tooltip="{i18n>Refresh}" press="onRefreshIdentity" />
+          <Button icon="sap-icon://add" tooltip="{i18n>addIdentity}"
+            text="{i18n>Add}" press="onAddIdentityConfiguration" />
+        </Toolbar>
+      </headerToolbar>
+      <columns>
+        <Column>
+          <Text text="{i18n>USERNAME_LABEL}" />
+        </Column>
+        <Column>
+          <Text text="{i18n>ROLES}" />
+        </Column>
+      </columns>
+      <items>
+        <ColumnListItem type="Active" press="onIdentityConfigSelect">
+          <cells>
+            <Text text="{username}" />
+            <Text text="{roles}" />
+          </cells>
+        </ColumnListItem>
+      </items>
+    </Table>
+  </VBox>
+</core:FragmentDefinition>

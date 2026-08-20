@@ -72,3 +72,7 @@ html {
     width: 100% !important;
   }
 }
+
+tr[data-mydata=true]{
+  background: #e97070 !important;
+}

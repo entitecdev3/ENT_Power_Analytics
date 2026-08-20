@@ -1183,6 +1183,104 @@ sap.ui.define(
           }
         },
 
+        //------------- Identity Configuration ------------------
+
+        onAddIdentityConfiguration: function () {
+          this.addIdentityCong = true;
+          let oContext = this.byId("idIdentityConfigTable").getBinding("items").create({}, true, { groupId: "IdentityChanges" });
+          this.openIdentityConfigDialog(this.getModel('i18n').getProperty('addIdentity'), this.getModel('i18n').getProperty('Add'), oContext);
+        },
+        onIdentityConfigSelect: async function (oEvent) {
+          this.addIdentityCong = false;
+          let oSource = oEvent.getSource(), oContext = oSource.getBindingContext();
+          this._selectedIdentityObject = JSON.parse(
+            JSON.stringify(oContext.getObject())
+          );
+          this.openIdentityConfigDialog(
+            this.getModel('i18n').getProperty("editIdentity"),
+            this.getModel('i18n').getProperty("update"),
+            oSource.getBindingContext()
+          );
+        },
+        openIdentityConfigDialog: function (title, button, oContext) {
+          let oView = this.getView();
+          if (!this._oDialog) {
+            this._oDialog = sap.ui.xmlfragment(oView.getId(),"entitec.pbi.embedding.fragments.EditIdentityConfiguration",this);
+            oView.addDependent(this._oDialog);
+          }
+          this._oDialog.setBindingContext(oContext);
+          this._oDialog.setTitle(title);
+          this._oDialog.open();
+        },
+        onDeleteIdentityConfig: function (oEvent) {
+          var oItem = oEvent.getParameter("listItem");
+          var oContext = oItem.getBindingContext();
+
+          if (!oContext) {
+            MessageToast.show(this.getModel('i18n').getProperty('noIdentitySelected'));
+            return;
+          }
+
+          MessageBox.confirm(
+            this.getModel('i18n').getProperty('confirmDeleteIdentity'),
+            {
+              actions: [MessageBox.Action.OK, MessageBox.Action.CANCEL],
+              onClose: function (sAction) {
+                if (sAction === MessageBox.Action.OK) {
+                  oContext.delete("IdentityChanges");
+                  this.visSaveDiscardButton("IdentityChanges")
+                }
+              }.bind(this),
+            }
+          );
+        },
+        onRefreshIdentity: function () {
+          var that = this;
+          let oModel = this.getView().getModel();
+          if (oModel.hasPendingChanges()) {
+            this.showDiscardChangesWarning(this.getModel('i18n').getProperty('DiscardMsg'),null,oModel,"IdentityChanges",
+              this,["visDiscardButton", "visSaveButton"],"idIdentityConfigTable");
+          } else {
+            oModel.resetChanges("IdentityChanges");
+            oModel.refresh();
+            this.onChangeHighlightTableRow("idIdentityConfigTable"); // Changing the status of the table row
+          }
+        },
+        onSaveEditIdentityDialog: async function () {
+          let oContext = this._oDialog.getBindingContext();
+          let userObject = oContext.getObject();
+          let validated = await this._validateIdentityFields(userObject);
+          if (!validated) {
+            return;
+          }
+          this._oDialog.close();
+          if (this.getView().getModel().hasPendingChanges('IdentityChanges')) {
+            this.visSaveDiscardButton('IdentityChanges');
+            this.onChangeHighlightTableRow("idIdentityConfigTable"); // Changing the status of the table row
+          }
+        },
+        _validateIdentityFields: async function (userObject) {
+          const isValid = await this.validateEntityFields("Identity",userObject);
+          if (!isValid) return false;
+          return true;
+        },
+        onCloseEditIdentityDialog: function (oEvent) {
+          let oContext = oEvent.getSource().getBindingContext();
+
+          if (oContext?.hasPendingChanges("IdentityChanges") && !oContext.isTransient()) {
+            Object.keys(this._selectedIdentityObject).forEach((key) => {
+              if (key.includes("isTransient")) return;
+              oContext.setProperty(key, this._selectedIdentityObject[key]);
+            });
+          } else {
+            if (oContext?.isTransient()) {
+              oContext.delete();
+            }
+          }
+          this.onChangeHighlightTableRow("idIdentityConfigTable");
+          this._oDialog.close();
+        },
+
         // --------- End Fragments --------------------
 
         onSaveChanges: async function () {
@@ -1366,6 +1464,61 @@ sap.ui.define(
                 oODataModel.refresh();
               })
               .catch(oError => MessageBox.error(this.getModel("i18n").getProperty('batchRequestFailed') + oError.message));
+          } else if (sSelectedKey.includes("idIdentityConfig")) {
+            if (!oModel.hasPendingChanges("IdentityChanges")) {
+              MessageToast.show(this.getModel('i18n').getProperty('noChangesDetected'));
+              return;
+            }
+            this.getModel()
+              .submitBatch("IdentityChanges")
+              .then(() => {
+                const oContext = this.byId("idIdentityConfigTable").getBinding("items");
+                const aMessages = this.getModel().getMessages(oContext);
+
+                if (aMessages.length > 0) {
+                  let aErrorMessages = aMessages.filter(
+                    (msg) => msg.getType() === "Error"
+                  );
+                  let aWarningMessages = aMessages.filter(
+                    (msg) => msg.getType() === "Warning"
+                  );
+
+                  if (aErrorMessages.length > 0) {
+                    // Construct error message from multiple messages
+                    let sErrorMessage = aErrorMessages
+                      .map((msg) => {
+                        let aTargets = msg
+                          .getTargets()
+                          .map((target) => target.split("/").pop());
+                        return `${aTargets.join(", ")} ${msg.getMessage()}`;
+                      })
+                      .join("\n\n");
+
+                    MessageBox.error(sErrorMessage);
+                  } else if (aWarningMessages.length > 0) {
+                    // Display warnings
+                    let sWarningMessage = aWarningMessages
+                      .map((msg) => msg.getMessage())
+                      .join("\n");
+                    MessageBox.warning(sWarningMessage);
+                  } else {
+                    MessageToast.show(this.getModel('i18n').getProperty('batchOperationSuccess'));
+                    that.visSaveDiscardButton('IdentityChanges');
+                    that.onChangeHighlightTableRow("idIdentityConfigTable"); // Changing the status of the table row
+                    that.getCallData(that.getView().getModel('appView'), that.getView().getModel(), "/Identity", "/Identity");
+                  }
+                } else {
+                  MessageToast.show(
+                    this.getModel('i18n').getProperty('IdentityUpdateSuccess')
+                  );
+                  that.visSaveDiscardButton('IdentityChanges')
+                  that.onChangeHighlightTableRow("idIdentityConfigTable"); // Changing the status of the table row
+                  that.getCallData(that.getView().getModel('appView'), that.getView().getModel(), "/Identity", "/Identity");
+                }
+              })
+              .catch((oError) => {
+                MessageBox.error(this.getModel('i18n').getProperty('batchRequestFailed') + oError.message);
+              });
           }
 
 
@@ -1405,7 +1558,18 @@ sap.ui.define(
               ["visDiscardButton", "visSaveButton"],
               "idConfigSecurityFilterTable"
             );
+          } else if (sSelectedKey.includes("idIdentityConfig")) {
+            this.showDiscardChangesWarning(
+              this.getModel('i18n').getProperty('confirmDiscardChanges'),
+              null,
+              oModel,
+              "IdentityChanges",
+              this,
+              ["visDiscardButton", "visSaveButton"],
+              "idIdentityConfigTable"
+            );
           }
+
         },
         showDiscardChangesWarning: function (
           message,

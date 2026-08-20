@@ -41,6 +41,9 @@
       </columns>
       <items>
         <ColumnListItem type="Active" press="onConfigSelect">
+          <customData>
+            <core:CustomData key="mydata" value="{= ${isExpire} ? 'true' : 'false' }" writeToDom="true" />
+          </customData>
           <cells>
             <Text text="{biUser}" />
             <Text text="{clientId}" />

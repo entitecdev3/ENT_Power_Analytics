@@ -19,16 +19,9 @@ const castValueType = (val) => {
 };
 
 module.exports = cds.service.impl(async function () {
-  // const { PowerBi, ReportsExposed, SecurityFilters, ReportsToSecurityFilters } = this.entities;
-  const db = await cds.connect.to("db"); // explicitly connect to the DB
-  const {
-    PowerBi,
-    ReportsExposed,
-    SecurityFilters,
-    ReportsToSecurityFilters,
-    Users
-  } = this.entities;
-  const Companies = cds.entities['PowerBiPortal.Companies'];
+  const db = await cds.connect.to("db");
+  const {PowerBi,ReportsExposed,SecurityFilters,ReportsToSecurityFilters,Users} = this.entities;
+  const Companies = cds.entities['PowerBiPortal.Companies'], Identity = cds.entities['PowerBiPortal.Identity'];
   const tokenCache = new Map();
 
   async function getAccessToken(config) {
@@ -152,11 +145,34 @@ module.exports = cds.service.impl(async function () {
           );
  
           embedInfo = embedUrlResponse.data;
-
           const generateTokenPayload = {
             accessLevel: "view",
             datasetId: embedInfo.datasetId
           };
+          // --- Get RLS(Row Level Security) check parameter ---
+          const datasetId = embedInfo.datasetId, datasetWorkspaceId = embedInfo.datasetWorkspaceId;
+          const datasetResponse = await axios.get(
+            `${config.biApiUrl}v1.0/myorg/groups/${datasetWorkspaceId}/datasets/${datasetId}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${azureToken}`,
+                    Accept: "application/json"
+                },
+                timeout: 30000
+            }
+          );
+
+          const dataset = datasetResponse.data;
+          if (dataset.isEffectiveIdentityRequired === true && dataset.isEffectiveIdentityRolesRequired === true) {
+            const identities = await db.run(SELECT.from(Identity));
+            if (identities?.length) {
+              generateTokenPayload.identities = identities.map(identity => ({
+                  username: identity.username,
+                  roles: identity.roles.includes(',') ? identity.split(',')  : [identity.roles], 
+                  datasets: [embedInfo.datasetId]
+              }));
+            }
+          }
 
           const embedTokenResponse = await axios.post(
             `${config.biApiUrl}v1.0/myorg/groups/${reportDetails.workspaceId}/reports/${reportDetails.reportId}/GenerateToken`,
@@ -177,9 +193,7 @@ module.exports = cds.service.impl(async function () {
           errCode = err?.response?.data?.error?.code || "";
           if (errCode.includes('Limit') || errMessage.toLowerCase().includes('limit') || errMessage.toLowerCase().includes('exceeded')) {
             try {
-              await db.run(
-                UPDATE(PowerBi).set({ isExpire: true }).where({ ID: config.ID })
-              );
+              await db.run(UPDATE(PowerBi).set({ isExpire: true }).where({ ID: config.ID }));
             } catch (updateErr) {}
           }
         }
@@ -517,13 +531,38 @@ module.exports = cds.service.impl(async function () {
             }
           );
           embedInfo = embedUrlResponse.data;
+          const generateTokenPayload = {
+            accessLevel: "view",
+            datasetId: embedInfo.datasetId
+          };
+          // --- Get RLS(Row Level Security) check parameter ---
+          const datasetId = embedInfo.datasetId, datasetWorkspaceId = embedInfo.datasetWorkspaceId;
+          const datasetResponse = await axios.get(
+            `${config.biApiUrl}v1.0/myorg/groups/${datasetWorkspaceId}/datasets/${datasetId}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${azureToken}`,
+                    Accept: "application/json"
+                },
+                timeout: 30000
+            }
+          );
+
+          const dataset = datasetResponse.data;
+          if (dataset.isEffectiveIdentityRequired === true && dataset.isEffectiveIdentityRolesRequired === true) {
+            const identities = await db.run(SELECT.from(Identity));
+            if (identities?.length) {
+              generateTokenPayload.identities = identities.map(identity => ({
+                  username: identity.username,
+                  roles: identity.roles.includes(',') ? identity.split(',')  : [identity.roles], 
+                  datasets: [embedInfo.datasetId]
+              }));
+            }
+          }
 
           const embedTokenResponse = await axios.post(
             `${config.biApiUrl}v1.0/myorg/groups/${reportDetails.workspaceId}/reports/${reportDetails.reportId}/GenerateToken`,
-            {
-              accessLevel: "view",
-              datasetId: embedInfo.datasetId,
-            },
+            generateTokenPayload,
             {
               headers: {
                 Authorization: `Bearer ${azureToken}`,
@@ -555,7 +594,6 @@ module.exports = cds.service.impl(async function () {
       }
 
       if (!embedToken) {
-        console.error("All service principals in the pool failed.", lastError?.response?.data || lastError?.message);
         return req.error(500, "Failed to generate Power BI embed token using any available service principal.");
       }
 
