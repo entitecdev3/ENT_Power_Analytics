@@ -131,6 +131,7 @@ module.exports = cds.service.impl(async function () {
             }),
             {
               headers: { "Content-Type": "application/x-www-form-urlencoded" },
+              timeout: 30000
             }
           );
  
@@ -141,6 +142,7 @@ module.exports = cds.service.impl(async function () {
             `${config.biApiUrl}v1.0/myorg/groups/${reportDetails.workspaceId}/reports/${reportDetails.reportId}`,
             {
               headers: { Authorization: `Bearer ${azureToken}` },
+              timeout: 30000
             }
           );
  
@@ -181,7 +183,8 @@ module.exports = cds.service.impl(async function () {
               headers: {
                 Authorization: `Bearer ${azureToken}`,
                 "Content-Type": "application/json"
-              }
+              },
+              timeout: 30000
             }
           );
           embedToken = embedTokenResponse.data.token;
@@ -519,7 +522,10 @@ module.exports = cds.service.impl(async function () {
               client_secret: config.clientSecret,
               scope: config.scopeBase,
             }),
-            { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
+            { 
+              headers: { "Content-Type": "application/x-www-form-urlencoded" },
+              timeout: 30000 
+            }
           );
 
           const azureToken = tokenResponse.data.access_token;
@@ -528,6 +534,7 @@ module.exports = cds.service.impl(async function () {
             `${config.biApiUrl}v1.0/myorg/groups/${reportDetails.workspaceId}/reports/${reportDetails.reportId}`,
             {
               headers: { Authorization: `Bearer ${azureToken}` },
+              timeout: 30000
             }
           );
           embedInfo = embedUrlResponse.data;
@@ -568,6 +575,7 @@ module.exports = cds.service.impl(async function () {
                 Authorization: `Bearer ${azureToken}`,
                 "Content-Type": "application/json",
               },
+              timeout: 30000
             }
           );
           embedToken = embedTokenResponse.data.token;

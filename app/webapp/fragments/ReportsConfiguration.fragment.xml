@@ -73,7 +73,7 @@
               </items>
             </VBox>
             <Text text="{path: 'externalRoles'}" />
-            <Button text="{i18n>PreviewReport}" type="Emphasized" press=".onLoadReport" />
+            <Button text="{i18n>PreviewReport}" enabled="{=!${@$ui5.context.isTransient}}" tooltip="{= ${@$ui5.context.isTransient} ? ${i18n>saveChangesBeforePreview} : ${i18n>PreviewReport} }" type="Emphasized" press=".onLoadReport" />
           </cells>
         </ColumnListItem>
       </items>
